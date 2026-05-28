@@ -37,7 +37,7 @@ export default function App() {
       case 'posts':
         return <PostsApp />;
       case 'pets':
-        return <PetsApp />;
+        return <PetsApp usePetStore={usePetStore} />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">

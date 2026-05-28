@@ -1,47 +1,54 @@
 import React, { useEffect, useState } from 'react';
+import { create } from 'zustand';
 
-// Remote imports state store safely
-let usePetStore;
-try {
-  const storeModule = await import('shell/petStore');
-  usePetStore = storeModule.usePetStore;
-} catch (e) {
-  // Local fallback store if shell isn't active
-  const create = (await import('zustand')).create;
-  usePetStore = create((set) => ({
-    hunger: 50,
-    happiness: 50,
-    status: 'idle',
-    isSleeping: false,
-    feed: () => set((state) => ({ hunger: Math.max(0, state.hunger - 20), status: 'eating' })),
-    play: () => set((state) => ({ happiness: Math.min(100, state.happiness + 20), status: 'playing' })),
-    toggleSleep: () => set((state) => ({ isSleeping: !state.isSleeping, status: !state.isSleeping ? 'sleeping' : 'idle' })),
-    setStatus: (status) => set({ status })
-  }));
-}
+// Local fallback store for standalone development
+const useLocalStore = create((set) => ({
+  hunger: 50,
+  happiness: 50,
+  status: 'idle',
+  isSleeping: false,
+  feed: () => set((state) => {
+    if (state.isSleeping) return {};
+    return { hunger: Math.max(0, state.hunger - 20), status: 'eating' };
+  }),
+  play: () => set((state) => {
+    if (state.isSleeping) return {};
+    return { happiness: Math.min(100, state.happiness + 20), status: 'playing' };
+  }),
+  toggleSleep: () => set((state) => ({ isSleeping: !state.isSleeping, status: !state.isSleeping ? 'sleeping' : 'idle' })),
+  setStatus: (status) => set({ status })
+}));
 
-export default function PetsApp() {
-  const hunger = usePetStore((state) => state.hunger);
-  const happiness = usePetStore((state) => state.happiness);
-  const status = usePetStore((state) => state.status);
-  const isSleeping = usePetStore((state) => state.isSleeping);
-  const feed = usePetStore((state) => state.feed);
-  const play = usePetStore((state) => state.play);
-  const toggleSleep = usePetStore((state) => state.toggleSleep);
-  const setStatus = usePetStore((state) => state.setStatus);
+export default function PetsApp({ usePetStore }) {
+  const store = usePetStore || useLocalStore;
+
+  const hunger = store((state) => state.hunger);
+  const happiness = store((state) => state.happiness);
+  const status = store((state) => state.status);
+  const isSleeping = store((state) => state.isSleeping);
+  const feed = store((state) => state.feed);
+  const play = store((state) => state.play);
+  const toggleSleep = store((state) => state.toggleSleep);
+  const setStatus = store((state) => state.setStatus);
 
   const [animationFrame, setAnimationFrame] = useState(0);
 
-  // Basic animation frame loop for bouncy movement
+  // Animation frame loop for leg bouncy movement
   useEffect(() => {
     const timer = setInterval(() => {
       setAnimationFrame((f) => (f + 1) % 2);
-      // Clear action status back to idle
-      if (status === 'eating' || status === 'playing') {
-        setTimeout(() => setStatus('idle'), 2000);
-      }
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Clear status back to idle after 2 seconds of eating/playing
+  useEffect(() => {
+    if (status === 'eating' || status === 'playing') {
+      const timer = setTimeout(() => {
+        setStatus('idle');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
   }, [status, setStatus]);
 
   // Simple procedural pixel pet rendering
@@ -87,6 +94,12 @@ export default function PetsApp() {
   return (
     <div className="flex flex-col items-center justify-between h-full py-2">
       <h2 className="font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 w-full text-center">🐾 TAMAGOTCHI ROOM</h2>
+
+      {/* Standalone UI enhancements */}
+      <div className="flex gap-4 text-xs font-press bg-[#d7ecd9] border-2 border-cozy-border p-1 mb-2">
+        <span>🍔 HNG: {hunger}</span>
+        <span>💖 HPP: {happiness}</span>
+      </div>
 
       {/* Pet display */}
       <div className={`p-4 border-4 border-cozy-border bg-white rounded flex items-center justify-center w-36 h-36 relative ${isSleeping ? 'bg-slate-900' : ''}`}>

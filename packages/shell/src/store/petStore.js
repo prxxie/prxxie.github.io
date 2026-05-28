@@ -30,16 +30,21 @@ export const usePetStore = create((set) => ({
   setStatus: (status) => set({ status }),
 
   tick: () => set((state) => {
-    if (state.isSleeping) {
-      return {
-        hunger: Math.min(100, state.hunger + 2),
-        happiness: Math.max(0, state.happiness - 1)
-      };
+    const nextHunger = Math.min(100, state.hunger + (state.isSleeping ? 2 : 5));
+    const nextHappiness = Math.max(0, state.happiness - (state.isSleeping ? 1 : 5));
+    
+    let nextStatus = state.status;
+    if (state.status === 'eating' || state.status === 'playing') {
+      nextStatus = 'idle';
     }
+    if (state.isSleeping) {
+      nextStatus = 'sleeping';
+    }
+
     return {
-      hunger: Math.min(100, state.hunger + 5),
-      happiness: Math.max(0, state.happiness - 5),
-      status: state.hunger >= 90 || state.happiness <= 10 ? 'idle' : state.status
+      hunger: nextHunger,
+      happiness: nextHappiness,
+      status: nextStatus
     };
   })
 }));

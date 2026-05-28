@@ -34,4 +34,20 @@ describe('Pet Zustand Store', () => {
     expect(usePetStore.getState().hunger).toBe(55);
     expect(usePetStore.getState().happiness).toBe(45);
   });
+
+  it('should not allow feeding or playing when sleeping', () => {
+    usePetStore.setState({ isSleeping: true, hunger: 50, happiness: 50 });
+    usePetStore.getState().feed();
+    expect(usePetStore.getState().hunger).toBe(50);
+    usePetStore.getState().play();
+    expect(usePetStore.getState().happiness).toBe(50);
+  });
+
+  it('should decay slower when sleeping on tick()', () => {
+    usePetStore.setState({ isSleeping: true, hunger: 50, happiness: 50 });
+    usePetStore.getState().tick();
+    expect(usePetStore.getState().hunger).toBe(52);
+    expect(usePetStore.getState().happiness).toBe(49);
+  });
 });
+

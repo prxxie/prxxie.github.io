@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev -w packages/shell\" \"npm run dev -w packages/about\" \"npm run dev -w packages/posts\" \"npm run dev -w packages/pets\"",
     "build": "npm run build --workspaces",
+    "build:static": "bash scripts/build-static.sh",
     "test": "vitest run"
   },
   "devDependencies": {

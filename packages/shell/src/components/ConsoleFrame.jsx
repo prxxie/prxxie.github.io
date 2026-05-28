@@ -2,7 +2,9 @@ import React from 'react';
 import { usePetStore } from '../store/petStore';
 
 export default function ConsoleFrame({ children, currentTab, setTab }) {
-  const { hunger, happiness, status } = usePetStore();
+  const hunger = usePetStore((state) => state.hunger);
+  const happiness = usePetStore((state) => state.happiness);
+  const status = usePetStore((state) => state.status);
 
   return (
     <div className="w-[500px] pixel-border bg-[#cce9d2] p-6 rounded-lg flex flex-col gap-4">

@@ -1,23 +1,20 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-
-// Mock dynamic federated imports so Vitest doesn't fail resolving them
-vi.mock('about/AboutApp', () => ({
-  default: () => <div>Mocked About App</div>
-}));
-vi.mock('posts/PostsApp', () => ({
-  default: () => <div>Mocked Posts App</div>
-}));
-vi.mock('pets/PetsApp', () => ({
-  default: () => <div>Mocked Pets App</div>
-}));
-
+import { describe, it, expect } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import App from './App';
 
 describe('Shell Host App', () => {
   it('renders welcoming header text', () => {
     render(<App />);
-    expect(screen.getByText('WELCOME HOME')).toBeDefined();
+    expect(screen.getByText('WELCOME HOME')).toBeInTheDocument();
+  });
+
+  it('navigates to different tabs on button clicks', () => {
+    render(<App />);
+    
+    // Click ABOUT button
+    fireEvent.click(screen.getByText('ABOUT'));
+    expect(screen.getByText('LOADING MFE...')).toBeInTheDocument();
   });
 });

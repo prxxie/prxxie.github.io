@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev -w packages/shell\" \"npm run dev -w packages/about\" \"npm run dev -w packages/posts\" \"npm run dev -w packages/pets\"",
     "build": "npm run build --workspaces",
-    "test": "vitest run --workspaces"
+    "test": "vitest run"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

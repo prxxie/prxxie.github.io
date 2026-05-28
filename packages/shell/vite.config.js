@@ -9,6 +9,10 @@ export default defineConfig({
     tailwindcss(),
     federation({
       name: 'shell',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './petStore': './src/store/petStore.js'
+      },
       remotes: {
         about: 'http://localhost:3001/assets/remoteEntry.js',
         posts: 'http://localhost:3002/assets/remoteEntry.js',
@@ -23,3 +27,4 @@ export default defineConfig({
     cssCodeSplit: false
   }
 });
+

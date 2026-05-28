@@ -10,6 +10,9 @@ export default defineConfig({
     federation({
       name: 'pets',
       filename: 'remoteEntry.js',
+      remotes: {
+        shell: 'http://localhost:3000/assets/remoteEntry.js'
+      },
       exposes: {
         './PetsApp': './src/PetsApp.jsx'
       },
@@ -25,3 +28,4 @@ export default defineConfig({
     }
   }
 });
+

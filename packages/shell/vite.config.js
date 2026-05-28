@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import federation from '@originjs/vite-plugin-federation';
 
 export default defineConfig({
+  publicDir: '../../public',
   plugins: [
     react(),
     tailwindcss(),

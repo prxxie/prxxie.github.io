@@ -6,13 +6,13 @@ import federation from '@originjs/vite-plugin-federation';
 export default defineConfig(({ command }) => {
   const isProd = command === 'build';
   const aboutUrl = isProd
-    ? 'https://prxxie.github.io/mfe/about/assets/remoteEntry.js'
+    ? './mfe/about/assets/remoteEntry.js'
     : 'http://localhost:3001/assets/remoteEntry.js';
   const postsUrl = isProd
-    ? 'https://prxxie.github.io/mfe/posts/assets/remoteEntry.js'
+    ? './mfe/posts/assets/remoteEntry.js'
     : 'http://localhost:3002/assets/remoteEntry.js';
   const petsUrl = isProd
-    ? 'https://prxxie.github.io/mfe/pets/assets/remoteEntry.js'
+    ? './mfe/pets/assets/remoteEntry.js'
     : 'http://localhost:3003/assets/remoteEntry.js';
 
   return {

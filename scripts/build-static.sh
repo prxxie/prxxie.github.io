@@ -22,8 +22,4 @@ cp -r packages/about/dist/* dist/mfe/about/
 cp -r packages/posts/dist/* dist/mfe/posts/
 cp -r packages/pets/dist/* dist/mfe/pets/
 
-# Copy blog files
-mkdir -p dist/posts
-cp -r public/posts/* dist/posts/
-
 echo "Build assembled successfully in dist/!"

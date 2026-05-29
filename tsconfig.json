@@ -29,6 +29,8 @@
     "packages/shikaku/src/**/*.ts",
     "packages/shikaku/src/**/*.tsx",
     "packages/shikaku/src/**/*.d.ts",
+    "packages/sokoban/src/**/*.ts",
+    "packages/sokoban/src/**/*.tsx",
     "vitest.config.ts",
     "packages/*/vite.config.ts"
   ]

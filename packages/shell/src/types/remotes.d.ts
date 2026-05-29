@@ -31,3 +31,8 @@ declare module "pets/PetsApp" {
   }) => import("react").ReactElement;
   export default PetsApp;
 }
+
+declare module "sokoban/SokobanApp" {
+  const SokobanApp: () => import("react").ReactElement;
+  export default SokobanApp;
+}

@@ -15,6 +15,7 @@ const NAV_ITEMS: Array<{ id: Tab; label: string }> = [
   { id: "posts", label: "POSTS" },
   { id: "pets", label: "PETS" },
   { id: "shikaku", label: "SHIKAKU" },
+  { id: "sokoban", label: "SOKOBAN" },
 ];
 
 export default function ConsoleFrame({

@@ -30,6 +30,9 @@ export default defineConfig(({ command }) => {
           posts: postsUrl,
           pets: petsUrl,
           shikaku: shikakuUrl,
+          sokoban: isProd
+            ? "/mfe/sokoban/assets/remoteEntry.js"
+            : "http://localhost:3005/assets/remoteEntry.js",
         },
         shared: ["react", "react-dom", "zustand", "@tanstack/react-query"],
       }),

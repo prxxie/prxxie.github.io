@@ -35,6 +35,13 @@ const ShikakuApp = lazy(
     }))
 );
 
+const SokobanApp = lazy(
+  () =>
+    import("sokoban/SokobanApp").catch(() => ({
+      default: () => <Fallback name="Sokoban" />,
+    }))
+);
+
 function Fallback({ name }: { name: string }): React.ReactElement {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-2 p-4">
@@ -91,6 +98,8 @@ export default function App(): React.ReactElement {
         return <PetsApp usePetStore={usePetStore} />;
       case "shikaku":
         return <ShikakuApp />;
+      case "sokoban":
+        return <SokobanApp />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">

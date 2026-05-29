@@ -334,7 +334,7 @@ const usePetStore = create((set) => ({
 }));
 
 const React$1 = await importShared('react');
-const {useState,useEffect,lazy,Suspense} = React$1;
+const {useState,useEffect,useRef,lazy,Suspense} = React$1;
 const {QueryClient,QueryClientProvider} = await importShared('@tanstack/react-query');
 
 const queryClient = new QueryClient();
@@ -355,6 +355,30 @@ function Fallback({ name }) {
 function App() {
   const [tab, setTab] = useState("home");
   const tick = usePetStore((state) => state.tick);
+  const windowRef = useRef(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      if (windowRef.current) {
+        windowRef.current.requestFullscreen().catch((err) => {
+          console.error("Failed to enter fullscreen mode:", err);
+        });
+      }
+    } else {
+      document.exitFullscreen().catch((err) => {
+        console.error("Failed to exit fullscreen mode:", err);
+      });
+    }
+  };
   useEffect(() => {
     const timer = setInterval(() => {
       tick();
@@ -382,7 +406,7 @@ function App() {
     }
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full flex justify-center min-h-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ConsoleFrame, { currentTab: tab, setTab, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-6 items-start", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `col-span-1 ${tab === "pets" ? "md:col-span-3" : "md:col-span-2"} retro-window`, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: windowRef, className: `col-span-1 ${tab === "pets" ? "md:col-span-3" : "md:col-span-2"} retro-window`, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
           "📖 ",
@@ -391,7 +415,18 @@ function App() {
             "_VIEW.EXE"
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 items-center", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: toggleFullscreen,
+              className: "text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]",
+              "aria-label": "Toggle Fullscreen",
+              children: isFullscreen ? "[🗗]" : "[⛶]"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
+        ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[8px]", children: "LOADING MFE..." }), children: renderMainContent() }) })
     ] }),

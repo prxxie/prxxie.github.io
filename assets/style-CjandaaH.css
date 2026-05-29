@@ -49,7 +49,7 @@
     --default-mono-font-family: var(--font-mono);
     --font-pixel: "VT323", monospace;
     --font-press: "Press Start 2P", monospace;
-    --color-cozy-bg: #f8f9fa;
+    --color-cozy-bg: oklch(96.8% .007 247.896);
     --color-cozy-text: oklch(20.8% .042 265.755);
     --color-cozy-border: oklch(20.8% .042 265.755);
     --color-cozy-accent: #c66;
@@ -692,6 +692,12 @@
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
 
+  @media (hover: hover) {
+    .hover\:underline:hover {
+      text-decoration-line: underline;
+    }
+  }
+
   @media (min-width: 48rem) {
     .md\:col-span-2 {
       grid-column: span 2 / span 2;
@@ -909,6 +915,15 @@ body {
   to {
     opacity: 1;
   }
+}
+.retro-window:fullscreen {
+  box-shadow: none;
+  border: none;
+  width: 100vw;
+  height: 100vh;
+}
+.retro-window:fullscreen .window-body {
+  flex-grow: 1;
 }
 @property --tw-translate-x {
   syntax: "*";

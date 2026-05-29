@@ -23,8 +23,43 @@ function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&
 
 var jsxRuntimeExports = jsxRuntime.exports;
 
-const {useEffect,useState} = await importShared('react');
+const PixelChickenIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "4", width: "6", height: "6" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "5", width: "8", height: "4" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "10", width: "2", height: "3" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "12", width: "4", height: "2" })
+] });
+const PixelBearIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "3", width: "3", height: "3" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "3", width: "3", height: "3" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "5", width: "8", height: "8" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "8", width: "1", height: "1", fill: "#fff" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "8", width: "1", height: "1", fill: "#fff" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "10", width: "2", height: "1" })
+] });
+const PixelMoonIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "2", width: "4", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "4", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "6", width: "3", height: "4" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "10", width: "4", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "12", width: "4", height: "2" })
+] });
+const PixelSunIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "6", width: "4", height: "4" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "2", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "12", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "2", y: "7", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "12", y: "7", width: "2", height: "2" })
+] });
+const PixelHeartIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "3", width: "3", height: "3" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "3", width: "3", height: "3" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "2", y: "6", width: "12", height: "4" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "10", width: "8", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "12", width: "4", height: "2" })
+] });
 
+const {useEffect,useState} = await importShared('react');
 const {create} = await importShared('zustand');
 
 const useLocalStore = create()((set) => ({
@@ -176,19 +211,24 @@ function PetsApp({
     );
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-between h-full py-2 box-border", children: [
-    !usePetStore && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 text-xs font-press bg-[#f8f9fa] border-2 border-cozy-border p-2 mb-2 box-border", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-        "🍔 HNG: ",
+    !usePetStore && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 text-xs font-press bg-[#f8f9fa] border-2 border-cozy-border p-2 mb-2 box-border items-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(PixelChickenIcon, { className: "w-3.5 h-3.5" }),
+        " HNG: ",
         hunger
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-        "💖 HPP: ",
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(PixelHeartIcon, { className: "w-3.5 h-3.5" }),
+        " HPP: ",
         happiness
       ] })
     ] }),
     usePetStore && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-2 text-xs mb-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "🍔 HUNGER" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(PixelChickenIcon, { className: "w-3.5 h-3.5" }),
+          " HUNGER"
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
           hunger,
           "/100"
@@ -202,7 +242,10 @@ function PetsApp({
         }
       ) }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mt-1", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "💖 HAPPINESS" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(PixelHeartIcon, { className: "w-3.5 h-3.5" }),
+          " HAPPINESS"
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
           happiness,
           "/100"
@@ -227,14 +270,26 @@ function PetsApp({
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 w-full mt-4", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: feed, className: "pixel-btn text-[8px] flex-1 py-1", children: "FEED 🍗" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: play, className: "pixel-btn text-[8px] flex-1 py-1", children: "PLAY 🧸" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: feed, className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1", children: [
+        "FEED ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(PixelChickenIcon, { className: "w-3.5 h-3.5" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { onClick: play, className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1", children: [
+        "PLAY ",
+        /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBearIcon, { className: "w-3.5 h-3.5" })
+      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
           onClick: toggleSleep,
-          className: "pixel-btn text-[8px] flex-1 py-1",
-          children: isSleeping ? "WAKE ☀" : "SLEEP 🌙"
+          className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1",
+          children: isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            "WAKE ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelSunIcon, { className: "w-3.5 h-3.5" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            "SLEEP ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelMoonIcon, { className: "w-3.5 h-3.5" })
+          ] })
         }
       )
     ] })

@@ -413,6 +413,14 @@
     display: inline-block;
   }
 
+  .h-3\.5 {
+    height: calc(var(--spacing) * 3.5);
+  }
+
+  .h-4 {
+    height: calc(var(--spacing) * 4);
+  }
+
   .h-12 {
     height: calc(var(--spacing) * 12);
   }
@@ -427,6 +435,14 @@
 
   .min-h-screen {
     min-height: 100vh;
+  }
+
+  .w-3\.5 {
+    width: calc(var(--spacing) * 3.5);
+  }
+
+  .w-4 {
+    width: calc(var(--spacing) * 4);
   }
 
   .w-12 {
@@ -492,6 +508,10 @@
 
   .justify-center {
     justify-content: center;
+  }
+
+  .gap-1 {
+    gap: calc(var(--spacing) * 1);
   }
 
   .gap-2 {
@@ -920,6 +940,17 @@ body {
 }
 .retro-window:fullscreen .window-body {
   flex-grow: 1;
+}
+button:focus-visible, [role="button"]:focus-visible, .pixel-btn:focus-visible {
+  outline: 3px dashed var(--color-cozy-accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-bounce, .animate-shake, .transition-transform, .pixel-btn {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
 }
 @property --tw-translate-x {
   syntax: "*";

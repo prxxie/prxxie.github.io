@@ -2,6 +2,21 @@ import { importShared } from './__federation_fn_import-0f6vq-VT.js';
 import { j as jsxRuntimeExports } from './jsx-runtime-CsM3lTE3.js';
 import { c as commonjsGlobal, g as getDefaultExportFromCjs } from './index-BxRxKft-.js';
 
+const PixelBookIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M1 2h6v11H1V2z M9 2h6v11H9V2z" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "5", x2: "5", y2: "5" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "8", x2: "5", y2: "8" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "5", x2: "13", y2: "5" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "8", x2: "13", y2: "8" })
+] });
+const PixelScrollIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M3 2h10v12H3V2z" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "6", y1: "5", x2: "10", y2: "5" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "6", y1: "8", x2: "10", y2: "8" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "6", y1: "11", x2: "10", y2: "11" })
+] });
+const PixelBackIcon = ({ className = "w-3 h-3 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className, viewBox: "0 0 8 8", fill: "currentColor", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M4 1L1 4l3 3V5h3V3H4V1z" }) });
+
 /**
  * marked v12.0.2 - a markdown parser
  * Copyright (c) 2011-2024, Christopher Jeffrey. (MIT Licensed)
@@ -4925,7 +4940,6 @@ async function renderMarkdown(markdownStr) {
 }
 
 const {useState} = await importShared('react');
-
 const {useQuery} = await importShared('@tanstack/react-query');
 function PostsApp() {
   const [selectedPost, setSelectedPost] = useState(null);
@@ -4955,15 +4969,19 @@ function PostsApp() {
     enabled: !!selectedPost
   });
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-2 overflow-y-auto", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1", children: "📚 BLOG CATALOG" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 flex items-center gap-1", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBookIcon, { className: "w-4 h-4 text-cozy-accent" }),
+      " BLOG CATALOG"
+    ] }),
     selectedPost === null ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-2 pt-2", children: postsList.map((post) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
       {
         onClick: () => setSelectedPost(post.id),
         className: "border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white flex justify-between items-center text-sm",
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-            "📜 ",
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelScrollIcon, { className: "w-4 h-4 mr-2" }),
+            " ",
             post.title
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 font-mono", children: post.date })
@@ -4971,12 +4989,15 @@ function PostsApp() {
       },
       post.id
     )) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
           onClick: () => setSelectedPost(null),
           className: "pixel-btn text-[8px] py-1 px-2 mb-2",
-          children: "🔙 BACK"
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBackIcon, { className: "w-3.5 h-3.5 mr-1" }),
+            " BACK"
+          ]
         }
       ),
       isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-[8px] pt-4 text-center", children: "LOADING POST CONTENT..." }),

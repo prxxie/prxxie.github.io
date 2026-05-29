@@ -147,6 +147,25 @@ const remotesMap = {
                     return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
                 }
 
+const PixelFolderIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M1 3h4l2 2h8v8H1V3z" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "1", y1: "5", x2: "15", y2: "5" })
+] });
+const PixelBookIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M1 2h6v11H1V2z M9 2h6v11H9V2z" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "5", x2: "5", y2: "5" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "8", x2: "5", y2: "8" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "5", x2: "13", y2: "5" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "8", x2: "13", y2: "8" })
+] });
+const PixelPawIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "7", width: "2", height: "3" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "9", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "9", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "4", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "4", width: "2", height: "2" })
+] });
+
 const {create: create$1} = await importShared('zustand');
 
 const useUiStore = create$1()((set) => ({
@@ -254,7 +273,10 @@ function ConsoleFrame({
         className: "fixed top-0 right-0 bottom-0 w-64 bg-white border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden",
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-[10px] text-cozy-accent", children: "📂 MENU.EXE" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[10px] text-cozy-accent flex items-center gap-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-3.5 h-3.5" }),
+              " MENU.EXE"
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
               {
@@ -439,9 +461,8 @@ function App() {
         className: `col-span-1 ${tab === "pets" ? "md:col-span-3" : "md:col-span-2"} retro-window`,
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-              "📖",
-              " ",
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBookIcon, { className: "w-3.5 h-3.5" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "window-header-accent", children: [
                 tab.toUpperCase(),
                 "_VIEW.EXE"
@@ -472,8 +493,8 @@ function App() {
     ),
     tab !== "pets" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 retro-window", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-          "🐾 ",
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "window-header-accent", children: "PET_HUD.EXE" })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[-]" })

@@ -155,7 +155,10 @@ const useShikakuStore = create()((set, get) => ({
       const saved = localStorage.getItem("cozy_os_shikaku_save");
       if (saved) {
         const parsed = JSON.parse(saved);
-        set({ completedLevels: parsed.completed || {} });
+        if (parsed && typeof parsed === "object" && "completed" in parsed) {
+          const completed = parsed.completed;
+          set({ completedLevels: completed || {} });
+        }
       }
     } catch (e) {
       console.error("Failed to load save state", e);
@@ -745,7 +748,9 @@ class RetroSynth {
       }
     }
     if (this.ctx && this.ctx.state === "suspended") {
-      void this.ctx.resume();
+      void this.ctx.resume().catch((err) => {
+        console.warn("Failed to resume AudioContext:", err);
+      });
     }
   }
   setMuted(val) {
@@ -10890,7 +10895,7 @@ function LevelSelect({
           className: "border-2 border-[#2b4c3f] bg-[#e2f4e5] p-3 flex flex-col items-center justify-center cursor-pointer active:translate-y-0.5 hover:bg-[#cce8d0] transition-colors",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px]", children: index + 1 }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[6px] mt-1 text-slate-500 font-sans", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[6px] mt-1 text-slate-700 font-sans", children: [
               lvl.width,
               "x",
               lvl.height

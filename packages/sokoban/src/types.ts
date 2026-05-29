@@ -18,7 +18,7 @@ export interface Box {
 
 export interface MoveSnapshot {
   player: Player;
-  boxes: { id: string; x: number; y: number }[];
+  boxes: Box[];
 }
 
 export interface LevelData {

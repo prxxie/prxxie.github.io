@@ -27,9 +27,9 @@ describe("Sokoban Levels", () => {
         }
       });
 
-      expect(players).toBe(1);
-      expect(boxes).toBeGreaterThan(0);
-      expect(targets).toBe(boxes);
+      expect(players, `Level ${lvl.id} (${lvl.name}) must have exactly 1 player`).toBe(1);
+      expect(boxes, `Level ${lvl.id} (${lvl.name}) must have at least 1 box`).toBeGreaterThan(0);
+      expect(targets, `Level ${lvl.id} (${lvl.name}) box count must match target count`).toBe(boxes);
     });
   });
 });

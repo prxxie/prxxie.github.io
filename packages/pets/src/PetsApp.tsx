@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { PixelChickenIcon, PixelBearIcon, PixelMoonIcon, PixelSunIcon, PixelHeartIcon } from "./Icons";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 type PetStatus = "idle" | "eating" | "playing" | "sleeping";
@@ -169,16 +170,16 @@ export default function PetsApp({
   return (
     <div className="flex flex-col items-center justify-between h-full py-2 box-border">
       {!usePetStore && (
-        <div className="flex gap-4 text-xs font-press bg-[#f8f9fa] border-2 border-cozy-border p-2 mb-2 box-border">
-          <span>🍔 HNG: {hunger}</span>
-          <span>💖 HPP: {happiness}</span>
+        <div className="flex gap-4 text-xs font-press bg-[#f8f9fa] border-2 border-cozy-border p-2 mb-2 box-border items-center">
+          <span className="flex items-center gap-1"><PixelChickenIcon className="w-3.5 h-3.5" /> HNG: {hunger}</span>
+          <span className="flex items-center gap-1"><PixelHeartIcon className="w-3.5 h-3.5" /> HPP: {happiness}</span>
         </div>
       )}
 
       {usePetStore && (
         <div className="w-full flex flex-col gap-2 text-xs mb-4">
           <div className="flex justify-between items-center">
-            <span>🍔 HUNGER</span>
+            <span className="flex items-center gap-1"><PixelChickenIcon className="w-3.5 h-3.5" /> HUNGER</span>
             <span>{hunger}/100</span>
           </div>
           <div className="h-4 border-2 border-cozy-border bg-gray-100 relative">
@@ -188,7 +189,7 @@ export default function PetsApp({
             ></div>
           </div>
           <div className="flex justify-between items-center mt-1">
-            <span>💖 HAPPINESS</span>
+            <span className="flex items-center gap-1"><PixelHeartIcon className="w-3.5 h-3.5" /> HAPPINESS</span>
             <span>{happiness}/100</span>
           </div>
           <div className="h-4 border-2 border-cozy-border bg-gray-100 relative">
@@ -212,17 +213,25 @@ export default function PetsApp({
       </div>
 
       <div className="flex gap-2 w-full mt-4">
-        <button onClick={feed} className="pixel-btn text-[8px] flex-1 py-1">
-          FEED 🍗
+        <button onClick={feed} className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1">
+          FEED <PixelChickenIcon className="w-3.5 h-3.5" />
         </button>
-        <button onClick={play} className="pixel-btn text-[8px] flex-1 py-1">
-          PLAY 🧸
+        <button onClick={play} className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1">
+          PLAY <PixelBearIcon className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={toggleSleep}
-          className="pixel-btn text-[8px] flex-1 py-1"
+          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1"
         >
-          {isSleeping ? "WAKE ☀" : "SLEEP 🌙"}
+          {isSleeping ? (
+            <>
+              WAKE <PixelSunIcon className="w-3.5 h-3.5" />
+            </>
+          ) : (
+            <>
+              SLEEP <PixelMoonIcon className="w-3.5 h-3.5" />
+            </>
+          )}
         </button>
       </div>
     </div>

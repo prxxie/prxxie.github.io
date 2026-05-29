@@ -37,9 +37,17 @@ export default function Board() {
       }
     };
 
+    const handleGlobalPointerCancel = () => {
+      cancelDrag();
+    };
+
     window.addEventListener('pointerup', handleGlobalPointerUp);
-    return () => window.removeEventListener('pointerup', handleGlobalPointerUp);
-  }, [dragStart, commitDrag]);
+    window.addEventListener('pointercancel', handleGlobalPointerCancel);
+    return () => {
+      window.removeEventListener('pointerup', handleGlobalPointerUp);
+      window.removeEventListener('pointercancel', handleGlobalPointerCancel);
+    };
+  }, [dragStart, commitDrag, cancelDrag]);
 
   if (!puzzle) return null;
 
@@ -69,7 +77,6 @@ export default function Board() {
           isCovered={isCovered}
           onPointerDown={startDrag}
           onPointerEnter={updateDrag}
-          onPointerUp={commitDrag}
         />
       );
     }

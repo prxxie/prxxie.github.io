@@ -100,4 +100,17 @@ describe('Board Component', () => {
     expect(commitMock).toHaveBeenCalled();
     expect(synth.playError).toHaveBeenCalled();
   });
+
+  it('handles global pointercancel events and triggers cancelDrag', () => {
+    const cancelMock = vi.fn();
+    useShikakuStore.setState({
+      dragStart: { x: 0, y: 0 },
+      cancelDrag: cancelMock
+    });
+
+    render(<Board />);
+
+    fireEvent(window, new Event('pointercancel'));
+    expect(cancelMock).toHaveBeenCalled();
+  });
 });

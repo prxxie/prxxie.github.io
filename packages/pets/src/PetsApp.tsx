@@ -12,6 +12,7 @@ interface PetState {
   play: () => void;
   toggleSleep: () => void;
   setStatus: (status: PetStatus) => void;
+  tick?: () => void; // Optional fallback tick
 }
 
 type PetStore = UseBoundStore<StoreApi<PetState>>;

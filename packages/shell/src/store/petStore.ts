@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { PetStatus } from "../types";
 
+// Explicit PetState definition
 export interface PetState {
   hunger: number;
   happiness: number;

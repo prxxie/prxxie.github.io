@@ -26,7 +26,8 @@ export default function PostsApp() {
 
   // Static posts catalog index
   const postsList = [
-    { id: 'first-post', title: 'Hello, Retro World!', date: '2026-05-28' }
+    { id: 'first-post', title: 'Hello, Retro World!', date: '2026-05-28' },
+    { id: 'markdown-test', title: 'Markdown Verification', date: '2026-05-29' }
   ];
 
   const { data: postContent, isLoading, isError } = useQuery({

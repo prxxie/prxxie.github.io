@@ -1,4 +1,4 @@
-import { importShared } from './__federation_fn_import-IAOfKW3J.js';
+import { importShared } from './__federation_fn_import-D-nfbenS.js';
 import { r as reactExports, g as getDefaultExportFromCjs } from './index-Dm_EQZZA.js';
 
 const __vite_import_meta_env__$1 = {};

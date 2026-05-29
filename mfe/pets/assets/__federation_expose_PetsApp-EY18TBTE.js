@@ -1,4 +1,4 @@
-import { importShared } from './__federation_fn_import-IAOfKW3J.js';
+import { importShared } from './__federation_fn_import-D-nfbenS.js';
 import { r as reactExports } from './index-Dm_EQZZA.js';
 
 var jsxRuntime = {exports: {}};
@@ -134,4 +134,4 @@ function PetsApp({ usePetStore }) {
   ] });
 }
 
-export { PetsApp as default };
+export { PetsApp as default, jsxRuntimeExports as j };

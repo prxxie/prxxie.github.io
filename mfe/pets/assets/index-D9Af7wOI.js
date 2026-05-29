@@ -374,4 +374,4 @@ function checkDCE() {
 var reactDomExports = reactDom.exports;
 const index = /*@__PURE__*/getDefaultExportFromCjs(reactDomExports);
 
-export { index as default };
+export { index as i, reactDomExports as r };

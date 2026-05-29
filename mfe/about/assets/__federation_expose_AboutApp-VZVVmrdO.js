@@ -1,4 +1,4 @@
-import { importShared } from './__federation_fn_import-DRpujy9w.js';
+import { importShared } from './__federation_fn_import-gVVR6EuA.js';
 import { r as reactExports } from './index-Dm_EQZZA.js';
 
 var jsxRuntime = {exports: {}};
@@ -75,4 +75,4 @@ function AboutApp() {
   ] });
 }
 
-export { AboutApp as default };
+export { AboutApp as default, jsxRuntimeExports as j };

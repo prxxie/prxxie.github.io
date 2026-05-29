@@ -1,4 +1,4 @@
-import { importShared } from './__federation_fn_import-C1MTFLth.js';
+import { importShared } from './__federation_fn_import-Ms9HzHFY.js';
 import { j as jsxRuntimeExports } from './jsx-runtime-CyoIsdjr.js';
 
 const React = await importShared('react');

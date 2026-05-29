@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.superpowers/
+.gemini/
+packages/*/dist/
+.DS_Store
+*.log

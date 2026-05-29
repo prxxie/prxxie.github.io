@@ -70,32 +70,31 @@ function PetsApp({ usePetStore }) {
     }
   }, [status, setStatus]);
   const renderPetSprite = () => {
-    let color = "#2b4c3f";
-    if (status === "eating") color = "#996633";
-    if (status === "playing") color = "#2b4c3f";
+    let color = "oklch(20.8% 0.042 265.755)";
+    if (status === "eating") color = "#CC6666";
+    if (status === "playing") color = "#CC6666";
     if (isSleeping) color = "#779988";
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { viewBox: "0 0 16 16", className: `w-28 h-28 ${status === "playing" ? "animate-bounce" : ""}`, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "8", height: "8", fill: color }),
       animationFrame === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "12", width: "2", height: "2", fill: "#000" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "12", width: "2", height: "2", fill: "#000" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "12", width: "2", height: "2", fill: "var(--color-cozy-border)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "12", width: "2", height: "2", fill: "var(--color-cozy-border)" })
       ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "12", width: "2", height: "2", fill: "#000" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "12", width: "2", height: "2", fill: "#000" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "12", width: "2", height: "2", fill: "var(--color-cozy-border)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "12", width: "2", height: "2", fill: "var(--color-cozy-border)" })
       ] }),
       !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "6", width: "1", height: "1", fill: "#fff" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "6", width: "1", height: "1", fill: "#fff" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "9", width: "2", height: "1", fill: "#000" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "9", width: "2", height: "1", fill: "var(--color-cozy-border)" })
       ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "2", height: "1", fill: "#000" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7", width: "2", height: "1", fill: "#000" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "2", height: "1", fill: "var(--color-cozy-border)" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7", width: "2", height: "1", fill: "var(--color-cozy-border)" })
       ] })
     ] });
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-between h-full py-2", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 w-full text-center", children: "🐾 TAMAGOTCHI ROOM" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 text-xs font-press bg-[#d7ecd9] border-2 border-cozy-border p-1 mb-2", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-between h-full py-2 box-border", children: [
+    !usePetStore && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 text-xs font-press bg-[#f8f9fa] border-2 border-cozy-border p-2 mb-2 box-border", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
         "🍔 HNG: ",
         hunger
@@ -105,11 +104,29 @@ function PetsApp({ usePetStore }) {
         happiness
       ] })
     ] }),
+    usePetStore && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-2 text-xs mb-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "🍔 HUNGER" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+          hunger,
+          "/100"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 border-2 border-cozy-border bg-gray-100 relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-full bg-cozy-accent", style: { width: `${hunger}%` } }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mt-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "💖 HAPPINESS" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+          happiness,
+          "/100"
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 border-2 border-cozy-border bg-gray-100 relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-full bg-cozy-accent", style: { width: `${happiness}%` } }) })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `p-4 border-4 border-cozy-border bg-white rounded flex items-center justify-center w-36 h-36 relative ${isSleeping ? "bg-slate-900" : ""}`, children: [
       renderPetSprite(),
       isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-2 right-2 text-white font-press text-[8px] animate-pulse", children: "Zzz..." })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 w-full", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 w-full mt-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: feed, className: "pixel-btn text-[8px] flex-1 py-1", children: "FEED 🍗" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: play, className: "pixel-btn text-[8px] flex-1 py-1", children: "PLAY 🧸" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: toggleSleep, className: "pixel-btn text-[8px] flex-1 py-1", children: isSleeping ? "WAKE ☀" : "SLEEP 🌙" })

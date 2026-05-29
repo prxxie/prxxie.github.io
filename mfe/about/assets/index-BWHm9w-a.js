@@ -37,8 +37,8 @@ function AboutApp() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-2 overflow-y-auto", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1", children: "🗄️ BIO DIRECTORY" }),
     openFolder === null ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2 pt-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: () => setOpenFolder("bio"), className: "border-2 border-cozy-border p-2 bg-[#f0f9f2] cursor-pointer hover:bg-[#d5eedb]", children: "📁 [BIO] - Who is prxxie?" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: () => setOpenFolder("skills"), className: "border-2 border-cozy-border p-2 bg-[#f0f9f2] cursor-pointer hover:bg-[#d5eedb]", children: "📁 [SKILLS] - Character Stats" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: () => setOpenFolder("bio"), className: "border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white", children: "📁 [BIO] - Who is prxxie?" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { onClick: () => setOpenFolder("skills"), className: "border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white", children: "📁 [SKILLS] - Character Stats" })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setOpenFolder(null), className: "pixel-btn text-[8px] py-1 px-2 mb-2", children: "🔙 BACK" }),
       openFolder === "bio" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-2 border-cozy-border p-3 bg-white text-sm leading-relaxed", children: [

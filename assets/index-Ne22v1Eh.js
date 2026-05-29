@@ -200,36 +200,64 @@ const usePetStore = create((set) => ({
 
 await importShared('react');
 function ConsoleFrame({ children, currentTab, setTab }) {
-  const hunger = usePetStore((state) => state.hunger);
-  const happiness = usePetStore((state) => state.happiness);
-  const status = usePetStore((state) => state.status);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-[500px] pixel-border bg-[#cce9d2] p-6 rounded-lg flex flex-col gap-4", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center bg-[#fff] p-2 border-2 border-cozy-border font-press text-[8px]", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "🔋 COZY-OS v1.0" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-        "STATUS: ",
-        status.toUpperCase()
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-[#fff] min-h-[300px] border-4 border-cozy-border p-4 relative overflow-hidden flex flex-col justify-between", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-2 bg-[#d7ecd9] border-2 border-cozy-border p-2 text-sm", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        "🍔 HUNGER: ",
-        hunger,
-        "/100"
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full max-w-5xl flex flex-col gap-6 px-4 py-6 box-border", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "bg-white border-4 border-cozy-border p-3 flex justify-between items-center shadow-[3px_3px_0px_var(--color-cozy-accent)] box-border", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "svg",
+          {
+            className: "inline-block",
+            viewBox: "0 0 16 16",
+            width: "16",
+            height: "16",
+            fill: "none",
+            stroke: "var(--color-cozy-accent)",
+            strokeWidth: "2.5",
+            strokeLinecap: "square",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M3,4 L8,8 L3,12" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "9", y1: "12", x2: "14", y2: "12" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-xs font-bold text-cozy-accent", children: "PRXXIE" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        "💖 HAPPY: ",
-        happiness,
-        "/100"
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "flex gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => setTab("home"),
+            className: `pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === "home" ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
+            children: "HOME"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => setTab("about"),
+            className: `pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === "about" ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
+            children: "ABOUT"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => setTab("posts"),
+            className: `pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === "posts" ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
+            children: "POSTS"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: () => setTab("pets"),
+            className: `pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === "pets" ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
+            children: "PETS"
+          }
+        )
       ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-around gap-2 mt-2", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setTab("home"), className: `pixel-btn flex-1 ${currentTab === "home" ? "bg-[#bce0c3]" : ""}`, children: "HOME" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setTab("about"), className: `pixel-btn flex-1 ${currentTab === "about" ? "bg-[#bce0c3]" : ""}`, children: "ABOUT" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setTab("posts"), className: `pixel-btn flex-1 ${currentTab === "posts" ? "bg-[#bce0c3]" : ""}`, children: "POSTS" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setTab("pets"), className: `pixel-btn flex-1 ${currentTab === "pets" ? "bg-[#bce0c3]" : ""}`, children: "PETS" })
-    ] })
+    /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "w-full flex-1", children })
   ] });
 }
 
@@ -242,8 +270,8 @@ const AboutApp = lazy(() => __federation_method_getRemote("about" , "./AboutApp"
 const PostsApp = lazy(() => __federation_method_getRemote("posts" , "./PostsApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Posts" }) })));
 const PetsApp = lazy(() => __federation_method_getRemote("pets" , "./PetsApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Pets" }) })));
 function Fallback({ name }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full gap-2", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-press text-[12px] text-red-600", children: "⚠ MFE LOAD ERROR" }),
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full gap-2 p-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-press text-[10px] text-red-600", children: "⚠ MFE LOAD ERROR" }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-center", children: [
       "Remote `",
       name,
@@ -260,7 +288,7 @@ function App() {
     }, 5e3);
     return () => clearInterval(timer);
   }, [tick]);
-  const renderContent = () => {
+  const renderMainContent = () => {
     switch (tab) {
       case "about":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(AboutApp, {});
@@ -270,15 +298,39 @@ function App() {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { usePetStore });
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center p-4", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-press text-[18px] mb-4", children: "WELCOME HOME" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg", children: "I am prxxie. This is my cozy retro pocket portal. Nav-select below to explore pages!" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 bg-cozy-text mt-6 animate-bounce", style: {
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-press text-[14px] mb-4 text-cozy-accent", children: "WELCOME HOME" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg", children: "I am prxxie. This is my responsive retro dashboard workspace. Swivel tabs above to see more sections!" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-cozy-accent mt-6 animate-bounce", style: {
             clipPath: "polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)"
           } })
         ] });
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ConsoleFrame, { currentTab: tab, setTab, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[10px]", children: "LOADING MFE..." }), children: renderContent() }) }) });
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full flex justify-center min-h-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ConsoleFrame, { currentTab: tab, setTab, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-6 items-start", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `col-span-1 ${tab === "pets" ? "md:col-span-3" : "md:col-span-2"} retro-window`, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+          "📖 ",
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "window-header-accent", children: [
+            tab.toUpperCase(),
+            "_VIEW.EXE"
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[8px]", children: "LOADING MFE..." }), children: renderMainContent() }) })
+    ] }),
+    tab !== "pets" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 retro-window", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+          "🐾 ",
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "window-header-accent", children: "PET_HUD.EXE" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[-]" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[8px]", children: "LOADING PET..." }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { usePetStore }) }) })
+    ] })
+  ] }) }) }) });
 }
 
 const React = await importShared('react');

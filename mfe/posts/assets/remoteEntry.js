@@ -13,7 +13,7 @@ const currentImports = {};
         }
 
         const curUrl = metaUrl.substring(0, metaUrl.lastIndexOf('remoteEntry.js'));
-        const base = '/';
+        const base = '/mfe/posts/';
         'assets';
 
         cssFilePaths.forEach(cssPath => {

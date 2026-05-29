@@ -54,4 +54,26 @@ describe('Shikaku Validation Engine', () => {
     expect(res.valid).toBe(false);
     expect(res.reason).toBe('OVERLAP');
   });
+
+  it('should reject a region with zero or negative dimensions', () => {
+    const res1 = validateRegion({ x: 0, y: 0, width: 0, height: 2 }, mockPuzzle, []);
+    expect(res1.valid).toBe(false);
+    expect(res1.reason).toBe('OUT_OF_BOUNDS');
+
+    const res2 = validateRegion({ x: 0, y: 0, width: 2, height: -1 }, mockPuzzle, []);
+    expect(res2.valid).toBe(false);
+    expect(res2.reason).toBe('OUT_OF_BOUNDS');
+  });
+
+  it('should exclude the region itself from overlaps check (by reference or id)', () => {
+    const region = { id: 'r1', x: 0, y: 0, width: 2, height: 2 };
+    // Even if existing regions contains the region itself, it should be valid
+    const res1 = validateRegion(region, mockPuzzle, [region]);
+    expect(res1.valid).toBe(true);
+
+    const sameIdRegion = { id: 'r1', x: 0, y: 0, width: 2, height: 2 };
+    // Even if it matches by ID, it should be excluded
+    const res2 = validateRegion(region, mockPuzzle, [sameIdRegion]);
+    expect(res2.valid).toBe(true);
+  });
 });

@@ -1,5 +1,6 @@
 export function validateRegion(region, puzzle, existingRegions) {
   if (
+    region.width <= 0 || region.height <= 0 ||
     region.x < 0 || region.y < 0 ||
     region.x + region.width > puzzle.width ||
     region.y + region.height > puzzle.height
@@ -29,6 +30,9 @@ export function validateRegion(region, puzzle, existingRegions) {
   }
 
   const overlaps = existingRegions.some(existing => {
+    if (existing === region || (existing.id && existing.id === region.id)) {
+      return false;
+    }
     return (
       region.x < existing.x + existing.width &&
       region.x + region.width > existing.x &&

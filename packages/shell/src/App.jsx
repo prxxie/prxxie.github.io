@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import ConsoleFrame from './components/ConsoleFrame';
 import { usePetStore } from './store/petStore';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -23,6 +23,28 @@ function Fallback({ name }) {
 export default function App() {
   const [tab, setTab] = useState('home');
   const tick = usePetStore((state) => state.tick);
+  const windowRef = useRef(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      if (windowRef.current) {
+        windowRef.current.requestFullscreen();
+      }
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -62,10 +84,19 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             
             {/* Main Content Window (2 columns wide on desktop, full-width on mobile) */}
-            <div className={`col-span-1 ${tab === 'pets' ? 'md:col-span-3' : 'md:col-span-2'} retro-window`}>
+            <div ref={windowRef} className={`col-span-1 ${tab === 'pets' ? 'md:col-span-3' : 'md:col-span-2'} retro-window`}>
               <div className="window-header">
                 <span>📖 <span className="window-header-accent">{tab.toUpperCase()}_VIEW.EXE</span></span>
-                <span className="text-cozy-accent font-bold cursor-pointer">[X]</span>
+                <div className="flex gap-2 items-center">
+                  <button 
+                    onClick={toggleFullscreen} 
+                    className="text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]"
+                    aria-label="Toggle Fullscreen"
+                  >
+                    {isFullscreen ? '[🗗]' : '[⛶]'}
+                  </button>
+                  <span className="text-cozy-accent font-bold cursor-pointer">[X]</span>
+                </div>
               </div>
               <div className="window-body min-h-[350px]">
                 <Suspense fallback={<div className="font-press text-center pt-10 text-[8px]">LOADING MFE...</div>}>

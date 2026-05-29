@@ -21,10 +21,7 @@ export default defineConfig(({ command }) => {
     build: {
       target: 'esnext',
       minify: false,
-      cssCodeSplit: false,
-      rollupOptions: {
-        input: './src/PetsApp.jsx'
-      }
+      cssCodeSplit: false
     }
   };
 });

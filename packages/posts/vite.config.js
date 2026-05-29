@@ -22,10 +22,7 @@ export default defineConfig(({ command }) => {
     build: {
       target: 'esnext',
       minify: false,
-      cssCodeSplit: false,
-      rollupOptions: {
-        input: './src/PostsApp.jsx'
-      }
+      cssCodeSplit: false
     }
   };
 });

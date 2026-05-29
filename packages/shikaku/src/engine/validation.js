@@ -7,19 +7,6 @@ export function validateRegion(region, puzzle, existingRegions) {
     return { valid: false, reason: "OUT_OF_BOUNDS" };
   }
 
-  const overlaps = existingRegions.some(existing => {
-    return (
-      region.x < existing.x + existing.width &&
-      region.x + region.width > existing.x &&
-      region.y < existing.y + existing.height &&
-      region.y + region.height > existing.y
-    );
-  });
-
-  if (overlaps) {
-    return { valid: false, reason: "OVERLAP" };
-  }
-
   const cluesInside = puzzle.clues.filter(
     clue =>
       clue.x >= region.x &&
@@ -39,6 +26,19 @@ export function validateRegion(region, puzzle, existingRegions) {
   const area = region.width * region.height;
   if (area !== clue.value) {
     return { valid: false, reason: "WRONG_AREA" };
+  }
+
+  const overlaps = existingRegions.some(existing => {
+    return (
+      region.x < existing.x + existing.width &&
+      region.x + region.width > existing.x &&
+      region.y < existing.y + existing.height &&
+      region.y + region.height > existing.y
+    );
+  });
+
+  if (overlaps) {
+    return { valid: false, reason: "OVERLAP" };
   }
 
   return { valid: true, clueX: clue.x, clueY: clue.y };

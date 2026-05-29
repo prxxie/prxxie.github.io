@@ -40,9 +40,16 @@ describe('Shikaku Validation Engine', () => {
     expect(res.reason).toBe('NO_CLUE');
   });
 
+  it('should reject a region out of bounds', () => {
+    const region = { x: -1, y: 0, width: 2, height: 2 };
+    const res = validateRegion(region, mockPuzzle, []);
+    expect(res.valid).toBe(false);
+    expect(res.reason).toBe('OUT_OF_BOUNDS');
+  });
+
   it('should reject an overlapping rectangle', () => {
     const existing = [{ x: 0, y: 0, width: 2, height: 2 }];
-    const region = { x: 1, y: 0, width: 2, height: 2 }; // overlaps with existing
+    const region = { x: 0, y: 0, width: 4, height: 1 }; // contains clue (0,0) value 4, area 4, but overlaps
     const res = validateRegion(region, mockPuzzle, existing);
     expect(res.valid).toBe(false);
     expect(res.reason).toBe('OVERLAP');

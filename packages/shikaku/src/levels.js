@@ -213,26 +213,6 @@ export const SHIKAKU_LEVELS = [
     ],
     targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
   },
-  {
-    id: 'medium-8',
-    difficulty: 'Medium',
-    width: 8,
-    height: 8,
-    clues: [
-      { x: 3, y: 5, value: 8 },
-      { x: 4, y: 2, value: 8 },
-      { x: 1, y: 1, value: 9 },
-      { x: 0, y: 3, value: 3 },
-      { x: 2, y: 4, value: 6 },
-      { x: 1, y: 7, value: 6 },
-      { x: 6, y: 0, value: 9 },
-      { x: 7, y: 3, value: 3 },
-      { x: 5, y: 5, value: 6 },
-      { x: 6, y: 6, value: 6 }
-    ],
-    targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
-  },
-
   // --- HARD LEVELS (10x10) ---
   {
     id: 'hard-1',
@@ -329,6 +309,34 @@ export const SHIKAKU_LEVELS = [
     width: 10,
     height: 10,
     clues: [
+      { x: 1, y: 1, value: 9 },
+      { x: 8, y: 2, value: 9 },
+      { x: 2, y: 8, value: 9 },
+      { x: 7, y: 7, value: 9 },
+      { x: 4, y: 3, value: 4 },
+      { x: 3, y: 5, value: 3 },
+      { x: 5, y: 5, value: 9 },
+      { x: 5, y: 0, value: 4 },
+      { x: 3, y: 2, value: 4 },
+      { x: 6, y: 1, value: 4 },
+      { x: 4, y: 9, value: 4 },
+      { x: 4, y: 8, value: 4 },
+      { x: 5, y: 7, value: 4 },
+      { x: 0, y: 4, value: 4 },
+      { x: 1, y: 3, value: 4 },
+      { x: 2, y: 6, value: 4 },
+      { x: 9, y: 5, value: 4 },
+      { x: 8, y: 4, value: 4 },
+      { x: 7, y: 6, value: 4 }
+    ],
+    targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
+  },
+  {
+    id: 'hard-6',
+    difficulty: 'Hard',
+    width: 10,
+    height: 10,
+    clues: [
       { x: 4, y: 0, value: 10 },
       { x: 6, y: 1, value: 10 },
       { x: 3, y: 8, value: 10 },
@@ -347,7 +355,7 @@ export const SHIKAKU_LEVELS = [
     targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
   },
   {
-    id: 'hard-6',
+    id: 'hard-7',
     difficulty: 'Hard',
     width: 10,
     height: 10,

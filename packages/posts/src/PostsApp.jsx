@@ -1,5 +1,21 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Marked } from 'marked';
+import prismjs from 'prismjs';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-css';
+
+const marked = new Marked({
+  gfm: true,
+  breaks: true,
+  highlight(code, lang) {
+    if (prismjs.languages[lang]) {
+      return prismjs.highlight(code, prismjs.languages[lang], lang);
+    }
+    return code;
+  }
+});
 
 // Minimal frontmatter parser
 function parsePost(mdText) {
@@ -34,11 +50,12 @@ export default function PostsApp() {
     queryKey: ['post', selectedPost],
     queryFn: async () => {
       if (!selectedPost) return null;
-      // Fetching post from central public path
       const res = await fetch(`./posts/${selectedPost}.md`);
       if (!res.ok) throw new Error('Post not found');
       const text = await res.text();
-      return parsePost(text);
+      const parsed = parsePost(text);
+      const htmlContent = await marked.parse(parsed.content);
+      return { ...parsed, htmlContent };
     },
     enabled: !!selectedPost
   });
@@ -66,10 +83,16 @@ export default function PostsApp() {
           {isLoading && <div className="font-press text-[8px] pt-4 text-center">LOADING POST CONTENT...</div>}
           {isError && <div className="text-red-500 text-sm">Failed to load post.</div>}
           {postContent && (
-            <div className="border-2 border-cozy-border p-3 bg-white text-sm">
-              <h3 className="font-bold border-b border-cozy-border pb-1 mb-2 text-md">{postContent.title}</h3>
-              <p className="text-xs text-gray-500 mb-4">Date: {postContent.date} | Author: {postContent.author || 'prxxie'}</p>
-              <div className="whitespace-pre-wrap leading-relaxed">{postContent.content}</div>
+            <div className="notebook-paper p-6 relative min-h-[300px]">
+              <div className="notebook-margin"></div>
+              <div className="notebook-content relative z-10 pl-6">
+                <h3 className="font-bold border-b border-cozy-border pb-1 mb-2 text-md text-[#5c3c24]">{postContent.title}</h3>
+                <p className="text-[10px] text-gray-500 mb-4 font-mono">Date: {postContent.date} | Author: {postContent.author || 'prxxie'}</p>
+                <div 
+                  className="markdown-body text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: postContent.htmlContent }}
+                />
+              </div>
             </div>
           )}
         </div>

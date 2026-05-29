@@ -146,6 +146,139 @@ const remotesMap = {
                     return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
                 }
 
+const {create: create$1} = await importShared('zustand');
+
+
+const useUiStore = create$1((set) => ({
+  isMenuOpen: false,
+  setMenuOpen: (isOpen) => set({ isMenuOpen: isOpen }),
+  toggleMenu: () => set((state) => ({ isMenuOpen: !state.isMenuOpen }))
+}));
+
+const React$2 = await importShared('react');
+const {useEffect: useEffect$1} = React$2;
+const NAV_ITEMS = [
+  { id: "home", label: "HOME" },
+  { id: "about", label: "ABOUT" },
+  { id: "posts", label: "POSTS" },
+  { id: "pets", label: "PETS" }
+];
+function ConsoleFrame({ children, currentTab, setTab }) {
+  const { isMenuOpen, setMenuOpen, toggleMenu } = useUiStore();
+  useEffect$1(() => {
+    if (isMenuOpen) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [isMenuOpen]);
+  useEffect$1(() => {
+    if (!isMenuOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isMenuOpen, setMenuOpen]);
+  const handleTabClick = (tabName) => {
+    setTab(tabName);
+    setMenuOpen(false);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full min-h-screen flex flex-col bg-cozy-bg box-border", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "bg-white border-b-4 border-cozy-border p-3 shadow-[0_3px_0px_var(--color-cozy-accent)] box-border w-full relative z-30", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "svg",
+          {
+            className: "inline-block",
+            viewBox: "0 0 16 16",
+            width: "16",
+            height: "16",
+            fill: "none",
+            stroke: "var(--color-cozy-accent)",
+            strokeWidth: "2.5",
+            strokeLinecap: "square",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M3,4 L8,8 L3,12" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "9", y1: "12", x2: "14", y2: "12" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-xs font-bold text-cozy-accent", children: "PRXXIE" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { className: "hidden md:flex gap-2", children: NAV_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          onClick: () => handleTabClick(item.id),
+          className: `pixel-btn text-[9px] px-3 py-1 ${currentTab === item.id ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
+          children: item.label
+        },
+        item.id
+      )) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          onClick: toggleMenu,
+          className: "md:hidden pixel-btn text-[9px] px-3 py-1",
+          "aria-expanded": isMenuOpen,
+          "aria-controls": "mobile-menu-drawer",
+          "aria-label": "Toggle navigation menu",
+          children: "[MENU.EXE]"
+        }
+      )
+    ] }) }),
+    isMenuOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "fixed inset-0 bg-black/45 z-40 md:hidden animate-[fade-in_0.2s_ease-out]",
+        onClick: () => setMenuOpen(false),
+        "aria-hidden": "true"
+      }
+    ),
+    isMenuOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        id: "mobile-menu-drawer",
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-label": "Navigation menu",
+        className: "fixed top-0 right-0 bottom-0 w-64 bg-white border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden",
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-[10px] text-cozy-accent", children: "📂 MENU.EXE" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setMenuOpen(false),
+                className: "text-cozy-accent font-bold cursor-pointer font-press text-[10px] bg-transparent border-none",
+                "aria-label": "Close navigation menu",
+                children: "[X]"
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { className: "flex flex-col gap-3", children: NAV_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => handleTabClick(item.id),
+              className: `pixel-btn w-full text-[10px] text-left py-2 px-3 ${currentTab === item.id ? "bg-cozy-accent text-white border-cozy-border shadow-none" : ""}`,
+              children: [
+                currentTab === item.id ? "[x]" : "[ ]",
+                " ",
+                item.label
+              ]
+            },
+            item.id
+          )) })
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "w-full max-w-5xl mx-auto flex-1 px-4 py-6 box-border", children })
+  ] });
+}
+
 const {create} = await importShared('zustand');
 
 
@@ -197,69 +330,6 @@ const usePetStore = create((set) => ({
     };
   })
 }));
-
-await importShared('react');
-function ConsoleFrame({ children, currentTab, setTab }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full min-h-screen flex flex-col bg-cozy-bg box-border", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "bg-white border-b-4 border-cozy-border p-3 shadow-[0_3px_0px_var(--color-cozy-accent)] box-border w-full", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "svg",
-          {
-            className: "inline-block",
-            viewBox: "0 0 16 16",
-            width: "16",
-            height: "16",
-            fill: "none",
-            stroke: "var(--color-cozy-accent)",
-            strokeWidth: "2.5",
-            strokeLinecap: "square",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M3,4 L8,8 L3,12" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "9", y1: "12", x2: "14", y2: "12" })
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-xs font-bold text-cozy-accent", children: "PRXXIE" })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "flex gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: () => setTab("home"),
-            className: `pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === "home" ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
-            children: "HOME"
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: () => setTab("about"),
-            className: `pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === "about" ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
-            children: "ABOUT"
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: () => setTab("posts"),
-            className: `pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === "posts" ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
-            children: "POSTS"
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: () => setTab("pets"),
-            className: `pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === "pets" ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`,
-            children: "PETS"
-          }
-        )
-      ] })
-    ] }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "w-full max-w-5xl mx-auto flex-1 px-4 py-6 box-border", children })
-  ] });
-}
 
 const React$1 = await importShared('react');
 const {useState,useEffect,lazy,Suspense} = React$1;

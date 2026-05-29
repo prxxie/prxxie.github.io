@@ -2,44 +2,61 @@ import React from 'react';
 import { usePetStore } from '../store/petStore';
 
 export default function ConsoleFrame({ children, currentTab, setTab }) {
-  const hunger = usePetStore((state) => state.hunger);
-  const happiness = usePetStore((state) => state.happiness);
-  const status = usePetStore((state) => state.status);
-
   return (
-    <div className="w-[500px] pixel-border bg-[#cce9d2] p-6 rounded-lg flex flex-col gap-4">
-      {/* Status Bar */}
-      <div className="flex justify-between items-center bg-[#fff] p-2 border-2 border-cozy-border font-press text-[8px]">
-        <span>🔋 COZY-OS v1.0</span>
-        <span>STATUS: {status.toUpperCase()}</span>
-      </div>
+    <div className="w-full max-w-5xl flex flex-col gap-6 px-4 py-6 box-border">
+      {/* Top Header Bar */}
+      <header className="bg-white border-4 border-cozy-border p-3 flex justify-between items-center shadow-[3px_3px_0px_var(--color-cozy-accent)] box-border">
+        {/* Logo container with vertical centering */}
+        <div className="flex items-center gap-2">
+          <svg 
+            className="inline-block" 
+            viewBox="0 0 16 16" 
+            width="16" 
+            height="16" 
+            fill="none" 
+            stroke="var(--color-cozy-accent)" 
+            strokeWidth="2.5" 
+            strokeLinecap="square"
+          >
+            <path d="M3,4 L8,8 L3,12" />
+            <line x1="9" y1="12" x2="14" y2="12" />
+          </svg>
+          <span className="font-press text-xs font-bold text-cozy-accent">PRXXIE</span>
+        </div>
 
-      {/* Console Screen */}
-      <div className="bg-[#fff] min-h-[300px] border-4 border-cozy-border p-4 relative overflow-hidden flex flex-col justify-between">
-        <div className="flex-1">{children}</div>
-      </div>
+        {/* Navigation Menu */}
+        <nav className="flex gap-2">
+          <button 
+            onClick={() => setTab('home')} 
+            className={`pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === 'home' ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
+          >
+            HOME
+          </button>
+          <button 
+            onClick={() => setTab('about')} 
+            className={`pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === 'about' ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
+          >
+            ABOUT
+          </button>
+          <button 
+            onClick={() => setTab('posts')} 
+            className={`pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === 'posts' ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
+          >
+            POSTS
+          </button>
+          <button 
+            onClick={() => setTab('pets')} 
+            className={`pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === 'pets' ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
+          >
+            PETS
+          </button>
+        </nav>
+      </header>
 
-      {/* Pet status LCD indicator */}
-      <div className="grid grid-cols-2 gap-2 bg-[#d7ecd9] border-2 border-cozy-border p-2 text-sm">
-        <div>🍔 HUNGER: {hunger}/100</div>
-        <div>💖 HAPPY: {happiness}/100</div>
-      </div>
-
-      {/* Action Controls */}
-      <div className="flex justify-around gap-2 mt-2">
-        <button onClick={() => setTab('home')} className={`pixel-btn flex-1 ${currentTab === 'home' ? 'bg-[#bce0c3]' : ''}`}>
-          HOME
-        </button>
-        <button onClick={() => setTab('about')} className={`pixel-btn flex-1 ${currentTab === 'about' ? 'bg-[#bce0c3]' : ''}`}>
-          ABOUT
-        </button>
-        <button onClick={() => setTab('posts')} className={`pixel-btn flex-1 ${currentTab === 'posts' ? 'bg-[#bce0c3]' : ''}`}>
-          POSTS
-        </button>
-        <button onClick={() => setTab('pets')} className={`pixel-btn flex-1 ${currentTab === 'pets' ? 'bg-[#bce0c3]' : ''}`}>
-          PETS
-        </button>
-      </div>
+      {/* Content Section */}
+      <main className="w-full flex-1">
+        {children}
+      </main>
     </div>
   );
 }

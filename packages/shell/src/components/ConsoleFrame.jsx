@@ -1,11 +1,45 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePetStore } from '../store/petStore';
+import { useUiStore } from '../store/uiStore';
 
 export default function ConsoleFrame({ children, currentTab, setTab }) {
+  const { isMenuOpen, setMenuOpen, toggleMenu } = useUiStore();
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+    return () => {
+      document.body.classList.remove('overflow-hidden');
+    };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setMenuOpen]);
+
+  const handleTabClick = (tabName) => {
+    setTab(tabName);
+    setMenuOpen(false);
+  };
+
+  const navItems = [
+    { id: 'home', label: 'HOME' },
+    { id: 'about', label: 'ABOUT' },
+    { id: 'posts', label: 'POSTS' },
+    { id: 'pets', label: 'PETS' }
+  ];
+
   return (
     <div className="w-full min-h-screen flex flex-col bg-cozy-bg box-border">
       {/* Top Header Bar */}
-      <header className="bg-white border-b-4 border-cozy-border p-3 shadow-[0_3px_0px_var(--color-cozy-accent)] box-border w-full">
+      <header className="bg-white border-b-4 border-cozy-border p-3 shadow-[0_3px_0px_var(--color-cozy-accent)] box-border w-full relative z-30">
         <div className="max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border">
           {/* Logo container with vertical centering */}
           <div className="flex items-center gap-2">
@@ -25,35 +59,62 @@ export default function ConsoleFrame({ children, currentTab, setTab }) {
             <span className="font-press text-xs font-bold text-cozy-accent">PRXXIE</span>
           </div>
 
-          {/* Navigation Menu */}
-          <nav className="flex gap-2">
-            <button 
-              onClick={() => setTab('home')} 
-              className={`pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === 'home' ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
-            >
-              HOME
-            </button>
-            <button 
-              onClick={() => setTab('about')} 
-              className={`pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === 'about' ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
-            >
-              ABOUT
-            </button>
-            <button 
-              onClick={() => setTab('posts')} 
-              className={`pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === 'posts' ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
-            >
-              POSTS
-            </button>
-            <button 
-              onClick={() => setTab('pets')} 
-              className={`pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-1 ${currentTab === 'pets' ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
-            >
-              PETS
-            </button>
+          {/* Navigation Menu (Desktop Only) */}
+          <nav className="hidden md:flex gap-2">
+            {navItems.map((item) => (
+              <button 
+                key={item.id}
+                onClick={() => handleTabClick(item.id)} 
+                className={`pixel-btn text-[9px] px-3 py-1 ${currentTab === item.id ? 'bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]' : ''}`}
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
+
+          {/* Menu Toggle Button (Mobile Only) */}
+          <button
+            onClick={toggleMenu}
+            className="md:hidden pixel-btn text-[9px] px-3 py-1"
+          >
+            [MENU.EXE]
+          </button>
         </div>
       </header>
+
+      {/* Mobile Drawer Overlay Backdrop */}
+      {isMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/45 z-40 md:hidden animate-[fade-in_0.2s_ease-out]"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Offcanvas Drawer Panel */}
+      {isMenuOpen && (
+        <div className="fixed top-0 right-0 bottom-0 w-64 bg-white border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden">
+          <div className="flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2">
+            <span className="font-press text-[10px] text-cozy-accent">📂 MENU.EXE</span>
+            <button 
+              onClick={() => setMenuOpen(false)} 
+              className="text-cozy-accent font-bold cursor-pointer font-press text-[10px] bg-transparent border-none"
+            >
+              [X]
+            </button>
+          </div>
+          <nav className="flex flex-col gap-3">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleTabClick(item.id)}
+                className={`pixel-btn w-full text-[10px] text-left py-2 px-3 ${currentTab === item.id ? 'bg-cozy-accent text-white border-cozy-border shadow-none' : ''}`}
+              >
+                {currentTab === item.id ? '[x]' : '[ ]'} {item.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
 
       {/* Content Section */}
       <main className="w-full max-w-5xl mx-auto flex-1 px-4 py-6 box-border">

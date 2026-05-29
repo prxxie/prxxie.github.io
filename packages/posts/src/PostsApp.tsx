@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { PixelBookIcon, PixelScrollIcon, PixelBackIcon } from "./Icons";
 import { useQuery } from "@tanstack/react-query";
 import { parsePost, renderMarkdown } from "./utils/markdown";
 
@@ -51,8 +52,8 @@ export default function PostsApp(): React.ReactElement {
 
   return (
     <div className="flex flex-col h-full gap-2 overflow-y-auto">
-      <h2 className="font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1">
-        📚 BLOG CATALOG
+      <h2 className="font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 flex items-center gap-1">
+        <PixelBookIcon className="w-4 h-4 text-cozy-accent" /> BLOG CATALOG
       </h2>
 
       {selectedPost === null ? (
@@ -63,7 +64,7 @@ export default function PostsApp(): React.ReactElement {
               onClick={() => setSelectedPost(post.id)}
               className="border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white flex justify-between items-center text-sm"
             >
-              <span>📜 {post.title}</span>
+              <span className="flex items-center"><PixelScrollIcon className="w-4 h-4 mr-2" /> {post.title}</span>
               <span className="text-xs text-gray-500 font-mono">
                 {post.date}
               </span>
@@ -76,7 +77,7 @@ export default function PostsApp(): React.ReactElement {
             onClick={() => setSelectedPost(null)}
             className="pixel-btn text-[8px] py-1 px-2 mb-2"
           >
-            🔙 BACK
+            <PixelBackIcon className="w-3.5 h-3.5 mr-1" /> BACK
           </button>
           {isLoading && (
             <div className="font-press text-[8px] pt-4 text-center">

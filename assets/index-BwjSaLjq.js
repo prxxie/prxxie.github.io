@@ -51,7 +51,8 @@ var m = reactDomExports;
 const remotesMap = {
 'about':{url:'/mfe/about/assets/remoteEntry.js',format:'esm',from:'vite'},
   'posts':{url:'/mfe/posts/assets/remoteEntry.js',format:'esm',from:'vite'},
-  'pets':{url:'/mfe/pets/assets/remoteEntry.js',format:'esm',from:'vite'}
+  'pets':{url:'/mfe/pets/assets/remoteEntry.js',format:'esm',from:'vite'},
+  'shikaku':{url:'/mfe/shikaku/assets/remoteEntry.js',format:'esm',from:'vite'}
 };
                 const currentImports = {};
                 const loadJS = async (url, fn) => {
@@ -161,7 +162,8 @@ const NAV_ITEMS = [
   { id: "home", label: "HOME" },
   { id: "about", label: "ABOUT" },
   { id: "posts", label: "POSTS" },
-  { id: "pets", label: "PETS" }
+  { id: "pets", label: "PETS" },
+  { id: "shikaku", label: "SHIKAKU" }
 ];
 function ConsoleFrame({ children, currentTab, setTab }) {
   const { isMenuOpen, setMenuOpen, toggleMenu } = useUiStore();
@@ -339,6 +341,7 @@ const queryClient = new QueryClient();
 const AboutApp = lazy(() => __federation_method_getRemote("about" , "./AboutApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "About" }) })));
 const PostsApp = lazy(() => __federation_method_getRemote("posts" , "./PostsApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Posts" }) })));
 const PetsApp = lazy(() => __federation_method_getRemote("pets" , "./PetsApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Pets" }) })));
+const ShikakuApp = lazy(() => __federation_method_getRemote("shikaku" , "./ShikakuApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Shikaku" }) })));
 function Fallback({ name }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full gap-2 p-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-press text-[10px] text-red-600", children: "⚠ MFE LOAD ERROR" }),
@@ -366,6 +369,8 @@ function App() {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(PostsApp, {});
       case "pets":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { usePetStore });
+      case "shikaku":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(ShikakuApp, {});
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center p-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-press text-[14px] mb-4 text-cozy-accent", children: "WELCOME HOME" }),

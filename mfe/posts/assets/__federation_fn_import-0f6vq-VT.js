@@ -356,7 +356,7 @@ function satisfy(version, range) {
 const currentImports = {};
 
 // eslint-disable-next-line no-undef
-const moduleMap = {'react':{get:()=>()=>__federation_import(new URL('__federation_shared_react-BCcI129A.js', import.meta.url).href),import:true},'react-dom':{get:()=>()=>__federation_import(new URL('__federation_shared_react-dom-BhMZJInU.js', import.meta.url).href),import:true},'@tanstack/react-query':{get:()=>()=>__federation_import(new URL('__federation_shared_@tanstack/react-query-Cj7c0dxA.js', import.meta.url).href),import:true}};
+const moduleMap = {'react':{get:()=>()=>__federation_import(new URL('__federation_shared_react-C3Pr5fKJ.js', import.meta.url).href),import:true},'react-dom':{get:()=>()=>__federation_import(new URL('__federation_shared_react-dom-34UylTkL.js', import.meta.url).href),import:true},'@tanstack/react-query':{get:()=>()=>__federation_import(new URL('__federation_shared_@tanstack/react-query-BPBeN8Pl.js', import.meta.url).href),import:true}};
 const moduleCache = Object.create(null);
 async function importShared(name, shareScope = 'default') {
   return moduleCache[name]

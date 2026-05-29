@@ -1,7 +1,7 @@
-import { importShared } from './__federation_fn_import-Ms9HzHFY.js';
-import { j as jsxRuntimeExports } from './jsx-runtime-CyoIsdjr.js';
-import { r as reactDomExports } from './index-D9Af7wOI.js';
-import PostsApp from './__federation_expose_PostsApp-BbRGHZbz.js';
+import { importShared } from './__federation_fn_import-0f6vq-VT.js';
+import { j as jsxRuntimeExports } from './jsx-runtime-CsM3lTE3.js';
+import { r as reactDomExports } from './index-CM0Mep8a.js';
+import PostsApp from './__federation_expose_PostsApp-7uI8ONHL.js';
 
 true&&(function polyfill() {
   const relList = document.createElement("link").relList;

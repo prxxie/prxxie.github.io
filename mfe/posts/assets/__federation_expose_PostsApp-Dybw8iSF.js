@@ -4857,70 +4857,91 @@ Prism.languages.js = Prism.languages.javascript;
 
 const marked = new Marked({
   gfm: true,
-  breaks: true,
+  breaks: true
 });
-
 marked.use({
   renderer: {
     code(code, infostring, escaped) {
-      const lang = (infostring || '').match(/^\S*/)?.[0];
-      if (lang && prismjs.languages[lang]) {
+      const lang = (infostring || "").match(/^\S*/)?.[0];
+      if (lang && lang in prismjs.languages) {
         try {
-          const highlighted = prismjs.highlight(code, prismjs.languages[lang], lang);
+          const highlighted = prismjs.highlight(
+            code,
+            prismjs.languages[lang],
+            lang
+          );
           return `<pre class="language-${lang}"><code class="language-${lang}">${highlighted}</code></pre>`;
         } catch (e) {
-          console.error('Prism highlighting failed:', e);
+          console.error("Prism highlighting failed:", e);
         }
       }
-      // Fallback escape helper
-      const escape = (str) => str.replace(/[&<>"']/g, (m) => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-      }[m]));
+      const escape = (str) => str.replace(/[&<>"']/g, (m) => {
+        const map = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        };
+        return map[m];
+      });
       return `<pre><code>${escaped ? code : escape(code)}</code></pre>`;
     }
   }
 });
-
-// Frontmatter parser utility
 function parsePost(mdText) {
   const regex = /^---\r?\n([\s\S]+?)\r?\n---\r?\n([\s\S]*)$/;
   const match = regex.exec(mdText);
-  if (!match) return { title: 'Untitled Post', date: '', content: mdText };
-
+  if (!match) {
+    const defaultPost = {
+      title: "Untitled Post",
+      date: "",
+      author: "",
+      content: mdText
+    };
+    return defaultPost;
+  }
   const frontmatter = match[1];
   const content = match[2];
   const metadata = {};
-  frontmatter.split('\n').forEach((line) => {
-    const parts = line.split(':');
+  frontmatter.split("\n").forEach((line) => {
+    const parts = line.split(":");
     if (parts.length >= 2) {
       const key = parts[0].trim();
-      const value = parts.slice(1).join(':').replace(/"/g, '').trim();
+      const value = parts.slice(1).join(":").replace(/"/g, "").trim();
       metadata[key] = value;
     }
   });
-  return { ...metadata, content };
+  return {
+    title: metadata.title || "Untitled Post",
+    date: metadata.date || "",
+    author: metadata.author || "",
+    ...metadata,
+    content
+  };
 }
-
-// Render markdown string to HTML asynchronously
 async function renderMarkdown(markdownStr) {
   return await marked.parse(markdownStr);
 }
 
-const React = await importShared('react');
-const {useState} = React;
+const {useState} = await importShared('react');
 
 const {useQuery} = await importShared('@tanstack/react-query');
 function PostsApp() {
   const [selectedPost, setSelectedPost] = useState(null);
   const postsList = [
     { id: "first-post", title: "Hello, Retro World!", date: "2026-05-28" },
-    { id: "markdown-test", title: "Markdown Verification", date: "2026-05-29" }
+    {
+      id: "markdown-test",
+      title: "Markdown Verification",
+      date: "2026-05-29"
+    }
   ];
-  const { data: postContent, isLoading, isError } = useQuery({
+  const {
+    data: postContent,
+    isLoading,
+    isError
+  } = useQuery({
     queryKey: ["post", selectedPost],
     queryFn: async () => {
       if (!selectedPost) return null;
@@ -4950,7 +4971,14 @@ function PostsApp() {
       },
       post.id
     )) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: () => setSelectedPost(null), className: "pixel-btn text-[8px] py-1 px-2 mb-2", children: "🔙 BACK" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          onClick: () => setSelectedPost(null),
+          className: "pixel-btn text-[8px] py-1 px-2 mb-2",
+          children: "🔙 BACK"
+        }
+      ),
       isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-[8px] pt-4 text-center", children: "LOADING POST CONTENT..." }),
       isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-500 text-sm", children: "Failed to load post." }),
       postContent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "notebook-paper p-6 relative min-h-[300px]", children: [
@@ -4960,14 +4988,17 @@ function PostsApp() {
           /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-[10px] text-gray-500 mb-4 font-mono", children: [
             "Date: ",
             postContent.date,
-            " | Author: ",
+            " | Author:",
+            " ",
             postContent.author || "prxxie"
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
             {
               className: "markdown-body text-sm leading-relaxed",
-              dangerouslySetInnerHTML: { __html: postContent.htmlContent }
+              dangerouslySetInnerHTML: {
+                __html: postContent.htmlContent
+              }
             }
           )
         ] })

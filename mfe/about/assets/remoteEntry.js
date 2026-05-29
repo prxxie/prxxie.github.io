@@ -3,7 +3,7 @@ const currentImports = {};
       let moduleMap = {
 "./AboutApp":()=>{
       dynamicLoadingCss(["style-BYv2ckrx.css"], false, './AboutApp');
-      return __federation_import('/mfe/about/assets/__federation_expose_AboutApp-VZVVmrdO.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      return __federation_import('/mfe/about/assets/__federation_expose_AboutApp-BQRtZcp0.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
         const metaUrl = import.meta.url;

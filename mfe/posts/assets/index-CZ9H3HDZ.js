@@ -1,6 +1,7 @@
-import { importShared } from './__federation_fn_import-D-nfbenS.js';
-import PetsApp, { j as jsxRuntimeExports } from './__federation_expose_PetsApp-EY18TBTE.js';
-import { r as reactDomExports } from './index-D9Af7wOI.js';
+import { importShared } from './__federation_fn_import-0f6vq-VT.js';
+import { j as jsxRuntimeExports } from './jsx-runtime-CsM3lTE3.js';
+import { r as reactDomExports } from './index-CM0Mep8a.js';
+import PostsApp from './__federation_expose_PostsApp-Dybw8iSF.js';
 
 true&&(function polyfill() {
   const relList = document.createElement("link").relList;
@@ -49,6 +50,13 @@ var m = reactDomExports;
 }
 
 const React = await importShared('react');
-client.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 w-[500px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, {}) }) })
+const {QueryClient,QueryClientProvider} = await importShared('@tanstack/react-query');
+
+const queryClient = new QueryClient();
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+client.createRoot(rootElement).render(
+  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 w-[500px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PostsApp, {}) }) }) })
 );

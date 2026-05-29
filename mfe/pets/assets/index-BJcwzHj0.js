@@ -1,5 +1,5 @@
-import { importShared } from './__federation_fn_import-gVVR6EuA.js';
-import AboutApp, { j as jsxRuntimeExports } from './__federation_expose_AboutApp-VZVVmrdO.js';
+import { importShared } from './__federation_fn_import-D-nfbenS.js';
+import PetsApp, { j as jsxRuntimeExports } from './__federation_expose_PetsApp-C__ccXJa.js';
 import { r as reactDomExports } from './index-D9Af7wOI.js';
 
 true&&(function polyfill() {
@@ -49,6 +49,10 @@ var m = reactDomExports;
 }
 
 const React = await importShared('react');
-client.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 w-[500px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AboutApp, {}) }) })
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+client.createRoot(rootElement).render(
+  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 w-[500px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, {}) }) })
 );

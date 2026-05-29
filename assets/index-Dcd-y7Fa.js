@@ -149,15 +149,13 @@ const remotesMap = {
 
 const {create: create$1} = await importShared('zustand');
 
-
-const useUiStore = create$1((set) => ({
+const useUiStore = create$1()((set) => ({
   isMenuOpen: false,
   setMenuOpen: (isOpen) => set({ isMenuOpen: isOpen }),
   toggleMenu: () => set((state) => ({ isMenuOpen: !state.isMenuOpen }))
 }));
 
-const React$2 = await importShared('react');
-const {useEffect: useEffect$1} = React$2;
+const {useEffect: useEffect$1} = await importShared('react');
 const NAV_ITEMS = [
   { id: "home", label: "HOME" },
   { id: "about", label: "ABOUT" },
@@ -165,8 +163,14 @@ const NAV_ITEMS = [
   { id: "pets", label: "PETS" },
   { id: "shikaku", label: "SHIKAKU" }
 ];
-function ConsoleFrame({ children, currentTab, setTab }) {
-  const { isMenuOpen, setMenuOpen, toggleMenu } = useUiStore();
+function ConsoleFrame({
+  children,
+  currentTab,
+  setTab
+}) {
+  const isMenuOpen = useUiStore((state) => state.isMenuOpen);
+  const setMenuOpen = useUiStore((state) => state.setMenuOpen);
+  const toggleMenu = useUiStore((state) => state.toggleMenu);
   useEffect$1(() => {
     if (isMenuOpen) {
       document.body.classList.add("overflow-hidden");
@@ -283,49 +287,50 @@ function ConsoleFrame({ children, currentTab, setTab }) {
 
 const {create} = await importShared('zustand');
 
-
-const usePetStore = create((set) => ({
+const usePetStore = create()((set) => ({
   hunger: 50,
   happiness: 50,
-  status: 'idle', // 'idle' | 'eating' | 'playing' | 'sleeping'
+  status: "idle",
   isSleeping: false,
-
   feed: () => set((state) => {
-    if (state.isSleeping) return {};
+    if (state.isSleeping) return state;
     return {
+      ...state,
       hunger: Math.max(0, state.hunger - 20),
-      status: 'eating'
+      status: "eating"
     };
   }),
-
   play: () => set((state) => {
-    if (state.isSleeping) return {};
+    if (state.isSleeping) return state;
     return {
+      ...state,
       happiness: Math.min(100, state.happiness + 20),
-      status: 'playing'
+      status: "playing"
     };
   }),
-
   toggleSleep: () => set((state) => ({
     isSleeping: !state.isSleeping,
-    status: !state.isSleeping ? 'sleeping' : 'idle'
+    status: !state.isSleeping ? "sleeping" : "idle"
   })),
-
   setStatus: (status) => set({ status }),
-
   tick: () => set((state) => {
-    const nextHunger = Math.min(100, state.hunger + (state.isSleeping ? 2 : 5));
-    const nextHappiness = Math.max(0, state.happiness - (state.isSleeping ? 1 : 5));
-    
+    const nextHunger = Math.min(
+      100,
+      state.hunger + (state.isSleeping ? 2 : 5)
+    );
+    const nextHappiness = Math.max(
+      0,
+      state.happiness - (state.isSleeping ? 1 : 5)
+    );
     let nextStatus = state.status;
-    if (state.status === 'eating' || state.status === 'playing') {
-      nextStatus = 'idle';
+    if (state.status === "eating" || state.status === "playing") {
+      nextStatus = "idle";
     }
     if (state.isSleeping) {
-      nextStatus = 'sleeping';
+      nextStatus = "sleeping";
     }
-
     return {
+      ...state,
       hunger: nextHunger,
       happiness: nextHappiness,
       status: nextStatus
@@ -333,15 +338,30 @@ const usePetStore = create((set) => ({
   })
 }));
 
-const React$1 = await importShared('react');
-const {useState,useEffect,useRef,lazy,Suspense} = React$1;
+const {useState,useEffect,useRef,lazy,Suspense} = await importShared('react');
 const {QueryClient,QueryClientProvider} = await importShared('@tanstack/react-query');
 
 const queryClient = new QueryClient();
-const AboutApp = lazy(() => __federation_method_getRemote("about" , "./AboutApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "About" }) })));
-const PostsApp = lazy(() => __federation_method_getRemote("posts" , "./PostsApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Posts" }) })));
-const PetsApp = lazy(() => __federation_method_getRemote("pets" , "./PetsApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Pets" }) })));
-const ShikakuApp = lazy(() => __federation_method_getRemote("shikaku" , "./ShikakuApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({ default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Shikaku" }) })));
+const AboutApp = lazy(
+  () => __federation_method_getRemote("about" , "./AboutApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({
+    default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "About" })
+  }))
+);
+const PostsApp = lazy(
+  () => __federation_method_getRemote("posts" , "./PostsApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({
+    default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Posts" })
+  }))
+);
+const PetsApp = lazy(
+  () => __federation_method_getRemote("pets" , "./PetsApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({
+    default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Pets" })
+  }))
+);
+const ShikakuApp = lazy(
+  () => __federation_method_getRemote("shikaku" , "./ShikakuApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({
+    default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Shikaku" })
+  }))
+);
 function Fallback({ name }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full gap-2 p-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-press text-[10px] text-red-600", children: "⚠ MFE LOAD ERROR" }),
@@ -399,37 +419,57 @@ function App() {
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center p-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-press text-[14px] mb-4 text-cozy-accent", children: "WELCOME HOME" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg", children: "I am prxxie. This is my responsive retro dashboard workspace. Swivel tabs above to see more sections!" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 bg-cozy-accent mt-6 animate-bounce", style: {
-            clipPath: "polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)"
-          } })
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "w-12 h-12 bg-cozy-accent mt-6 animate-bounce",
+              style: {
+                clipPath: "polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%)"
+              }
+            }
+          )
         ] });
     }
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full flex justify-center min-h-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ConsoleFrame, { currentTab: tab, setTab, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-6 items-start", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: windowRef, className: `col-span-1 ${tab === "pets" ? "md:col-span-3" : "md:col-span-2"} retro-window`, children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-          "📖 ",
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "window-header-accent", children: [
-            tab.toUpperCase(),
-            "_VIEW.EXE"
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 items-center", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "div",
+      {
+        ref: windowRef,
+        className: `col-span-1 ${tab === "pets" ? "md:col-span-3" : "md:col-span-2"} retro-window`,
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+              "📖",
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "window-header-accent", children: [
+                tab.toUpperCase(),
+                "_VIEW.EXE"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 items-center", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: toggleFullscreen,
+                  className: "text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]",
+                  "aria-label": "Toggle Fullscreen",
+                  children: isFullscreen ? "[🗗]" : "[⛶]"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Suspense,
             {
-              onClick: toggleFullscreen,
-              className: "text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]",
-              "aria-label": "Toggle Fullscreen",
-              children: isFullscreen ? "[🗗]" : "[⛶]"
+              fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[8px]", children: "LOADING MFE..." }),
+              children: renderMainContent()
             }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[8px]", children: "LOADING MFE..." }), children: renderMainContent() }) })
-    ] }),
+          ) })
+        ]
+      }
+    ),
     tab !== "pets" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 retro-window", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
@@ -438,12 +478,22 @@ function App() {
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[-]" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[8px]", children: "LOADING PET..." }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { usePetStore }) }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Suspense,
+        {
+          fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[8px]", children: "LOADING PET..." }),
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { usePetStore })
+        }
+      ) })
     ] })
   ] }) }) }) });
 }
 
 const React = await importShared('react');
-client.createRoot(document.getElementById("root")).render(
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+client.createRoot(rootElement).render(
   /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(App, {}) })
 );

@@ -24,52 +24,32 @@ function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&
 var jsxRuntimeExports = jsxRuntime.exports;
 
 function validateRegion(region, puzzle, existingRegions) {
-  if (
-    region.width <= 0 || region.height <= 0 ||
-    region.x < 0 || region.y < 0 ||
-    region.x + region.width > puzzle.width ||
-    region.y + region.height > puzzle.height
-  ) {
+  if (region.width <= 0 || region.height <= 0 || region.x < 0 || region.y < 0 || region.x + region.width > puzzle.width || region.y + region.height > puzzle.height) {
     return { valid: false, reason: "OUT_OF_BOUNDS" };
   }
-
   const cluesInside = puzzle.clues.filter(
-    clue =>
-      clue.x >= region.x &&
-      clue.x < region.x + region.width &&
-      clue.y >= region.y &&
-      clue.y < region.y + region.height
+    (clue2) => clue2.x >= region.x && clue2.x < region.x + region.width && clue2.y >= region.y && clue2.y < region.y + region.height
   );
-
   if (cluesInside.length === 0) {
     return { valid: false, reason: "NO_CLUE" };
   }
   if (cluesInside.length > 1) {
     return { valid: false, reason: "MULTIPLE_CLUES" };
   }
-
   const clue = cluesInside[0];
   const area = region.width * region.height;
   if (area !== clue.value) {
     return { valid: false, reason: "WRONG_AREA" };
   }
-
-  const overlaps = existingRegions.some(existing => {
-    if (existing === region || (existing.id && existing.id === region.id)) {
+  const overlaps = existingRegions.some((existing) => {
+    if (existing === region || existing.id && existing.id === region.id) {
       return false;
     }
-    return (
-      region.x < existing.x + existing.width &&
-      region.x + region.width > existing.x &&
-      region.y < existing.y + existing.height &&
-      region.y + region.height > existing.y
-    );
+    return region.x < existing.x + existing.width && region.x + region.width > existing.x && region.y < existing.y + existing.height && region.y + region.height > existing.y;
   });
-
   if (overlaps) {
     return { valid: false, reason: "OVERLAP" };
   }
-
   return { valid: true, clueX: clue.x, clueY: clue.y };
 }
 
@@ -79,18 +59,25 @@ function getValidPlacements(clue, puzzle, placed = []) {
   for (let w = 1; w <= val; w++) {
     if (val % w !== 0) continue;
     const h = val / w;
-
     const minOx = Math.max(0, clue.x + w - puzzle.width);
     const maxOx = Math.min(w - 1, clue.x);
-
     for (let ox = minOx; ox <= maxOx; ox++) {
       const minOy = Math.max(0, clue.y + h - puzzle.height);
       const maxOy = Math.min(h - 1, clue.y);
-
       for (let oy = minOy; oy <= maxOy; oy++) {
         const x = clue.x - ox;
         const y = clue.y - oy;
-        const reg = { x, y, width: w, height: h };
+        const reg = {
+          id: "",
+          x,
+          y,
+          width: w,
+          height: h,
+          area: val,
+          color: "",
+          clueX: 0,
+          clueY: 0
+        };
         const check = validateRegion(reg, puzzle, placed);
         if (check.valid) {
           placements.push({
@@ -105,39 +92,30 @@ function getValidPlacements(clue, puzzle, placed = []) {
   }
   return placements;
 }
-
 function solvePuzzle(puzzle) {
-  const clues = [...puzzle.clues].sort((a, b) => b.value - a.value); // Solve largest clues first
-
-  // Pre-compute candidates for each clue
-  const clueCandidates = clues.map(clue => getValidPlacements(clue, puzzle));
-
-  // If any clue has zero candidates, the puzzle is immediately unsolvable
-  if (clueCandidates.some(cands => cands.length === 0)) {
+  const clues = [...puzzle.clues].sort((a, b) => b.value - a.value);
+  const clueCandidates = clues.map(
+    (clue) => getValidPlacements(clue, puzzle)
+  );
+  if (clueCandidates.some((cands) => cands.length === 0)) {
     return null;
   }
-
   function backtrack(clueIdx, placed) {
     if (clueIdx === clues.length) {
-      const totalArea = placed.reduce((sum, r) => sum + r.width * r.height, 0);
+      const totalArea = placed.reduce(
+        (sum, r) => sum + r.width * r.height,
+        0
+      );
       if (totalArea === puzzle.width * puzzle.height) {
         return placed;
       }
       return null;
     }
-
     const candidates = clueCandidates[clueIdx];
     for (const cand of candidates) {
-      // Check if this candidate overlaps with any already placed region
-      const overlaps = placed.some(existing => {
-        return (
-          cand.x < existing.x + existing.width &&
-          cand.x + cand.width > existing.x &&
-          cand.y < existing.y + existing.height &&
-          cand.y + cand.height > existing.y
-        );
+      const overlaps = placed.some((existing) => {
+        return cand.x < existing.x + existing.width && cand.x + cand.width > existing.x && cand.y < existing.y + existing.height && cand.y + cand.height > existing.y;
       });
-
       if (!overlaps) {
         placed.push(cand);
         const res = backtrack(clueIdx + 1, placed);
@@ -147,22 +125,19 @@ function solvePuzzle(puzzle) {
     }
     return null;
   }
-
   return backtrack(0, []);
 }
 
 const {create} = await importShared('zustand');
-
 const DEFAULT_COLORS = [
-  'rgba(245, 158, 11, 0.3)',  // Amber
-  'rgba(16, 185, 129, 0.3)',  // Emerald
-  'rgba(59, 130, 246, 0.3)',  // Blue
-  'rgba(236, 72, 153, 0.3)',  // Pink
-  'rgba(139, 92, 246, 0.3)',  // Purple
-  'rgba(20, 184, 166, 0.3)'   // Teal
+  "rgba(245, 158, 11, 0.3)",
+  "rgba(16, 185, 129, 0.3)",
+  "rgba(59, 130, 246, 0.3)",
+  "rgba(236, 72, 153, 0.3)",
+  "rgba(139, 92, 246, 0.3)",
+  "rgba(20, 184, 166, 0.3)"
 ];
-
-const useShikakuStore = create((set, get) => ({
+const useShikakuStore = create()((set, get) => ({
   levels: [],
   currentLevelIndex: 0,
   puzzle: null,
@@ -175,35 +150,35 @@ const useShikakuStore = create((set, get) => ({
   isWon: false,
   starsAchieved: 0,
   completedLevels: {},
-
   loadSave: () => {
     try {
-      const saved = localStorage.getItem('cozy_os_shikaku_save');
+      const saved = localStorage.getItem("cozy_os_shikaku_save");
       if (saved) {
-        set({ completedLevels: JSON.parse(saved).completed || {} });
+        const parsed = JSON.parse(saved);
+        set({ completedLevels: parsed.completed || {} });
       }
     } catch (e) {
       console.error("Failed to load save state", e);
     }
   },
-
   saveProgress: (levelId, stars, time) => {
     const current = get().completedLevels[levelId];
     const bestTime = current ? Math.min(current.bestTime, time) : time;
     const bestStars = current ? Math.max(current.stars, stars) : stars;
-
     const updated = {
       ...get().completedLevels,
       [levelId]: { stars: bestStars, bestTime }
     };
     set({ completedLevels: updated });
     try {
-      localStorage.setItem('cozy_os_shikaku_save', JSON.stringify({ completed: updated }));
+      localStorage.setItem(
+        "cozy_os_shikaku_save",
+        JSON.stringify({ completed: updated })
+      );
     } catch (e) {
       console.error("Failed to save progress", e);
     }
   },
-
   loadLevel: (levelsList, index) => {
     const puzzle = levelsList[index];
     set({
@@ -220,26 +195,21 @@ const useShikakuStore = create((set, get) => ({
       starsAchieved: 0
     });
   },
-
   startDrag: (x, y) => {
     if (get().isWon) return;
     set({ dragStart: { x, y }, dragEnd: { x, y } });
   },
-
   updateDrag: (x, y) => {
     if (!get().dragStart) return;
     set({ dragEnd: { x, y } });
   },
-
   commitDrag: () => {
     const { dragStart, dragEnd, puzzle, regions, history, elapsedTime } = get();
     if (!dragStart || !dragEnd || !puzzle) return;
-
     const x = Math.min(dragStart.x, dragEnd.x);
     const y = Math.min(dragStart.y, dragEnd.y);
     const width = Math.abs(dragStart.x - dragEnd.x) + 1;
     const height = Math.abs(dragStart.y - dragEnd.y) + 1;
-
     const proposed = {
       id: `reg-${Date.now()}`,
       x,
@@ -247,35 +217,36 @@ const useShikakuStore = create((set, get) => ({
       width,
       height,
       area: width * height,
-      color: DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length]
+      color: DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length],
+      clueX: 0,
+      clueY: 0
     };
-
-    const valCheck = validateRegion(proposed, puzzle, regions);
-
+    const valCheck = validateRegion(
+      proposed,
+      puzzle,
+      regions
+    );
     if (valCheck.valid) {
       const committed = {
         ...proposed,
-        clueX: valCheck.clueX,
-        clueY: valCheck.clueY
+        clueX: valCheck.clueX ?? 0,
+        clueY: valCheck.clueY ?? 0
       };
-
       const nextRegions = [...regions, committed];
       const nextHistory = [...history, regions];
-
-      // Check Win Condition
-      const totalArea = nextRegions.reduce((sum, r) => sum + r.width * r.height, 0);
+      const totalArea = nextRegions.reduce(
+        (sum, r) => sum + r.width * r.height,
+        0
+      );
       const win = totalArea === puzzle.width * puzzle.height;
-
       let stars = 0;
       if (win) {
         const targets = puzzle.targets;
         if (elapsedTime <= targets.threeStars) stars = 3;
         else if (elapsedTime <= targets.twoStars) stars = 2;
         else stars = 1;
-        
         get().saveProgress(puzzle.id, stars, elapsedTime);
       }
-
       set({
         regions: nextRegions,
         history: nextHistory,
@@ -287,33 +258,26 @@ const useShikakuStore = create((set, get) => ({
       });
       return { success: true };
     }
-
     set({ dragStart: null, dragEnd: null });
     return { success: false, reason: valCheck.reason };
   },
-
   cancelDrag: () => {
     set({ dragStart: null, dragEnd: null });
   },
-
   removeRegionAt: (x, y) => {
     const { regions, history, isWon } = get();
     if (isWon) return;
-
     const found = regions.find(
-      r => x >= r.x && x < r.x + r.width && y >= r.y && y < r.y + r.height
+      (r) => x >= r.x && x < r.x + r.width && y >= r.y && y < r.y + r.height
     );
     if (!found) return;
-
-    const nextRegions = regions.filter(r => r.id !== found.id);
+    const nextRegions = regions.filter((r) => r.id !== found.id);
     const nextHistory = [...history, regions];
-
     set({
       regions: nextRegions,
       history: nextHistory
     });
   },
-
   undo: () => {
     const { history, isWon } = get();
     if (history.length === 0 || isWon) return;
@@ -324,7 +288,6 @@ const useShikakuStore = create((set, get) => ({
       history: nextHistory
     });
   },
-
   resetLevel: () => {
     set({
       regions: [],
@@ -337,66 +300,48 @@ const useShikakuStore = create((set, get) => ({
       starsAchieved: 0
     });
   },
-
   tickTimer: () => {
     if (get().timerActive) {
-      set(state => ({ elapsedTime: state.elapsedTime + 1 }));
+      set((state) => ({ elapsedTime: state.elapsedTime + 1 }));
     }
   },
-
   getHint: () => {
     const { puzzle, regions } = get();
     if (!puzzle || get().isWon) return;
-
     const fullSolution = solvePuzzle(puzzle);
     if (!fullSolution) return;
-
-    // Find the first solution region that is not currently covered correctly
-    const missingRegion = fullSolution.find(solReg => {
+    const missingRegion = fullSolution.find((solReg) => {
       return !regions.some(
-        userReg =>
-          userReg.x === solReg.x &&
-          userReg.y === solReg.y &&
-          userReg.width === solReg.width &&
-          userReg.height === solReg.height
+        (userReg) => userReg.x === solReg.x && userReg.y === solReg.y && userReg.width === solReg.width && userReg.height === solReg.height
       );
     });
-
     if (missingRegion) {
-      // Clear any user regions that overlap the missing (correct) region
-      const overlappingUserRegs = regions.filter(userReg => {
-        return (
-          userReg.x < missingRegion.x + missingRegion.width &&
-          userReg.x + userReg.width > missingRegion.x &&
-          userReg.y < missingRegion.y + missingRegion.height &&
-          userReg.y + userReg.height > missingRegion.y
-        );
+      const overlappingUserRegs = regions.filter((userReg) => {
+        return userReg.x < missingRegion.x + missingRegion.width && userReg.x + userReg.width > missingRegion.x && userReg.y < missingRegion.y + missingRegion.height && userReg.y + userReg.height > missingRegion.y;
       });
-
       let nextRegions = regions;
       if (overlappingUserRegs.length > 0) {
-        nextRegions = regions.filter(r => !overlappingUserRegs.some(o => o.id === r.id));
+        nextRegions = regions.filter(
+          (r) => !overlappingUserRegs.some((o) => o.id === r.id)
+        );
       }
-
       const committedHint = {
         ...missingRegion,
         id: `hint-${Date.now()}`,
-        color: 'rgba(16, 185, 129, 0.4)' // Green tint for hint
+        color: "rgba(16, 185, 129, 0.4)"
       };
-
       const finalRegions = [...nextRegions, committedHint];
       const nextHistory = [...get().history, regions];
-
-      // Check if hint completes board
-      const totalArea = finalRegions.reduce((sum, r) => sum + r.width * r.height, 0);
+      const totalArea = finalRegions.reduce(
+        (sum, r) => sum + r.width * r.height,
+        0
+      );
       const win = totalArea === puzzle.width * puzzle.height;
-
       let stars = 0;
       if (win) {
-        stars = 1; // Hint completion limits to 1 star
+        stars = 1;
         get().saveProgress(puzzle.id, stars, get().elapsedTime);
       }
-
       set({
         regions: finalRegions,
         history: nextHistory,
@@ -409,10 +354,9 @@ const useShikakuStore = create((set, get) => ({
 }));
 
 const SHIKAKU_LEVELS = [
-  // --- EASY LEVELS (4x4 to 6x6) ---
   {
-    id: 'easy-1',
-    difficulty: 'Easy',
+    id: "easy-1",
+    difficulty: "Easy",
     width: 4,
     height: 4,
     clues: [
@@ -424,8 +368,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 10, twoStars: 20, oneStar: 40 }
   },
   {
-    id: 'easy-2',
-    difficulty: 'Easy',
+    id: "easy-2",
+    difficulty: "Easy",
     width: 5,
     height: 5,
     clues: [
@@ -438,8 +382,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 15, twoStars: 30, oneStar: 60 }
   },
   {
-    id: 'easy-3',
-    difficulty: 'Easy',
+    id: "easy-3",
+    difficulty: "Easy",
     width: 6,
     height: 6,
     clues: [
@@ -451,8 +395,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 20, twoStars: 40, oneStar: 80 }
   },
   {
-    id: 'easy-4',
-    difficulty: 'Easy',
+    id: "easy-4",
+    difficulty: "Easy",
     width: 6,
     height: 6,
     clues: [
@@ -466,8 +410,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 20, twoStars: 40, oneStar: 80 }
   },
   {
-    id: 'easy-5',
-    difficulty: 'Easy',
+    id: "easy-5",
+    difficulty: "Easy",
     width: 6,
     height: 6,
     clues: [
@@ -480,8 +424,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 25, twoStars: 50, oneStar: 100 }
   },
   {
-    id: 'easy-6',
-    difficulty: 'Easy',
+    id: "easy-6",
+    difficulty: "Easy",
     width: 6,
     height: 6,
     clues: [
@@ -496,11 +440,9 @@ const SHIKAKU_LEVELS = [
     ],
     targets: { threeStars: 25, twoStars: 50, oneStar: 100 }
   },
-
-  // --- MEDIUM LEVELS (8x8) ---
   {
-    id: 'medium-1',
-    difficulty: 'Medium',
+    id: "medium-1",
+    difficulty: "Medium",
     width: 8,
     height: 8,
     clues: [
@@ -518,8 +460,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
   },
   {
-    id: 'medium-2',
-    difficulty: 'Medium',
+    id: "medium-2",
+    difficulty: "Medium",
     width: 8,
     height: 8,
     clues: [
@@ -534,8 +476,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
   },
   {
-    id: 'medium-3',
-    difficulty: 'Medium',
+    id: "medium-3",
+    difficulty: "Medium",
     width: 8,
     height: 8,
     clues: [
@@ -552,8 +494,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
   },
   {
-    id: 'medium-4',
-    difficulty: 'Medium',
+    id: "medium-4",
+    difficulty: "Medium",
     width: 8,
     height: 8,
     clues: [
@@ -570,8 +512,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
   },
   {
-    id: 'medium-5',
-    difficulty: 'Medium',
+    id: "medium-5",
+    difficulty: "Medium",
     width: 8,
     height: 8,
     clues: [
@@ -588,8 +530,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
   },
   {
-    id: 'medium-6',
-    difficulty: 'Medium',
+    id: "medium-6",
+    difficulty: "Medium",
     width: 8,
     height: 8,
     clues: [
@@ -607,8 +549,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
   },
   {
-    id: 'medium-7',
-    difficulty: 'Medium',
+    id: "medium-7",
+    difficulty: "Medium",
     width: 8,
     height: 8,
     clues: [
@@ -623,10 +565,9 @@ const SHIKAKU_LEVELS = [
     ],
     targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
   },
-  // --- HARD LEVELS (10x10) ---
   {
-    id: 'hard-1',
-    difficulty: 'Hard',
+    id: "hard-1",
+    difficulty: "Hard",
     width: 10,
     height: 10,
     clues: [
@@ -648,8 +589,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
   },
   {
-    id: 'hard-2',
-    difficulty: 'Hard',
+    id: "hard-2",
+    difficulty: "Hard",
     width: 10,
     height: 10,
     clues: [
@@ -669,8 +610,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
   },
   {
-    id: 'hard-3',
-    difficulty: 'Hard',
+    id: "hard-3",
+    difficulty: "Hard",
     width: 10,
     height: 10,
     clues: [
@@ -692,8 +633,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
   },
   {
-    id: 'hard-4',
-    difficulty: 'Hard',
+    id: "hard-4",
+    difficulty: "Hard",
     width: 10,
     height: 10,
     clues: [
@@ -714,8 +655,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
   },
   {
-    id: 'hard-5',
-    difficulty: 'Hard',
+    id: "hard-5",
+    difficulty: "Hard",
     width: 10,
     height: 10,
     clues: [
@@ -742,8 +683,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
   },
   {
-    id: 'hard-6',
-    difficulty: 'Hard',
+    id: "hard-6",
+    difficulty: "Hard",
     width: 10,
     height: 10,
     clues: [
@@ -765,8 +706,8 @@ const SHIKAKU_LEVELS = [
     targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
   },
   {
-    id: 'hard-7',
-    difficulty: 'Hard',
+    id: "hard-7",
+    difficulty: "Hard",
     width: 10,
     height: 10,
     clues: [
@@ -790,129 +731,113 @@ const SHIKAKU_LEVELS = [
 ];
 
 class RetroSynth {
+  ctx;
+  muted;
   constructor() {
     this.ctx = null;
     this.muted = false;
   }
-
   init() {
     if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        this.ctx = new AudioContextClass();
+      }
     }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
+    if (this.ctx && this.ctx.state === "suspended") {
+      void this.ctx.resume();
     }
   }
-
   setMuted(val) {
     this.muted = val;
   }
-
   playPlace() {
     if (this.muted) return;
     this.init();
     const ctx = this.ctx;
-    
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    
-    osc.type = 'sine';
+    osc.type = "sine";
     osc.connect(gain);
     gain.connect(ctx.destination);
-    
     const now = ctx.currentTime;
-    osc.frequency.setValueAtTime(523.25, now); // C5
-    osc.frequency.setValueAtTime(659.25, now + 0.05); // E5
-    
+    osc.frequency.setValueAtTime(523.25, now);
+    osc.frequency.setValueAtTime(659.25, now + 0.05);
     gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
-    
+    gain.gain.exponentialRampToValueAtTime(1e-3, now + 0.15);
     osc.start(now);
     osc.stop(now + 0.15);
   }
-
   playError() {
     if (this.muted) return;
     this.init();
     const ctx = this.ctx;
-    
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    
-    osc.type = 'sawtooth';
+    osc.type = "sawtooth";
     osc.connect(gain);
     gain.connect(ctx.destination);
-    
     const now = ctx.currentTime;
     osc.frequency.setValueAtTime(150, now);
     gain.gain.setValueAtTime(0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-    
+    gain.gain.exponentialRampToValueAtTime(1e-3, now + 0.12);
     osc.start(now);
     osc.stop(now + 0.12);
   }
-
   playWin() {
     if (this.muted) return;
     this.init();
     const ctx = this.ctx;
-    
-    const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+    if (!ctx) return;
+    const notes = [523.25, 659.25, 783.99, 1046.5];
     const now = ctx.currentTime;
-    
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      
-      osc.type = 'triangle';
+      osc.type = "triangle";
       osc.connect(gain);
       gain.connect(ctx.destination);
-      
       osc.frequency.setValueAtTime(freq, now + idx * 0.08);
       gain.gain.setValueAtTime(0.15, now + idx * 0.08);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.2);
-      
+      gain.gain.exponentialRampToValueAtTime(
+        1e-3,
+        now + idx * 0.08 + 0.2
+      );
       osc.start(now + idx * 0.08);
       osc.stop(now + idx * 0.08 + 0.2);
     });
   }
-
   playClick() {
     if (this.muted) return;
     this.init();
     const ctx = this.ctx;
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    
-    osc.type = 'sine';
+    osc.type = "sine";
     osc.connect(gain);
     gain.connect(ctx.destination);
-    
     const now = ctx.currentTime;
     osc.frequency.setValueAtTime(800, now);
     gain.gain.setValueAtTime(0.05, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-    
+    gain.gain.exponentialRampToValueAtTime(1e-3, now + 0.02);
     osc.start(now);
     osc.stop(now + 0.02);
   }
 }
-
 const synth = new RetroSynth();
 
-const React$5 = await importShared('react');
-const {useEffect: useEffect$6} = React$5;
+const {useEffect: useEffect$6} = await importShared('react');
 function HUD({ onBack }) {
-  const {
-    puzzle,
-    elapsedTime,
-    isWon,
-    starsAchieved,
-    undo,
-    resetLevel,
-    getHint,
-    tickTimer
-  } = useShikakuStore();
+  const puzzle = useShikakuStore((state) => state.puzzle);
+  const elapsedTime = useShikakuStore((state) => state.elapsedTime);
+  const starsAchieved = useShikakuStore((state) => state.starsAchieved);
+  const undo = useShikakuStore((state) => state.undo);
+  const resetLevel = useShikakuStore((state) => state.resetLevel);
+  const getHint = useShikakuStore((state) => state.getHint);
+  const tickTimer = useShikakuStore((state) => state.tickTimer);
   useEffect$6(() => {
     const interval = setInterval(() => {
       tickTimer();
@@ -987,24 +912,35 @@ function HUD({ onBack }) {
   ] });
 }
 
-await importShared('react');
-
-function Cell({ x, y, clue, isCovered, onPointerDown, onPointerEnter }) {
+function Cell({
+  x,
+  y,
+  clue,
+  isCovered,
+  onPointerDown,
+  onPointerEnter
+}) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "div",
     {
       onPointerDown: (e) => {
         e.preventDefault();
         try {
-          e.target.releasePointerCapture(e.pointerId);
-        } catch (err) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
         }
         onPointerDown(x, y);
       },
       onPointerEnter: () => onPointerEnter(x, y),
       className: "aspect-square border border-[#2b4c3f]/30 bg-[#e2f4e5] select-none flex items-center justify-center relative touch-none",
       style: { touchAction: "none" },
-      children: clue !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `font-press text-[12px] ${isCovered ? "opacity-30" : "font-bold"}`, children: clue })
+      children: clue !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "span",
+        {
+          className: `font-press text-[12px] ${isCovered ? "opacity-30" : "font-bold"}`,
+          children: clue
+        }
+      )
     }
   );
 }
@@ -1052,7 +988,7 @@ const MotionConfigContext = createContext$3({
     reducedMotion: "never",
 });
 
-const React$4 = await importShared('react');
+const React$1 = await importShared('react');
 
 const {useId: useId$2,useRef: useRef$3,useContext: useContext$7,useInsertionEffect: useInsertionEffect$1} = await importShared('react');
 
@@ -1060,7 +996,7 @@ const {useId: useId$2,useRef: useRef$3,useContext: useContext$7,useInsertionEffe
  * Measurement functionality has to be within a separate component
  * to leverage snapshot lifecycle.
  */
-class PopChildMeasure extends React$4.Component {
+class PopChildMeasure extends React$1.Component {
     getSnapshotBeforeUpdate(prevProps) {
         const element = this.props.childRef.current;
         if (element && prevProps.isPresent && !this.props.isPresent) {
@@ -1123,10 +1059,10 @@ function PopChild({ children, isPresent }) {
             document.head.removeChild(style);
         };
     }, [isPresent]);
-    return (jsxRuntimeExports.jsx(PopChildMeasure, { isPresent: isPresent, childRef: ref, sizeRef: size, children: React$4.cloneElement(children, { ref }) }));
+    return (jsxRuntimeExports.jsx(PopChildMeasure, { isPresent: isPresent, childRef: ref, sizeRef: size, children: React$1.cloneElement(children, { ref }) }));
 }
 
-const React$3 = await importShared('react');
+const React = await importShared('react');
 
 const {useId: useId$1,useCallback: useCallback$2,useMemo: useMemo$5} = await importShared('react');
 
@@ -1167,7 +1103,7 @@ const PresenceChild = ({ children, initial, isPresent, onExitComplete, custom, p
      * If there's no `motion` components to fire exit animations, we want to remove this
      * component immediately.
      */
-    React$3.useEffect(() => {
+    React.useEffect(() => {
         !isPresent &&
             !presenceChildren.size &&
             onExitComplete &&
@@ -10771,21 +10707,18 @@ const createMotionComponent = /*@__PURE__*/ createMotionComponentFactory({
 
 const motion = /*@__PURE__*/ createDOMMotionComponentProxy(createMotionComponent);
 
-const React$2 = await importShared('react');
-const {useEffect: useEffect$2,useRef} = React$2;
+const {useEffect: useEffect$2,useRef} = await importShared('react');
 function Board() {
-  const {
-    puzzle,
-    regions,
-    dragStart,
-    dragEnd,
-    startDrag,
-    updateDrag,
-    commitDrag,
-    cancelDrag,
-    removeRegionAt,
-    isWon
-  } = useShikakuStore();
+  const puzzle = useShikakuStore((state) => state.puzzle);
+  const regions = useShikakuStore((state) => state.regions);
+  const dragStart = useShikakuStore((state) => state.dragStart);
+  const dragEnd = useShikakuStore((state) => state.dragEnd);
+  const startDrag = useShikakuStore((state) => state.startDrag);
+  const updateDrag = useShikakuStore((state) => state.updateDrag);
+  const commitDrag = useShikakuStore((state) => state.commitDrag);
+  const cancelDrag = useShikakuStore((state) => state.cancelDrag);
+  const removeRegionAt = useShikakuStore((state) => state.removeRegionAt);
+  const isWon = useShikakuStore((state) => state.isWon);
   const boardRef = useRef(null);
   useEffect$2(() => {
     const handleGlobalPointerUp = () => {
@@ -10797,7 +10730,10 @@ function Board() {
           synth.playError();
           if (boardRef.current) {
             boardRef.current.classList.add("animate-shake");
-            setTimeout(() => boardRef.current?.classList.remove("animate-shake"), 300);
+            setTimeout(
+              () => boardRef.current?.classList.remove("animate-shake"),
+              300
+            );
           }
         }
       }
@@ -10824,7 +10760,9 @@ function Board() {
   const cells = [];
   for (let y = 0; y < puzzle.height; y++) {
     for (let x = 0; x < puzzle.width; x++) {
-      const clueObj = puzzle.clues.find((c) => c.x === x && c.y === y);
+      const clueObj = puzzle.clues.find(
+        (c) => c.x === x && c.y === y
+      );
       const isCovered = regions.some(
         (r) => x >= r.x && x < r.x + r.width && y >= r.y && y < r.y + r.height
       );
@@ -10928,10 +10866,12 @@ function Board() {
   ] });
 }
 
-const React$1 = await importShared('react');
-const {useEffect: useEffect$1} = React$1;
-function LevelSelect({ onSelect }) {
-  const { completedLevels, loadSave } = useShikakuStore();
+const {useEffect: useEffect$1} = await importShared('react');
+function LevelSelect({
+  onSelect
+}) {
+  const completedLevels = useShikakuStore((state) => state.completedLevels);
+  const loadSave = useShikakuStore((state) => state.loadSave);
   useEffect$1(() => {
     loadSave();
   }, [loadSave]);
@@ -10939,7 +10879,7 @@ function LevelSelect({ onSelect }) {
     /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-[12px] text-center border-b-2 border-[#2b4c3f] pb-3", children: "SELECT LEVEL" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-3", children: SHIKAKU_LEVELS.map((lvl, index) => {
       const save = completedLevels[lvl.id];
-      const stars = save?.stars || 0;
+      const stars = save ? save.stars : 0;
       return /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
@@ -10967,11 +10907,11 @@ function LevelSelect({ onSelect }) {
   ] });
 }
 
-const React = await importShared('react');
-const {useState,useEffect} = React;
+const {useState,useEffect} = await importShared('react');
 function ShikakuApp() {
   const [selectedIdx, setSelectedIdx] = useState(null);
-  const { isWon, loadLevel } = useShikakuStore();
+  const isWon = useShikakuStore((state) => state.isWon);
+  const loadLevel = useShikakuStore((state) => state.loadLevel);
   useEffect(() => {
     if (isWon) {
       synth.playWin();

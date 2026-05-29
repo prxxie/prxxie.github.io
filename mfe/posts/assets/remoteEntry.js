@@ -3,7 +3,7 @@ const currentImports = {};
       let moduleMap = {
 "./PostsApp":()=>{
       dynamicLoadingCss(["style-CJVUnfKu.css"], false, './PostsApp');
-      return __federation_import('/mfe/posts/assets/__federation_expose_PostsApp-7uI8ONHL.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      return __federation_import('/mfe/posts/assets/__federation_expose_PostsApp-Dybw8iSF.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
         const metaUrl = import.meta.url;

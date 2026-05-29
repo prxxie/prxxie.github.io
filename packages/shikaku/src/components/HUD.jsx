@@ -36,7 +36,7 @@ export default function HUD({ onBack }) {
         >
           ◀ BACK
         </button>
-        <span>LVL: {puzzle?.id.toUpperCase()}</span>
+        <span>LVL: {puzzle?.id?.toUpperCase()}</span>
         <span className="font-mono text-sm">{formatTime(elapsedTime)}</span>
       </div>
       

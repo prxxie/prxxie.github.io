@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import ConsoleFrame from "./components/ConsoleFrame";
+import { PixelBookIcon, PixelPawIcon } from "./components/Icons";
 import { usePetStore } from "./store/petStore";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Tab } from "./types";
@@ -122,8 +123,8 @@ export default function App(): React.ReactElement {
               className={`col-span-1 ${tab === "pets" ? "md:col-span-3" : "md:col-span-2"} retro-window`}
             >
               <div className="window-header">
-                <span>
-                  📖{" "}
+                <span className="flex items-center gap-1">
+                  <PixelBookIcon className="w-3.5 h-3.5" />
                   <span className="window-header-accent">
                     {tab.toUpperCase()}_VIEW.EXE
                   </span>
@@ -157,8 +158,9 @@ export default function App(): React.ReactElement {
             {tab !== "pets" && (
               <div className="col-span-1 retro-window">
                 <div className="window-header">
-                  <span>
-                    🐾 <span className="window-header-accent">PET_HUD.EXE</span>
+                  <span className="flex items-center gap-1">
+                    <PixelPawIcon className="w-3.5 h-3.5" />
+                    <span className="window-header-accent">PET_HUD.EXE</span>
                   </span>
                   <span className="text-cozy-accent font-bold cursor-pointer">
                     [-]

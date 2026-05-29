@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { PixelFolderIcon } from "./Icons";
 import { useUiStore } from "../store/uiStore";
 import type { Tab } from "../types";
 
@@ -114,8 +115,8 @@ export default function ConsoleFrame({
           className="fixed top-0 right-0 bottom-0 w-64 bg-white border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden"
         >
           <div className="flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2">
-            <span className="font-press text-[10px] text-cozy-accent">
-              📂 MENU.EXE
+            <span className="font-press text-[10px] text-cozy-accent flex items-center gap-1">
+              <PixelFolderIcon className="w-3.5 h-3.5" /> MENU.EXE
             </span>
             <button
               onClick={() => setMenuOpen(false)}

@@ -40,7 +40,7 @@ describe("ConsoleFrame Responsive Menu", () => {
 
     expect(useUiStore.getState().isMenuOpen).toBe(true);
 
-    expect(screen.getByText("📂 MENU.EXE")).toBeInTheDocument();
+    expect(screen.getByText((content, el) => el?.tagName === "SPAN" && content.includes("MENU.EXE"))).toBeInTheDocument();
 
     const closeBtn = screen.getByRole("button", {
       name: "Close navigation menu",
@@ -57,7 +57,7 @@ describe("ConsoleFrame Responsive Menu", () => {
       </ConsoleFrame>
     );
 
-    expect(screen.getByText("📂 MENU.EXE")).toBeInTheDocument();
+    expect(screen.getByText((content, el) => el?.tagName === "SPAN" && content.includes("MENU.EXE"))).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: "Escape", code: "Escape" });
 

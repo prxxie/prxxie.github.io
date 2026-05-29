@@ -59,7 +59,7 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             
             {/* Main Content Window (2 columns wide on desktop, full-width on mobile) */}
-            <div className="col-span-1 md:col-span-2 retro-window">
+            <div className={`col-span-1 ${tab === 'pets' ? 'md:col-span-3' : 'md:col-span-2'} retro-window`}>
               <div className="window-header">
                 <span>📖 <span className="window-header-accent">{tab.toUpperCase()}_VIEW.EXE</span></span>
                 <span className="text-cozy-accent font-bold cursor-pointer">[X]</span>
@@ -72,17 +72,19 @@ export default function App() {
             </div>
 
             {/* Sidebar Tamagotchi Room (1 column wide on desktop. Stacks below on mobile if not on 'pets' tab) */}
-            <div className={`col-span-1 retro-window ${tab === 'pets' ? 'hidden' : 'block'}`}>
-              <div className="window-header">
-                <span>🐾 <span className="window-header-accent">PET_HUD.EXE</span></span>
-                <span className="text-cozy-accent font-bold cursor-pointer">[-]</span>
+            {tab !== 'pets' && (
+              <div className="col-span-1 retro-window">
+                <div className="window-header">
+                  <span>🐾 <span className="window-header-accent">PET_HUD.EXE</span></span>
+                  <span className="text-cozy-accent font-bold cursor-pointer">[-]</span>
+                </div>
+                <div className="window-body min-h-[350px]">
+                  <Suspense fallback={<div className="font-press text-center pt-10 text-[8px]">LOADING PET...</div>}>
+                    <PetsApp usePetStore={usePetStore} />
+                  </Suspense>
+                </div>
               </div>
-              <div className="window-body min-h-[350px]">
-                <Suspense fallback={<div className="font-press text-center pt-10 text-[8px]">LOADING PET...</div>}>
-                  <PetsApp usePetStore={usePetStore} />
-                </Suspense>
-              </div>
-            </div>
+            )}
 
           </div>
         </ConsoleFrame>

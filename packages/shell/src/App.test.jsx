@@ -1,10 +1,42 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import App from './App';
 
 describe('Shell Host App', () => {
+  let requestFullscreenMock;
+  let exitFullscreenMock;
+  let originalFullscreenElementDescriptor;
+
+  beforeEach(() => {
+    requestFullscreenMock = vi.fn().mockResolvedValue(undefined);
+    HTMLDivElement.prototype.requestFullscreen = requestFullscreenMock;
+
+    exitFullscreenMock = vi.fn().mockResolvedValue(undefined);
+    document.exitFullscreen = exitFullscreenMock;
+
+    originalFullscreenElementDescriptor = Object.getOwnPropertyDescriptor(document, 'fullscreenElement');
+
+    Object.defineProperty(document, 'fullscreenElement', {
+      value: null,
+      writable: true,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    delete HTMLDivElement.prototype.requestFullscreen;
+    delete document.exitFullscreen;
+
+    if (originalFullscreenElementDescriptor) {
+      Object.defineProperty(document, 'fullscreenElement', originalFullscreenElementDescriptor);
+    } else {
+      delete document.fullscreenElement;
+    }
+    vi.restoreAllMocks();
+  });
+
   it('renders welcoming header text', () => {
     render(<App />);
     expect(screen.getByText('WELCOME HOME')).toBeInTheDocument();
@@ -19,13 +51,6 @@ describe('Shell Host App', () => {
   });
 
   it('toggles fullscreen state when button is clicked', () => {
-    // Mock element and document methods
-    const requestFullscreenMock = vi.fn();
-    HTMLDivElement.prototype.requestFullscreen = requestFullscreenMock;
-
-    const exitFullscreenMock = vi.fn();
-    document.exitFullscreen = exitFullscreenMock;
-
     render(<App />);
 
     // Get the fullscreen toggle button
@@ -62,9 +87,5 @@ describe('Shell Host App', () => {
     });
     fireEvent(document, new Event('fullscreenchange'));
     expect(toggleButton).toHaveTextContent('[⛶]');
-
-    // Cleanup mocks
-    delete HTMLDivElement.prototype.requestFullscreen;
-    delete document.exitFullscreen;
   });
 });

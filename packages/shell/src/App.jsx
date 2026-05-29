@@ -39,10 +39,14 @@ export default function App() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       if (windowRef.current) {
-        windowRef.current.requestFullscreen();
+        windowRef.current.requestFullscreen().catch((err) => {
+          console.error("Failed to enter fullscreen mode:", err);
+        });
       }
     } else {
-      document.exitFullscreen();
+      document.exitFullscreen().catch((err) => {
+        console.error("Failed to exit fullscreen mode:", err);
+      });
     }
   };
 

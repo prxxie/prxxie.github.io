@@ -247,3 +247,12 @@ body {
   }
 }
 
+.retro-window:fullscreen {
+  border: none;
+  box-shadow: none;
+  width: 100vw;
+  height: 100vh;
+}
+.retro-window:fullscreen .window-body {
+  flex-grow: 1;
+}

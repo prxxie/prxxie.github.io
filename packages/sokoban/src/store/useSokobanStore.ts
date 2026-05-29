@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { TileType, Player, Box, MoveSnapshot } from "../types";
 import { SOKOBAN_LEVELS } from "../levels";
+import { synth } from "../engine/synth";
 
 interface SokobanState {
   currentLevelIdx: number;
@@ -53,6 +54,7 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
   deadlockedBoxIds: [],
 
   loadLevel: (levelIdx) => {
+    synth.init();
     const normalizedIdx = Math.max(0, Math.min(levelIdx, SOKOBAN_LEVELS.length - 1));
     const lvl = SOKOBAN_LEVELS[normalizedIdx];
     
@@ -107,8 +109,14 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
     const tx = player.x + dx;
     const ty = player.y + dy;
 
-    if (ty < 0 || ty >= board.length || tx < 0 || tx >= board[ty].length) return;
-    if (board[ty][tx] === TileType.WALL) return; // Blocked by wall
+    if (ty < 0 || ty >= board.length || tx < 0 || tx >= board[ty].length) {
+      synth.playError();
+      return;
+    }
+    if (board[ty][tx] === TileType.WALL) {
+      synth.playError();
+      return; // Blocked by wall
+    }
 
     const pushedBoxIndex = boxes.findIndex((b) => b.x === tx && b.y === ty);
 
@@ -117,9 +125,18 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
       const bx = tx + dx;
       const by = ty + dy;
 
-      if (by < 0 || by >= board.length || bx < 0 || bx >= board[by].length) return;
-      if (board[by][bx] === TileType.WALL) return; // Behind is wall
-      if (boxes.some((b) => b.x === bx && b.y === by)) return; // Behind is another box
+      if (by < 0 || by >= board.length || bx < 0 || bx >= board[by].length) {
+        synth.playError();
+        return;
+      }
+      if (board[by][bx] === TileType.WALL) {
+        synth.playError();
+        return; // Behind is wall
+      }
+      if (boxes.some((b) => b.x === bx && b.y === by)) {
+        synth.playError();
+        return; // Behind is another box
+      }
 
       // Valid Push move
       const snapshot: MoveSnapshot = {
@@ -133,6 +150,12 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
 
       const newDeadlocks = computeDeadlocks(board, updatedBoxes);
       const win = updatedBoxes.every((b) => board[b.y]?.[b.x] === TileType.TARGET);
+
+      if (win) {
+        synth.playWin();
+      } else {
+        synth.playPush();
+      }
 
       set({
         player: { x: tx, y: ty },
@@ -150,6 +173,12 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
       };
 
       const win = boxes.every((b) => board[b.y]?.[b.x] === TileType.TARGET);
+
+      if (win) {
+        synth.playWin();
+      } else {
+        synth.playMove();
+      }
 
       set({
         player: { x: tx, y: ty },
@@ -187,5 +216,8 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
     loadLevel(currentLevelIdx + 1);
   },
 
-  setMuted: (muted) => set({ isMuted: muted })
+  setMuted: (muted) => {
+    synth.setMuted(muted);
+    set({ isMuted: muted });
+  }
 }));

@@ -4,4 +4,4 @@
 - [x] Task 2: Create Test Markdown Post
 - [x] Task 3: Create Unit Tests for PostsApp
 - [x] Task 4: Implement Frontmatter & Markdown Parser in PostsApp.jsx
-- [ ] Task 5: Add Layout Styles for Cozy Notebook Theme
+- [x] Task 5: Add Layout Styles for Cozy Notebook Theme

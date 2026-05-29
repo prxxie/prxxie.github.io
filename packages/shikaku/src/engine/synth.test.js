@@ -29,7 +29,9 @@ describe('RetroSynth', () => {
       createOscillator: vi.fn().mockReturnValue(mockOscillator),
       createGain: vi.fn().mockReturnValue(mockGain),
       destination: {},
-      currentTime: 10
+      currentTime: 10,
+      state: 'suspended',
+      resume: vi.fn()
     }));
 
     vi.stubGlobal('AudioContext', mockAudioContext);
@@ -44,11 +46,25 @@ describe('RetroSynth', () => {
     vi.unstubAllGlobals();
   });
 
-  it('should initialize the AudioContext on first play/init call', () => {
+  it('should initialize the AudioContext on first play/init call and resume if suspended', () => {
     expect(synth.ctx).toBeNull();
     synth.init();
     expect(synth.ctx).not.toBeNull();
     expect(mockAudioContext).toHaveBeenCalledTimes(1);
+    expect(synth.ctx.resume).toHaveBeenCalledTimes(1);
+  });
+
+  it('should not call resume if AudioContext is already running', () => {
+    mockAudioContext.mockImplementationOnce(() => ({
+      createOscillator: vi.fn().mockReturnValue(mockOscillator),
+      createGain: vi.fn().mockReturnValue(mockGain),
+      destination: {},
+      currentTime: 10,
+      state: 'running',
+      resume: vi.fn()
+    }));
+    synth.init();
+    expect(synth.ctx.resume).not.toHaveBeenCalled();
   });
 
   it('should not initialize or play sounds when muted', () => {

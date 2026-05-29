@@ -4,7 +4,7 @@
 @theme {
   --font-pixel: "VT323", monospace;
   --font-press: "Press Start 2P", monospace;
-  --color-cozy-bg: #f8f9fa;
+  --color-cozy-bg: oklch(96.8% 0.007 247.896);
   --color-cozy-text: oklch(20.8% 0.042 265.755);
   --color-cozy-border: oklch(20.8% 0.042 265.755);
   --color-cozy-accent: #CC6666;

@@ -5,3 +5,5 @@ dist/
 packages/*/dist/
 .DS_Store
 *.log
+.commandcode/
+.openchrome/

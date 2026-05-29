@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { PixelFolderIcon, PixelBackIcon, PixelBioIcon } from "./Icons";
 
 interface Skill {
   name: string;
@@ -19,8 +20,8 @@ export default function AboutApp(): React.ReactElement {
 
   return (
     <div className="flex flex-col h-full gap-2 overflow-y-auto">
-      <h2 className="font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1">
-        🗄️ BIO DIRECTORY
+      <h2 className="font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 flex items-center gap-1">
+        <PixelBioIcon className="w-4 h-4 text-cozy-accent" /> BIO DIRECTORY
       </h2>
 
       {openFolder === null ? (
@@ -29,13 +30,13 @@ export default function AboutApp(): React.ReactElement {
             onClick={() => setOpenFolder("bio")}
             className="border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white"
           >
-            📁 [BIO] - Who is prxxie?
+            <PixelFolderIcon className="w-4 h-4 mr-2" /> [BIO] - Who is prxxie?
           </div>
           <div
             onClick={() => setOpenFolder("skills")}
             className="border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white"
           >
-            📁 [SKILLS] - Character Stats
+            <PixelFolderIcon className="w-4 h-4 mr-2" /> [SKILLS] - Character Stats
           </div>
         </div>
       ) : (
@@ -44,7 +45,7 @@ export default function AboutApp(): React.ReactElement {
             onClick={() => setOpenFolder(null)}
             className="pixel-btn text-[8px] py-1 px-2 mb-2"
           >
-            🔙 BACK
+            <PixelBackIcon className="w-3.5 h-3.5 mr-1" /> BACK
           </button>
           {openFolder === "bio" && (
             <div className="border-2 border-cozy-border p-3 bg-white text-sm leading-relaxed">

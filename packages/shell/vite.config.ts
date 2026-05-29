@@ -18,6 +18,10 @@ export default defineConfig(({ command }) => {
     ? "/mfe/shikaku/assets/remoteEntry.js"
     : "http://localhost:3004/assets/remoteEntry.js";
 
+  const sokobanUrl = isProd
+    ? "/mfe/sokoban/assets/remoteEntry.js"
+    : "http://localhost:3005/assets/remoteEntry.js";
+
   return {
     publicDir: "../../public",
     plugins: [
@@ -30,9 +34,7 @@ export default defineConfig(({ command }) => {
           posts: postsUrl,
           pets: petsUrl,
           shikaku: shikakuUrl,
-          sokoban: isProd
-            ? "/mfe/sokoban/assets/remoteEntry.js"
-            : "http://localhost:3005/assets/remoteEntry.js",
+          sokoban: sokobanUrl,
         },
         shared: ["react", "react-dom", "zustand", "@tanstack/react-query"],
       }),

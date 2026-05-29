@@ -53,9 +53,9 @@ export default function PetsApp({ usePetStore }) {
 
   // Simple procedural pixel pet rendering
   const renderPetSprite = () => {
-    let color = '#2b4c3f';
-    if (status === 'eating') color = '#996633';
-    if (status === 'playing') color = '#2b4c3f';
+    let color = 'oklch(20.8% 0.042 265.755)'; // Slate
+    if (status === 'eating') color = '#CC6666'; // Fuzzy Wuzzy
+    if (status === 'playing') color = '#CC6666';
     if (isSleeping) color = '#779988';
 
     return (
@@ -65,13 +65,13 @@ export default function PetsApp({ usePetStore }) {
         {/* Bottom Feet */}
         {animationFrame === 0 ? (
           <>
-            <rect x="4" y="12" width="2" height="2" fill="#000" />
-            <rect x="10" y="12" width="2" height="2" fill="#000" />
+            <rect x="4" y="12" width="2" height="2" fill="var(--color-cozy-border)" />
+            <rect x="10" y="12" width="2" height="2" fill="var(--color-cozy-border)" />
           </>
         ) : (
           <>
-            <rect x="5" y="12" width="2" height="2" fill="#000" />
-            <rect x="9" y="12" width="2" height="2" fill="#000" />
+            <rect x="5" y="12" width="2" height="2" fill="var(--color-cozy-border)" />
+            <rect x="9" y="12" width="2" height="2" fill="var(--color-cozy-border)" />
           </>
         )}
         {/* Face */}
@@ -79,12 +79,12 @@ export default function PetsApp({ usePetStore }) {
           <>
             <rect x="6" y="6" width="1" height="1" fill="#fff" />
             <rect x="9" y="6" width="1" height="1" fill="#fff" />
-            <rect x="7" y="9" width="2" height="1" fill="#000" />
+            <rect x="7" y="9" width="2" height="1" fill="var(--color-cozy-border)" />
           </>
         ) : (
           <>
-            <rect x="5" y="7" width="2" height="1" fill="#000" />
-            <rect x="9" y="7" width="2" height="1" fill="#000" />
+            <rect x="5" y="7" width="2" height="1" fill="var(--color-cozy-border)" />
+            <rect x="9" y="7" width="2" height="1" fill="var(--color-cozy-border)" />
           </>
         )}
       </svg>
@@ -92,14 +92,34 @@ export default function PetsApp({ usePetStore }) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between h-full py-2">
-      <h2 className="font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 w-full text-center">🐾 TAMAGOTCHI ROOM</h2>
+    <div className="flex flex-col items-center justify-between h-full py-2 box-border">
+      {/* Standalone HUD readout (only displays when running standalone) */}
+      {!usePetStore && (
+        <div className="flex gap-4 text-xs font-press bg-[#f8f9fa] border-2 border-cozy-border p-2 mb-2 box-border">
+          <span>🍔 HNG: {hunger}</span>
+          <span>💖 HPP: {happiness}</span>
+        </div>
+      )}
 
-      {/* Standalone UI enhancements */}
-      <div className="flex gap-4 text-xs font-press bg-[#d7ecd9] border-2 border-cozy-border p-1 mb-2">
-        <span>🍔 HNG: {hunger}</span>
-        <span>💖 HPP: {happiness}</span>
-      </div>
+      {/* Interactive Stats indicators inside Shell Sidebar */}
+      {usePetStore && (
+        <div className="w-full flex flex-col gap-2 text-xs mb-4">
+          <div className="flex justify-between items-center">
+            <span>🍔 HUNGER</span>
+            <span>{hunger}/100</span>
+          </div>
+          <div className="h-4 border-2 border-cozy-border bg-gray-100 relative">
+            <div className="h-full bg-cozy-accent" style={{ width: `${hunger}%` }}></div>
+          </div>
+          <div className="flex justify-between items-center mt-1">
+            <span>💖 HAPPINESS</span>
+            <span>{happiness}/100</span>
+          </div>
+          <div className="h-4 border-2 border-cozy-border bg-gray-100 relative">
+            <div className="h-full bg-cozy-accent" style={{ width: `${happiness}%` }}></div>
+          </div>
+        </div>
+      )}
 
       {/* Pet display */}
       <div className={`p-4 border-4 border-cozy-border bg-white rounded flex items-center justify-center w-36 h-36 relative ${isSleeping ? 'bg-slate-900' : ''}`}>
@@ -108,7 +128,7 @@ export default function PetsApp({ usePetStore }) {
       </div>
 
       {/* Buttons to mutate store state */}
-      <div className="flex gap-2 w-full">
+      <div className="flex gap-2 w-full mt-4">
         <button onClick={feed} className="pixel-btn text-[8px] flex-1 py-1">FEED 🍗</button>
         <button onClick={play} className="pixel-btn text-[8px] flex-1 py-1">PLAY 🧸</button>
         <button onClick={toggleSleep} className="pixel-btn text-[8px] flex-1 py-1">

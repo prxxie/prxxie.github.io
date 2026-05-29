@@ -52,7 +52,7 @@ export default function PostsApp() {
             <div 
               key={post.id}
               onClick={() => setSelectedPost(post.id)}
-              className="border-2 border-cozy-border p-2 bg-[#f0f9f2] cursor-pointer hover:bg-[#d5eedb] flex justify-between items-center text-sm"
+              className="border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white flex justify-between items-center text-sm"
             >
               <span>📜 {post.title}</span>
               <span className="text-xs text-gray-500 font-mono">{post.date}</span>

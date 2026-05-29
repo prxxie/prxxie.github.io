@@ -16,10 +16,10 @@ export default function AboutApp() {
       
       {openFolder === null ? (
         <div className="flex flex-col gap-2 pt-2">
-          <div onClick={() => setOpenFolder('bio')} className="border-2 border-cozy-border p-2 bg-[#f0f9f2] cursor-pointer hover:bg-[#d5eedb]">
+          <div onClick={() => setOpenFolder('bio')} className="border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white">
             📁 [BIO] - Who is prxxie?
           </div>
-          <div onClick={() => setOpenFolder('skills')} className="border-2 border-cozy-border p-2 bg-[#f0f9f2] cursor-pointer hover:bg-[#d5eedb]">
+          <div onClick={() => setOpenFolder('skills')} className="border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white">
             📁 [SKILLS] - Character Stats
           </div>
         </div>

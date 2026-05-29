@@ -24,6 +24,10 @@ export default defineConfig({
         __dirname,
         "./packages/shell/src/components/MockMfe.tsx"
       ),
+      "sokoban/SokobanApp": path.resolve(
+        __dirname,
+        "./packages/shell/src/components/MockMfe.tsx"
+      ),
     },
   },
 });

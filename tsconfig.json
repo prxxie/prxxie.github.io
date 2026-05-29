@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "useUnknownInCatchVariables": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowImportingTsExtensions": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["vitest/globals"]
+  },
+  "include": [
+    "packages/shell/src/**/*.ts",
+    "packages/shell/src/**/*.tsx",
+    "packages/shell/src/**/*.d.ts",
+    "packages/about/src/**/*.ts",
+    "packages/about/src/**/*.tsx",
+    "packages/posts/src/**/*.ts",
+    "packages/posts/src/**/*.tsx",
+    "packages/pets/src/**/*.ts",
+    "packages/pets/src/**/*.tsx",
+    "packages/shikaku/src/**/*.ts",
+    "packages/shikaku/src/**/*.tsx",
+    "packages/shikaku/src/**/*.d.ts",
+    "vitest.config.ts",
+    "packages/*/vite.config.ts"
+  ]
+}

@@ -15,7 +15,7 @@ export default defineConfig(({ command }) => {
         exposes: {
           './ShikakuApp': './src/ShikakuApp.jsx'
         },
-        shared: ['react', 'react-dom']
+        shared: ['react', 'react-dom', 'zustand']
       })
     ],
     build: {

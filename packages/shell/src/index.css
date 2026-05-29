@@ -4,10 +4,10 @@
 @theme {
   --font-pixel: "VT323", monospace;
   --font-press: "Press Start 2P", monospace;
-  --color-cozy-bg: #e2f4e5;
-  --color-cozy-text: #2b4c3f;
-  --color-cozy-border: #2b4c3f;
-  --color-cozy-accent: #4a8570;
+  --color-cozy-bg: #f8f9fa;
+  --color-cozy-text: oklch(20.8% 0.042 265.755);
+  --color-cozy-border: oklch(20.8% 0.042 265.755);
+  --color-cozy-accent: #CC6666;
 }
 
 body {
@@ -32,6 +32,7 @@ body {
   cursor: pointer;
   box-shadow: 2px 2px 0px var(--color-cozy-border);
   transition: transform 0.1s, box-shadow 0.1s;
+  color: var(--color-cozy-text);
 }
 
 .pixel-btn:active {

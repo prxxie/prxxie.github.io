@@ -37,7 +37,7 @@ export default function LevelSelect({
               className="border-2 border-[#2b4c3f] bg-[#e2f4e5] p-3 flex flex-col items-center justify-center cursor-pointer active:translate-y-0.5 hover:bg-[#cce8d0] transition-colors"
             >
               <span className="text-[10px]">{index + 1}</span>
-              <span className="text-[6px] mt-1 text-slate-500 font-sans">
+              <span className="text-[6px] mt-1 text-slate-700 font-sans">
                 {lvl.width}x{lvl.height}
               </span>
               <div className="text-[8px] mt-2">

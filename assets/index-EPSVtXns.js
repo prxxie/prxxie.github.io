@@ -49,9 +49,9 @@ var m = reactDomExports;
 }
 
 const remotesMap = {
-'about':{url:'./mfe/about/assets/remoteEntry.js',format:'esm',from:'vite'},
-  'posts':{url:'./mfe/posts/assets/remoteEntry.js',format:'esm',from:'vite'},
-  'pets':{url:'./mfe/pets/assets/remoteEntry.js',format:'esm',from:'vite'}
+'about':{url:'/mfe/about/assets/remoteEntry.js',format:'esm',from:'vite'},
+  'posts':{url:'/mfe/posts/assets/remoteEntry.js',format:'esm',from:'vite'},
+  'pets':{url:'/mfe/pets/assets/remoteEntry.js',format:'esm',from:'vite'}
 };
                 const currentImports = {};
                 const loadJS = async (url, fn) => {
@@ -200,8 +200,8 @@ const usePetStore = create((set) => ({
 
 await importShared('react');
 function ConsoleFrame({ children, currentTab, setTab }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full max-w-5xl flex flex-col gap-6 px-4 py-6 box-border", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("header", { className: "bg-white border-4 border-cozy-border p-3 flex justify-between items-center shadow-[3px_3px_0px_var(--color-cozy-accent)] box-border", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full min-h-screen flex flex-col bg-cozy-bg box-border", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "bg-white border-b-4 border-cozy-border p-3 shadow-[0_3px_0px_var(--color-cozy-accent)] box-border w-full", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "svg",
@@ -256,8 +256,8 @@ function ConsoleFrame({ children, currentTab, setTab }) {
           }
         )
       ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "w-full flex-1", children })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "w-full max-w-5xl mx-auto flex-1 px-4 py-6 box-border", children })
   ] });
 }
 

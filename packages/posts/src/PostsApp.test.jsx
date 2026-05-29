@@ -1,11 +1,16 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PostsApp from './PostsApp';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-global.fetch = vi.fn();
+const fetchMock = vi.fn();
+vi.stubGlobal('fetch', fetchMock);
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -32,22 +37,18 @@ author: "testauthor"
 # Heading 1
 This is a **bold** word.
 `;
-    fetch.mockResolvedValueOnce({
-      ok: true,
-      text: () => Promise.resolve(mockMarkdown),
-    });
 
     render(<PostsApp />, { wrapper: createWrapper() });
 
     const postItem = screen.getByText(/Hello, Retro World!/i);
     expect(postItem).toBeInTheDocument();
 
-    fetch.mockResolvedValueOnce({
+    fetchMock.mockResolvedValueOnce({
       ok: true,
       text: () => Promise.resolve(mockMarkdown),
     });
 
-    postItem.click();
+    fireEvent.click(postItem);
 
     await waitFor(() => {
       expect(screen.getByText('Test Post Title')).toBeInTheDocument();

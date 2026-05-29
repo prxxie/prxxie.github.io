@@ -1,41 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Marked } from 'marked';
-import prismjs from 'prismjs';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-bash';
-import 'prismjs/components/prism-css';
-
-const marked = new Marked({
-  gfm: true,
-  breaks: true,
-  highlight(code, lang) {
-    if (prismjs.languages[lang]) {
-      return prismjs.highlight(code, prismjs.languages[lang], lang);
-    }
-    return code;
-  }
-});
-
-// Minimal frontmatter parser
-function parsePost(mdText) {
-  const regex = /^---\r?\n([\s\S]+?)\r?\n---\r?\n([\s\S]*)$/;
-  const match = regex.exec(mdText);
-  if (!match) return { title: 'Untitled Post', date: '', content: mdText };
-
-  const frontmatter = match[1];
-  const content = match[2];
-  const metadata = {};
-  frontmatter.split('\n').forEach((line) => {
-    const parts = line.split(':');
-    if (parts.length >= 2) {
-      const key = parts[0].trim();
-      const value = parts.slice(1).join(':').replace(/"/g, '').trim();
-      metadata[key] = value;
-    }
-  });
-  return { ...metadata, content };
-}
+import { parsePost, renderMarkdown } from './utils/markdown';
 
 export default function PostsApp() {
   const [selectedPost, setSelectedPost] = useState(null);
@@ -54,7 +19,7 @@ export default function PostsApp() {
       if (!res.ok) throw new Error('Post not found');
       const text = await res.text();
       const parsed = parsePost(text);
-      const htmlContent = await marked.parse(parsed.content);
+      const htmlContent = await renderMarkdown(parsed.content);
       return { ...parsed, htmlContent };
     },
     enabled: !!selectedPost

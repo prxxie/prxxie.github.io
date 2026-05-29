@@ -9,6 +9,7 @@ const queryClient = new QueryClient();
 const AboutApp = lazy(() => import('about/AboutApp').catch(() => ({ default: () => <Fallback name="About" /> })));
 const PostsApp = lazy(() => import('posts/PostsApp').catch(() => ({ default: () => <Fallback name="Posts" /> })));
 const PetsApp = lazy(() => import('pets/PetsApp').catch(() => ({ default: () => <Fallback name="Pets" /> })));
+const ShikakuApp = lazy(() => import('shikaku/ShikakuApp').catch(() => ({ default: () => <Fallback name="Shikaku" /> })));
 
 function Fallback({ name }) {
   return (
@@ -38,6 +39,8 @@ export default function App() {
         return <PostsApp />;
       case 'pets':
         return <PetsApp usePetStore={usePetStore} />;
+      case 'shikaku':
+        return <ShikakuApp />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">

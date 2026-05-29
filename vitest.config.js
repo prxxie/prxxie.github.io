@@ -11,6 +11,7 @@ export default defineConfig({
       'about/AboutApp': path.resolve(__dirname, './packages/shell/src/components/MockMfe.jsx'),
       'posts/PostsApp': path.resolve(__dirname, './packages/shell/src/components/MockMfe.jsx'),
       'pets/PetsApp': path.resolve(__dirname, './packages/shell/src/components/MockMfe.jsx'),
+      'shikaku/ShikakuApp': path.resolve(__dirname, './packages/shell/src/components/MockMfe.jsx'),
     }
   }
 });

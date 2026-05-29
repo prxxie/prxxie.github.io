@@ -14,6 +14,9 @@ export default defineConfig(({ command }) => {
   const petsUrl = isProd
     ? '/mfe/pets/assets/remoteEntry.js'
     : 'http://localhost:3003/assets/remoteEntry.js';
+  const shikakuUrl = isProd
+    ? '/mfe/shikaku/assets/remoteEntry.js'
+    : 'http://localhost:3004/assets/remoteEntry.js';
 
   return {
     publicDir: '../../public',
@@ -25,7 +28,8 @@ export default defineConfig(({ command }) => {
         remotes: {
           about: aboutUrl,
           posts: postsUrl,
-          pets: petsUrl
+          pets: petsUrl,
+          shikaku: shikakuUrl
         },
         shared: ['react', 'react-dom', 'zustand', '@tanstack/react-query']
       })

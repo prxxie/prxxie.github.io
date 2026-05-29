@@ -5,7 +5,8 @@ const NAV_ITEMS = [
   { id: 'home', label: 'HOME' },
   { id: 'about', label: 'ABOUT' },
   { id: 'posts', label: 'POSTS' },
-  { id: 'pets', label: 'PETS' }
+  { id: 'pets', label: 'PETS' },
+  { id: 'shikaku', label: 'SHIKAKU' }
 ];
 
 export default function ConsoleFrame({ children, currentTab, setTab }) {

@@ -1,0 +1,12 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import PetsApp from './PetsApp';
+import '../../shell/src/index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <div className="p-4 w-[500px]">
+      <PetsApp />
+    </div>
+  </React.StrictMode>
+);

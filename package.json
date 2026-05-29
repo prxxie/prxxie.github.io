@@ -1,0 +1,20 @@
+{
+  "name": "prxxie-home-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w packages/shell\" \"npm run dev -w packages/about\" \"npm run dev -w packages/posts\" \"npm run dev -w packages/pets\"",
+    "build": "npm run build --workspaces",
+    "build:static": "bash scripts/build-static.sh",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "vitest": "^1.6.0",
+    "jsdom": "^24.0.0",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/jest-dom": "^6.4.5"
+  }
+}

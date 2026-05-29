@@ -37,12 +37,7 @@ export default function App() {
       case 'posts':
         return <PostsApp />;
       case 'pets':
-        // On mobile, show pets page in full if that tab is active
-        return (
-          <div className="block md:hidden">
-            <PetsApp usePetStore={usePetStore} />
-          </div>
-        );
+        return <PetsApp usePetStore={usePetStore} />;
       default:
         return (
           <div className="flex flex-col items-center justify-center h-full text-center p-4">
@@ -60,41 +55,24 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <div className="w-full flex justify-center min-h-screen">
         <ConsoleFrame currentTab={tab} setTab={setTab}>
-          {/* Grid Layout: Main panel left, Pet sidebar right (desktop only) */}
+          {/* Responsive Grid: Stacks vertically on mobile (grid-cols-1), two columns on desktop (md:grid-cols-3) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             
-            {/* Active Sub-page (Left Side Panel) */}
-            {tab !== 'pets' && (
-              <div className="col-span-1 md:col-span-2 retro-window">
-                <div className="window-header">
-                  <span>📖 <span className="window-header-accent">{tab.toUpperCase()}_VIEW.EXE</span></span>
-                  <span className="text-cozy-accent font-bold cursor-pointer">[X]</span>
-                </div>
-                <div className="window-body min-h-[350px]">
-                  <Suspense fallback={<div className="font-press text-center pt-10 text-[8px]">LOADING MFE...</div>}>
-                    {renderMainContent()}
-                  </Suspense>
-                </div>
+            {/* Main Content Window (2 columns wide on desktop, full-width on mobile) */}
+            <div className="col-span-1 md:col-span-2 retro-window">
+              <div className="window-header">
+                <span>📖 <span className="window-header-accent">{tab.toUpperCase()}_VIEW.EXE</span></span>
+                <span className="text-cozy-accent font-bold cursor-pointer">[X]</span>
               </div>
-            )}
-
-            {/* Stacking fallback when pets page is opened on mobile */}
-            {tab === 'pets' && (
-              <div className="col-span-1 md:col-span-2 retro-window block md:hidden">
-                <div className="window-header">
-                  <span>🐾 <span className="window-header-accent">PETS_VIEW.EXE</span></span>
-                  <span className="text-cozy-accent font-bold cursor-pointer">[X]</span>
-                </div>
-                <div className="window-body min-h-[350px]">
-                  <Suspense fallback={<div className="font-press text-center pt-10 text-[8px]">LOADING MFE...</div>}>
-                    {renderMainContent()}
-                  </Suspense>
-                </div>
+              <div className="window-body min-h-[350px]">
+                <Suspense fallback={<div className="font-press text-center pt-10 text-[8px]">LOADING MFE...</div>}>
+                  {renderMainContent()}
+                </Suspense>
               </div>
-            )}
+            </div>
 
-            {/* Tamagotchi Sidebar Room (Right Side Panel - Always visible on desktop, stows below content on mobile) */}
-            <div className={`col-span-1 retro-window ${tab === 'pets' ? 'block' : 'hidden md:block'}`}>
+            {/* Sidebar Tamagotchi Room (1 column wide on desktop. Stacks below on mobile if not on 'pets' tab) */}
+            <div className={`col-span-1 retro-window ${tab === 'pets' ? 'hidden' : 'block'}`}>
               <div className="window-header">
                 <span>🐾 <span className="window-header-accent">PET_HUD.EXE</span></span>
                 <span className="text-cozy-accent font-bold cursor-pointer">[-]</span>

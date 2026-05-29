@@ -68,9 +68,11 @@ export const useShikakuStore = create<ShikakuState>()((set, get) => ({
     try {
       const saved = localStorage.getItem("cozy_os_shikaku_save");
       if (saved) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const parsed: { completed: CompletedLevels } = JSON.parse(saved);
-        set({ completedLevels: parsed.completed || {} });
+        const parsed = JSON.parse(saved) as unknown;
+        if (parsed && typeof parsed === "object" && "completed" in parsed) {
+          const completed = (parsed as { completed: CompletedLevels }).completed;
+          set({ completedLevels: completed || {} });
+        }
       }
     } catch (e) {
       console.error("Failed to load save state", e);

@@ -1,6 +1,12 @@
 import React, { useEffect } from 'react';
-import { usePetStore } from '../store/petStore';
 import { useUiStore } from '../store/uiStore';
+
+const NAV_ITEMS = [
+  { id: 'home', label: 'HOME' },
+  { id: 'about', label: 'ABOUT' },
+  { id: 'posts', label: 'POSTS' },
+  { id: 'pets', label: 'PETS' }
+];
 
 export default function ConsoleFrame({ children, currentTab, setTab }) {
   const { isMenuOpen, setMenuOpen, toggleMenu } = useUiStore();
@@ -29,13 +35,6 @@ export default function ConsoleFrame({ children, currentTab, setTab }) {
     setMenuOpen(false);
   };
 
-  const navItems = [
-    { id: 'home', label: 'HOME' },
-    { id: 'about', label: 'ABOUT' },
-    { id: 'posts', label: 'POSTS' },
-    { id: 'pets', label: 'PETS' }
-  ];
-
   return (
     <div className="w-full min-h-screen flex flex-col bg-cozy-bg box-border">
       {/* Top Header Bar */}
@@ -61,7 +60,7 @@ export default function ConsoleFrame({ children, currentTab, setTab }) {
 
           {/* Navigation Menu (Desktop Only) */}
           <nav className="hidden md:flex gap-2">
-            {navItems.map((item) => (
+            {NAV_ITEMS.map((item) => (
               <button 
                 key={item.id}
                 onClick={() => handleTabClick(item.id)} 
@@ -76,6 +75,9 @@ export default function ConsoleFrame({ children, currentTab, setTab }) {
           <button
             onClick={toggleMenu}
             className="md:hidden pixel-btn text-[9px] px-3 py-1"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu-drawer"
+            aria-label="Toggle navigation menu"
           >
             [MENU.EXE]
           </button>
@@ -92,18 +94,25 @@ export default function ConsoleFrame({ children, currentTab, setTab }) {
 
       {/* Mobile Offcanvas Drawer Panel */}
       {isMenuOpen && (
-        <div className="fixed top-0 right-0 bottom-0 w-64 bg-white border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden">
+        <div 
+          id="mobile-menu-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation menu"
+          className="fixed top-0 right-0 bottom-0 w-64 bg-white border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden"
+        >
           <div className="flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2">
             <span className="font-press text-[10px] text-cozy-accent">📂 MENU.EXE</span>
             <button 
               onClick={() => setMenuOpen(false)} 
               className="text-cozy-accent font-bold cursor-pointer font-press text-[10px] bg-transparent border-none"
+              aria-label="Close navigation menu"
             >
               [X]
             </button>
           </div>
           <nav className="flex flex-col gap-3">
-            {navItems.map((item) => (
+            {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}

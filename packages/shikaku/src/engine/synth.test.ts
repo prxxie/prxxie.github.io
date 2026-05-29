@@ -46,7 +46,7 @@ describe("RetroSynth", () => {
       destination: {},
       currentTime: 10,
       state: "suspended",
-      resume: vi.fn(),
+      resume: vi.fn().mockResolvedValue(undefined),
     }));
 
     vi.stubGlobal("AudioContext", mockAudioContextCtor);
@@ -75,7 +75,7 @@ describe("RetroSynth", () => {
       destination: {},
       currentTime: 10,
       state: "running",
-      resume: vi.fn(),
+      resume: vi.fn().mockResolvedValue(undefined),
     }));
     synth.init();
     expect(synth.ctx!.resume).not.toHaveBeenCalled();

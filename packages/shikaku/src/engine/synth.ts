@@ -22,7 +22,9 @@ class RetroSynth {
       }
     }
     if (this.ctx && this.ctx.state === "suspended") {
-      void this.ctx.resume();
+      void this.ctx.resume().catch((err: unknown) => {
+        console.warn("Failed to resume AudioContext:", err);
+      });
     }
   }
 

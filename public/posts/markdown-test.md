@@ -27,5 +27,5 @@ Welcome to the markdown verification post!
 ## Code Blocks
 ```javascript
 const pet = "tamagotchi";
-console.log(`Hello, \${pet}!`);
+console.log(`Hello, ${pet}!`);
 ```

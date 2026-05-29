@@ -7,18 +7,26 @@ describe('Handcrafted Levels Verification', () => {
     expect(SHIKAKU_LEVELS.length).toBe(20);
   });
 
-  it('should verify there are 5 Easy, 8 Medium, and 7 Hard levels', () => {
+  it('should verify there are 6 Easy, 8 Medium, and 6 Hard levels', () => {
     const easy = SHIKAKU_LEVELS.filter(l => l.difficulty === 'Easy');
     const medium = SHIKAKU_LEVELS.filter(l => l.difficulty === 'Medium');
     const hard = SHIKAKU_LEVELS.filter(l => l.difficulty === 'Hard');
 
-    expect(easy.length).toBe(5);
+    expect(easy.length).toBe(6);
     expect(medium.length).toBe(8);
-    expect(hard.length).toBe(7);
+    expect(hard.length).toBe(6);
 
     easy.forEach(l => {
-      expect(l.width).toBe(6);
-      expect(l.height).toBe(6);
+      if (l.id === 'easy-1') {
+        expect(l.width).toBe(4);
+        expect(l.height).toBe(4);
+      } else if (l.id === 'easy-2') {
+        expect(l.width).toBe(5);
+        expect(l.height).toBe(5);
+      } else {
+        expect(l.width).toBe(6);
+        expect(l.height).toBe(6);
+      }
     });
 
     medium.forEach(l => {

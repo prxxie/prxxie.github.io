@@ -23,12 +23,13 @@ export default function ConsoleFrame({ children, currentTab, setTab }) {
   }, [isMenuOpen]);
 
   useEffect(() => {
+    if (!isMenuOpen) return;
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') setMenuOpen(false);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [setMenuOpen]);
+  }, [isMenuOpen, setMenuOpen]);
 
   const handleTabClick = (tabName) => {
     setTab(tabName);
@@ -89,6 +90,7 @@ export default function ConsoleFrame({ children, currentTab, setTab }) {
         <div 
           className="fixed inset-0 bg-black/45 z-40 md:hidden animate-[fade-in_0.2s_ease-out]"
           onClick={() => setMenuOpen(false)}
+          aria-hidden="true"
         />
       )}
 

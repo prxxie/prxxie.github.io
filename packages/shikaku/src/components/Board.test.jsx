@@ -113,4 +113,14 @@ describe('Board Component', () => {
     fireEvent(window, new Event('pointercancel'));
     expect(cancelMock).toHaveBeenCalled();
   });
+
+  it('applies responsive sizing inline styles to the board container', () => {
+    const { container } = render(<Board />);
+    const boardContainer = container.querySelector('.relative.border-4');
+    expect(boardContainer).toBeInTheDocument();
+    expect(boardContainer).toHaveStyle({
+      maxWidth: 'min(85vw, 60vh, 400px)',
+      maxHeight: 'min(85vw, 60vh, 400px)'
+    });
+  });
 });

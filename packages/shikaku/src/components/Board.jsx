@@ -96,8 +96,12 @@ export default function Board() {
       `}</style>
       <div 
         ref={boardRef}
-        className="relative border-4 border-[#2b4c3f] bg-[#2b4c3f] overflow-hidden select-none touch-none w-full max-w-[400px] aspect-square mx-auto transition-transform"
-        style={{ touchAction: 'none' }}
+        className="relative border-4 border-[#2b4c3f] bg-[#2b4c3f] overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform"
+        style={{ 
+          touchAction: 'none',
+          maxWidth: 'min(85vw, 60vh, 400px)',
+          maxHeight: 'min(85vw, 60vh, 400px)'
+        }}
       >
         {/* CSS Grid Layer */}
         <div

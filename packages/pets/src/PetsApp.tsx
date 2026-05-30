@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PixelChickenIcon, PixelBearIcon, PixelMoonIcon, PixelSunIcon, PixelHeartIcon } from "./Icons";
+import PetSprite from "../../shell/src/components/PetSprite";
 import { create, type StoreApi, type UseBoundStore } from "zustand";
 
 type PetStatus = "idle" | "eating" | "playing" | "sleeping";
@@ -93,87 +94,6 @@ export default function PetsApp({
     }
   }, [status, setStatus]);
 
-  const renderPetSprite = (): React.ReactNode => {
-    let color = "oklch(20.8% 0.042 265.755)";
-    if (status === "eating") color = "#CC6666";
-    if (status === "playing") color = "#CC6666";
-    if (isSleeping) color = "#779988";
-
-    return (
-      <svg
-        viewBox="0 0 16 16"
-        className={`w-28 h-28 ${status === "playing" ? "animate-bounce" : ""}`}
-      >
-        <rect x="4" y="4" width="8" height="8" fill={color} />
-        {animationFrame === 0 ? (
-          <>
-            <rect
-              x="4"
-              y="12"
-              width="2"
-              height="2"
-              fill="var(--color-cozy-border)"
-            />
-            <rect
-              x="10"
-              y="12"
-              width="2"
-              height="2"
-              fill="var(--color-cozy-border)"
-            />
-          </>
-        ) : (
-          <>
-            <rect
-              x="5"
-              y="12"
-              width="2"
-              height="2"
-              fill="var(--color-cozy-border)"
-            />
-            <rect
-              x="9"
-              y="12"
-              width="2"
-              height="2"
-              fill="var(--color-cozy-border)"
-            />
-          </>
-        )}
-        {!isSleeping ? (
-          <>
-            <rect x="6" y="6" width="1" height="1" fill="#fff" />
-            <rect x="9" y="6" width="1" height="1" fill="#fff" />
-            <rect
-              x="7"
-              y="9"
-              width="2"
-              height="1"
-              fill="var(--color-cozy-border)"
-            />
-          </>
-        ) : (
-          <>
-            <rect
-              x="5"
-              y="7"
-              width="2"
-              height="1"
-              fill="var(--color-cozy-border)"
-            />
-            <rect
-              x="9"
-              y="7"
-              width="2"
-              height="1"
-              fill="var(--color-cozy-border)"
-            />
-          </>
-        )}
-      </svg>
-    );
-  };
-
   return (
     <div className="flex flex-col items-center justify-between h-full py-2 box-border">
       {!usePetStore && (
@@ -206,7 +126,12 @@ export default function PetsApp({
         <span className="absolute bottom-1 right-2 text-[10px] text-cozy-text font-mono select-none">+</span>
 
         <div style={{ filter: "sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2)" }}>
-          {renderPetSprite()}
+          <PetSprite
+            size={112}
+            status={status}
+            isSleeping={isSleeping}
+            animationFrame={animationFrame}
+          />
         </div>
 
         {isSleeping && (

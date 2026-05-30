@@ -29,7 +29,7 @@ describe("Sokoban HUD Component", () => {
     const handleBack = vi.fn();
     render(<HUD onBack={handleBack} />);
 
-    expect(screen.getByText("MICROBAN #1")).toBeInTheDocument();
+    expect(screen.getByText("FIRST STEPS")).toBeInTheDocument();
     expect(screen.getByText("MOVES: 0")).toBeInTheDocument();
     expect(screen.getByText("UNDO")).toBeInTheDocument();
     expect(screen.getByText("RESET")).toBeInTheDocument();

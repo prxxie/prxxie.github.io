@@ -14,7 +14,9 @@ describe("Sokoban Game Store", () => {
       history: [],
       isWon: false,
       isMuted: false,
-      deadlockedBoxIds: []
+      deadlockedBoxIds: [],
+      lastDirection: "down",
+      isMoving: false,
     });
   });
 

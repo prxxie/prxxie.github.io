@@ -28,6 +28,8 @@ describe("SokobanApp Component", () => {
       isWon: false,
       isMuted: false,
       deadlockedBoxIds: [],
+      lastDirection: "down",
+      isMoving: false,
     });
   });
 
@@ -45,7 +47,7 @@ describe("SokobanApp Component", () => {
 
     // HUD element
     expect(screen.getByText("< MENU")).toBeInTheDocument();
-    expect(screen.getByText("MICROBAN #1")).toBeInTheDocument();
+    expect(screen.getByText("FIRST STEPS")).toBeInTheDocument();
     
     // Controls elements (virtual keys)
     expect(screen.getByLabelText("Move Up")).toBeInTheDocument();

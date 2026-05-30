@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { TileType, Player, Box, MoveSnapshot } from "../types";
+import { type PetDirection } from "../components/PetSprite";
 import { SOKOBAN_LEVELS } from "../levels";
 import { synth } from "../engine/synth";
 
@@ -13,6 +14,8 @@ interface SokobanState {
   isWon: boolean;
   isMuted: boolean;
   deadlockedBoxIds: string[];
+  lastDirection: PetDirection;
+  isMoving: boolean;
 
   loadLevel: (levelIdx: number) => void;
   move: (dx: number, dy: number) => void;
@@ -52,6 +55,8 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
   isWon: false,
   isMuted: false,
   deadlockedBoxIds: [],
+  lastDirection: "down",
+  isMoving: false,
 
   loadLevel: (levelIdx) => {
     synth.init();
@@ -98,13 +103,21 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
       moves: 0,
       history: [],
       isWon: false,
-      deadlockedBoxIds: []
+      deadlockedBoxIds: [],
+      lastDirection: "down",
+      isMoving: false
     });
   },
 
   move: (dx, dy) => {
     const { board, player, boxes, history, moves, isWon } = get();
     if (isWon) return;
+
+    // Update facing direction
+    const dirMap: Record<string, PetDirection> = { "0,-1": "up", "0,1": "down", "-1,0": "left", "1,0": "right" };
+    const dirKey = `${dx},${dy}`;
+    const newDir = dirMap[dirKey] || get().lastDirection;
+    set({ lastDirection: newDir, isMoving: true });
 
     const tx = player.x + dx;
     const ty = player.y + dy;
@@ -163,7 +176,8 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
         moves: moves + 1,
         history: [...history, snapshot],
         isWon: win,
-        deadlockedBoxIds: newDeadlocks
+        deadlockedBoxIds: newDeadlocks,
+        isMoving: false
       });
     } else {
       // Simple step move
@@ -184,7 +198,8 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
         player: { x: tx, y: ty },
         moves: moves + 1,
         history: [...history, snapshot],
-        isWon: win
+        isWon: win,
+        isMoving: false
       });
     }
   },

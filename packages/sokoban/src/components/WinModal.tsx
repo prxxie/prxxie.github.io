@@ -21,7 +21,7 @@ export default function WinModal({ onBack }: WinModalProps): React.ReactElement 
 
   return (
     <div className="absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4 select-none">
-      <div className="border-4 border-[#FFB000] bg-[#050505] p-6 shadow-md max-w-xs w-full text-center flex flex-col items-center gap-4">
+      <div className="border-4 border-[#FFB000] bg-[#050505] p-6 max-w-xs w-full text-center flex flex-col items-center gap-4">
         <h2 className="font-press text-[14px] text-cozy-text animate-bounce">
           STAGE CLEAR!
         </h2>

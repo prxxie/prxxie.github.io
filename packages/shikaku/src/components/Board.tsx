@@ -136,7 +136,7 @@ export default function Board(): React.ReactElement | null {
                 synth.playClick();
                 removeRegionAt(r.x, r.y);
               }}
-              className="absolute cursor-pointer flex items-center justify-center font-press text-[8px] select-none shadow-inner hover:brightness-95 active:scale-95"
+              className="absolute cursor-pointer flex items-center justify-center font-press text-[8px] select-none hover:brightness-95 active:scale-95"
               style={{
                 left: `calc((${r.x} / ${puzzle.width}) * 100%)`,
                 top: `calc((${r.y} / ${puzzle.height}) * 100%)`,

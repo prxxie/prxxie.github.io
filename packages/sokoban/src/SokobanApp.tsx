@@ -16,7 +16,7 @@ export default function SokobanApp(): React.ReactElement {
   };
 
   return (
-    <div className="w-full max-w-[450px] border-4 border-cozy-border bg-black p-4 shadow-md select-none relative flex flex-col items-center text-cozy-text">
+    <div className="w-full max-w-[450px] border-4 border-cozy-border bg-black p-4 select-none relative flex flex-col items-center text-cozy-text">
       {view === "menu" ? (
         <LevelSelect onSelect={handleSelectLevel} />
       ) : (

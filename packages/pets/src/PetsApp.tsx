@@ -219,19 +219,19 @@ export default function PetsApp({
       <div className="flex gap-2 w-full mt-4">
         <button
           onClick={feed}
-          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]"
+          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text"
         >
           FEED <PixelChickenIcon className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={play}
-          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]"
+          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text"
         >
           PLAY <PixelBearIcon className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={toggleSleep}
-          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]"
+          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text"
         >
           {isSleeping ? (
             <>

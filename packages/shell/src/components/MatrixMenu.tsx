@@ -37,7 +37,7 @@ export default function MatrixMenu({
             onClick={() => handleButtonClick(item.tab)}
             className={`pixel-btn text-[9px] py-2 px-1 text-center font-press capitalize ${
               currentTab === item.tab
-                ? "bg-cozy-accent text-black shadow-none border-cozy-border"
+                ? "bg-cozy-accent text-black border-cozy-border"
                 : "bg-transparent text-cozy-text hover:bg-cozy-muted/20"
             }`}
           >

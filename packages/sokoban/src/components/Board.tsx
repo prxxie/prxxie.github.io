@@ -18,7 +18,7 @@ export default function Board(): React.ReactElement {
 
   return (
     <div
-      className="relative w-full border-4 border-[#FFB000] bg-[#050505] shadow-inner select-none overflow-hidden"
+      className="relative w-full border-4 border-[#FFB000] bg-[#050505] select-none overflow-hidden"
       style={{ aspectRatio: `${cols} / ${rows}` }}
     >
       {/* Render Static Tiles (Wall, Floor, Target) */}

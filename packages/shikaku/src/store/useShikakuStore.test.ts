@@ -212,7 +212,8 @@ describe("Shikaku Game State Store", () => {
 
     const state = useShikakuStore.getState();
     expect(state.regions.length).toBe(1);
-    expect(state.regions[0].color).toBe("rgba(16, 185, 129, 0.4)");
+    expect(state.regions[0].color).toBe("rgba(16, 185, 129, 0.25)");
+    expect(state.regions[0].borderColor).toBe("rgba(16, 185, 129, 0.7)");
     expect(state.regions[0].id).toContain("hint-");
   });
 });

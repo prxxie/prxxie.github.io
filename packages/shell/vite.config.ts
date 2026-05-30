@@ -1,26 +1,21 @@
-import { defineConfig } from "vite";
+import { defineConfig, type ViteDevServer } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import federation from "@originjs/vite-plugin-federation";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import sirv from "sirv";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ command }) => {
   const isProd = command === "build";
-  const aboutUrl = isProd
-    ? "/mfe/about/assets/remoteEntry.js"
-    : "http://localhost:3001/assets/remoteEntry.js";
-  const postsUrl = isProd
-    ? "/mfe/posts/assets/remoteEntry.js"
-    : "http://localhost:3002/assets/remoteEntry.js";
-  const petsUrl = isProd
-    ? "/mfe/pets/assets/remoteEntry.js"
-    : "http://localhost:3003/assets/remoteEntry.js";
-  const shikakuUrl = isProd
-    ? "/mfe/shikaku/assets/remoteEntry.js"
-    : "http://localhost:3004/assets/remoteEntry.js";
 
-  const sokobanUrl = isProd
-    ? "/mfe/sokoban/assets/remoteEntry.js"
-    : "http://localhost:3005/assets/remoteEntry.js";
+  // Use /mfe/ path for both dev and prod
+  // In dev: served from sibling package dist folders via sirv middleware
+  // In prod: served from deployed static files
+  const mfePath = "/mfe";
+  const mfePackages = ["about", "posts", "pets", "shikaku", "sokoban"];
 
   return {
     publicDir: "../../public",
@@ -29,20 +24,34 @@ export default defineConfig(({ command }) => {
       tailwindcss(),
       federation({
         name: "shell",
-        remotes: {
-          about: aboutUrl,
-          posts: postsUrl,
-          pets: petsUrl,
-          shikaku: shikakuUrl,
-          sokoban: sokobanUrl,
-        },
+        remotes: Object.fromEntries(
+          mfePackages.map((name) => [
+            name,
+            `${mfePath}/${name}/assets/remoteEntry.js`,
+          ])
+        ),
         shared: ["react", "react-dom", "zustand", "@tanstack/react-query"],
       }),
-    ],
+      // Serve MFE dist folders in dev mode
+      !isProd && {
+        name: "serve-mfe-dist",
+        configureServer(server: ViteDevServer) {
+          // Mount each MFE's dist folder at /mfe/<name>
+          for (const name of mfePackages) {
+            const distPath = resolve(__dirname, "..", name, "dist");
+            server.middlewares.use(`/mfe/${name}`, sirv(distPath, { dev: true }));
+          }
+        },
+      },
+    ].filter(Boolean),
     build: {
       target: "esnext",
       minify: false,
       cssCodeSplit: false,
+    },
+    server: {
+      host: "0.0.0.0",
+      allowedHosts: true,
     },
   };
 });

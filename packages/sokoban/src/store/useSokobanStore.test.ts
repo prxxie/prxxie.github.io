@@ -14,7 +14,7 @@ describe("Sokoban Game Store", () => {
       history: [],
       isWon: false,
       isMuted: false,
-      deadlockedBoxIds: [],
+      deadlockedBoxIds: new Set(),
       lastDirection: "down",
       isMoving: false,
     });
@@ -130,6 +130,6 @@ describe("Sokoban Game Store", () => {
     expect(box.y).toBe(3);
     
     // (3,3) is a corner: Right is WALL (3,4) and Down is WALL (4,3), and it is not a target.
-    expect(state.deadlockedBoxIds).toContain(box.id);
+    expect(state.deadlockedBoxIds.has(box.id)).toBe(true);
   });
 });

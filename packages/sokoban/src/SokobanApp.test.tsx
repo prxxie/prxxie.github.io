@@ -27,7 +27,7 @@ describe("SokobanApp Component", () => {
       history: [],
       isWon: false,
       isMuted: false,
-      deadlockedBoxIds: [],
+      deadlockedBoxIds: new Set(),
       lastDirection: "down",
       isMoving: false,
     });

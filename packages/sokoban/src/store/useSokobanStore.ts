@@ -13,7 +13,7 @@ interface SokobanState {
   history: MoveSnapshot[];
   isWon: boolean;
   isMuted: boolean;
-  deadlockedBoxIds: string[];
+  deadlockedBoxIds: Set<string>;
   lastDirection: PetDirection;
   isMoving: boolean;
 
@@ -25,8 +25,8 @@ interface SokobanState {
   setMuted: (muted: boolean) => void;
 }
 
-const computeDeadlocks = (board: TileType[][], boxes: Box[]): string[] => {
-  const deadlocked: string[] = [];
+const computeDeadlocks = (board: TileType[][], boxes: Box[]): Set<string> => {
+  const deadlocked = new Set<string>();
   for (const box of boxes) {
     const { x, y } = box;
     if (y < 0 || y >= board.length || x < 0 || x >= board[y].length) continue;
@@ -39,7 +39,7 @@ const computeDeadlocks = (board: TileType[][], boxes: Box[]): string[] => {
 
     const inCorner = (leftWall || rightWall) && (upWall || downWall);
     if (inCorner) {
-      deadlocked.push(box.id);
+      deadlocked.add(box.id);
     }
   }
   return deadlocked;
@@ -54,7 +54,7 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
   history: [],
   isWon: false,
   isMuted: false,
-  deadlockedBoxIds: [],
+  deadlockedBoxIds: new Set(),
   lastDirection: "down",
   isMoving: false,
 
@@ -103,7 +103,7 @@ export const useSokobanStore = create<SokobanState>((set, get) => ({
       moves: 0,
       history: [],
       isWon: false,
-      deadlockedBoxIds: [],
+      deadlockedBoxIds: new Set(),
       lastDirection: "down",
       isMoving: false
     });

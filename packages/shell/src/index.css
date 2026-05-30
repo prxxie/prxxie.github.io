@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-pixel: "VT323", monospace;
-  --font-press: "Press Start 2P", monospace;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --font-pixel: "Geist Mono", ui-monospace, monospace;
+  --font-press: "Geist Mono", ui-monospace, monospace;
   --color-cozy-bg: #000000;
   --color-cozy-text: #FFB000;
   --color-cozy-border: #FFB000;
@@ -15,12 +16,10 @@
 body {
   background-color: var(--color-cozy-bg);
   color: var(--color-cozy-text);
-  font-family: var(--font-pixel);
-  font-size: 20px;
-  image-rendering: pixelated;
+  font-family: var(--font-mono);
+  font-size: 14px;
   position: relative;
   overflow-x: hidden;
-  text-shadow: 0 0 2px rgba(255, 176, 0, 0.35);
 }
 
 /* Scanlines Overlay */

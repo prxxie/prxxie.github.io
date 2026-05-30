@@ -650,73 +650,71 @@ function shallow$1(objA, objB) {
 }
 
 const React$4 = await importShared('react');
-function Tile({ cell, x, y, widthPercent, heightPercent }) {
+function Tile({
+  cell,
+  x,
+  y,
+  widthPercent,
+  heightPercent
+}) {
   if (cell === TileType.EMPTY) return null;
-  const isTarget = cell === TileType.TARGET;
-  const isWall = cell === TileType.WALL;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    "div",
-    {
-      className: "absolute",
-      style: {
-        left: `${x * widthPercent}%`,
-        top: `${y * heightPercent}%`,
-        width: `${widthPercent}%`,
-        height: `${heightPercent}%`
-      },
-      children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#080703]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: "absolute bottom-0 right-0 w-[1px] h-[1px] bg-[#FFB000]/8",
-            style: { boxShadow: "-1px -1px 0 0 rgba(255,176,0,0.04)" }
-          }
-        ) }),
-        isWall && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-[85%] h-[85%] bg-gradient-to-br from-[#1a1410] via-[#15100a] to-[#0f0b06] border border-[#FFB000]/25 rounded-[1px] relative overflow-hidden", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[15%] top-1/2 h-[1px] bg-[#FFB000]/8 -translate-y-1/2" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 bottom-1/2 w-[1px] bg-[#FFB000]/8 left-1/3" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1/2 bottom-0 w-[1px] bg-[#FFB000]/8 left-2/3" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 inset-x-0 h-[2px] bg-gradient-to-b from-[#FFB000]/15 to-transparent" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute bottom-0 inset-x-0 h-[2px] bg-gradient-to-t from-black/60 to-transparent" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-[15%] opacity-[0.04]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "div",
-            {
-              className: "w-full h-full",
-              style: {
-                backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,176,0,0.3) 2px, rgba(255,176,0,0.3) 3px)"
-              }
-            }
-          ) })
-        ] }) }),
-        isTarget && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex items-center justify-center", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "div",
-            {
-              className: "absolute w-3/5 h-3/5 rounded-full opacity-40",
-              style: {
-                background: "radial-gradient(circle, rgba(255,176,0,0.5) 0%, transparent 70%)",
-                animation: "targetPulse 2s ease-in-out infinite"
-              }
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-center justify-center", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "div",
-              {
-                className: "w-[40%] h-[40%] rotate-45 border border-[#FFB000]/60",
-                style: {
-                  background: "linear-gradient(135deg, rgba(255,176,0,0.15), rgba(255,176,0,0.05))",
-                  boxShadow: "inset 0 0 6px rgba(255,176,0,0.1)"
-                },
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-[60%] h-[60%] m-[20%] rotate-45 border border-[#FFB000]/30 bg-[#FFB000]/5" })
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute w-[6px] h-[6px] rounded-full bg-[#FFB000]/40" })
-          ] })
-        ] })
-      ]
-    }
-  );
+  const tileStyle = {
+    left: `${x * widthPercent}%`,
+    top: `${y * heightPercent}%`,
+    width: `${widthPercent}%`,
+    height: `${heightPercent}%`
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute", style: tileStyle, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-[#080808]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "absolute inset-0 opacity-[0.05]",
+        style: {
+          backgroundImage: `
+              linear-gradient(rgba(255,176,0,0.15) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,176,0,0.15) 1px, transparent 1px)
+            `,
+          backgroundSize: "6px 6px"
+        }
+      }
+    ) }),
+    cell === TileType.WALL && /* @__PURE__ */ jsxRuntimeExports.jsx(FirewallTile, {}),
+    cell === TileType.TARGET && /* @__PURE__ */ jsxRuntimeExports.jsx(SignalPortTile, {})
+  ] });
+}
+function FirewallTile() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-[88%] h-[88%] overflow-hidden border border-[#FFB000]/30 bg-gradient-to-b from-[#161616] to-[#0D0D0D]", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "absolute inset-0 opacity-[0.08]",
+        style: {
+          backgroundImage: "repeating-linear-gradient(180deg, transparent, transparent 2px, rgba(255,176,0,0.5) 2px, rgba(255,176,0,0.5) 3px)"
+        }
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-[2px] left-[2px] w-[3px] h-[3px] rounded-full bg-[#FFB000]/60" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 flex items-center justify-center font-mono text-[8px] font-bold tracking-tight text-[#FFB000]/75", children: "FW" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-0 top-0 h-[1px] bg-[#FFB000]/20" })
+  ] }) });
+}
+function SignalPortTile() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex items-center justify-center", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      "div",
+      {
+        className: "absolute w-[70%] h-[70%] rounded-full",
+        style: {
+          background: "radial-gradient(circle, rgba(0,255,153,0.25), transparent 70%)",
+          animation: "signalPulse 2s ease-in-out infinite"
+        }
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-center justify-center w-[55%] h-[55%] border border-[#00FF99]/50 bg-[#07110D]", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-mono text-[7px] font-bold text-[#00FF99]/80", children: "RX" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-0 bottom-0 h-[1px] bg-[#00FF99]/30" })
+    ] })
+  ] });
 }
 const Tile$1 = React$4.memo(Tile);
 

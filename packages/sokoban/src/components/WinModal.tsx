@@ -20,25 +20,25 @@ export default function WinModal({ onBack }: WinModalProps): React.ReactElement 
   if (!isWon) return <React.Fragment />;
 
   return (
-    <div className="absolute inset-0 bg-[#2b4c3f]/80 z-50 flex items-center justify-center p-4 select-none">
-      <div className="border-4 border-[#2b4c3f] bg-white p-6 shadow-md max-w-xs w-full text-center flex flex-col items-center gap-4">
-        <h2 className="font-press text-[14px] text-[#CC6666] animate-bounce">
+    <div className="absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4 select-none">
+      <div className="border-4 border-[#FFB000] bg-[#050505] p-6 shadow-md max-w-xs w-full text-center flex flex-col items-center gap-4">
+        <h2 className="font-press text-[14px] text-cozy-text animate-bounce">
           STAGE CLEAR!
         </h2>
-        <p className="font-mono text-sm text-[#2b4c3f]">
-          Finished in <span className="font-bold font-press text-[11px] text-[#CC6666]">{moves}</span> movements.
+        <p className="font-mono text-sm text-cozy-text">
+          Finished in <span className="font-bold font-press text-[11px] text-cozy-text">{moves}</span> movements.
         </p>
         <div className="flex gap-4 mt-2">
           <button
             onClick={nextLevel}
-            className="pixel-btn text-[10px] text-[#2b4c3f]"
+            className="pixel-btn text-[10px] text-cozy-text"
             aria-label="Next stage"
           >
             NEXT &gt;
           </button>
           <button
             onClick={onBack}
-            className="pixel-btn text-[10px] text-gray-500"
+            className="pixel-btn text-[10px] text-cozy-text/70"
             aria-label="Main menu"
           >
             MENU

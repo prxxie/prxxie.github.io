@@ -109,7 +109,7 @@ export default function Board(): React.ReactElement | null {
       `}</style>
       <div
         ref={boardRef}
-        className="relative border-4 border-[#2b4c3f] bg-[#2b4c3f] overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform"
+        className="relative border-4 border-cozy-border bg-black overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform"
         style={{
           maxWidth: "min(85vw, 60vh, 400px)",
           maxHeight: "min(85vw, 60vh, 400px)",
@@ -136,13 +136,15 @@ export default function Board(): React.ReactElement | null {
                 synth.playClick();
                 removeRegionAt(r.x, r.y);
               }}
-              className="absolute border-2 border-[#2b4c3f] cursor-pointer flex items-center justify-center font-press text-[8px] text-[#2b4c3f] select-none shadow-inner hover:brightness-95 active:scale-95"
+              className="absolute cursor-pointer flex items-center justify-center font-press text-[8px] select-none shadow-inner hover:brightness-95 active:scale-95"
               style={{
                 left: `calc((${r.x} / ${puzzle.width}) * 100%)`,
                 top: `calc((${r.y} / ${puzzle.height}) * 100%)`,
                 width: `calc((${r.width} / ${puzzle.width}) * 100%)`,
                 height: `calc((${r.height} / ${puzzle.height}) * 100%)`,
-                backgroundColor: r.color,
+                border: "2px solid #FFB000",
+                backgroundColor: "rgba(255, 176, 0, 0.15)",
+                color: "#FFB000",
               }}
             >
               <span>{r.width * r.height}</span>
@@ -152,7 +154,7 @@ export default function Board(): React.ReactElement | null {
 
         {dragRect && (
           <div
-            className="absolute border-2 border-dashed border-[#2b4c3f] bg-[#2b4c3f]/20 pointer-events-none"
+            className="absolute border border-dashed border-[#FFB000] bg-[#FFB000]/15 pointer-events-none"
             style={{
               left: `calc((${dragRect.x} / ${puzzle.width}) * 100%)`,
               top: `calc((${dragRect.y} / ${puzzle.height}) * 100%)`,
@@ -166,7 +168,7 @@ export default function Board(): React.ReactElement | null {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="absolute inset-0 bg-[#e2f4e5]/90 flex flex-col items-center justify-center font-press text-[#2b4c3f] gap-4"
+            className="absolute inset-0 bg-black/95 flex flex-col items-center justify-center font-press text-cozy-text gap-4"
           >
             <h3 className="text-sm animate-bounce">BOARD SOLVED!</h3>
             <p className="text-[8px]">TAP HINT OR BACK TO REPLAY</p>

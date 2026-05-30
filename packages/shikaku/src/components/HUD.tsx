@@ -29,14 +29,14 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
   };
 
   return (
-    <div className="w-full flex flex-col gap-4 border-b-2 border-[#2b4c3f] pb-4 font-press text-[10px] text-[#2b4c3f]">
+    <div className="w-full flex flex-col gap-4 border-b-2 border-cozy-border pb-4 font-press text-[10px] text-cozy-text">
       <div className="flex justify-between items-center">
         <button
           onClick={() => {
             synth.playClick();
             onBack();
           }}
-          className="border-2 border-[#2b4c3f] bg-[#e2f4e5] px-2 py-1 cursor-pointer active:translate-y-0.5"
+          className="border-2 border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5"
         >
           ◀ BACK
         </button>
@@ -51,7 +51,7 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
               synth.playClick();
               undo();
             }}
-            className="border-2 border-[#2b4c3f] bg-[#e2f4e5] px-2 py-1 cursor-pointer active:translate-y-0.5"
+            className="border-2 border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5"
           >
             UNDO
           </button>
@@ -60,7 +60,7 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
               synth.playClick();
               resetLevel();
             }}
-            className="border-2 border-[#2b4c3f] bg-[#e2f4e5] px-2 py-1 cursor-pointer active:translate-y-0.5"
+            className="border-2 border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5"
           >
             RESET
           </button>
@@ -69,7 +69,7 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
               synth.playClick();
               getHint();
             }}
-            className="border-2 border-[#2b4c3f] bg-[#e2f4e5] px-2 py-1 cursor-pointer active:translate-y-0.5"
+            className="border-2 border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5"
           >
             HINT
           </button>

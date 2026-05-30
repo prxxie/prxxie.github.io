@@ -29,7 +29,7 @@ export default function Cell({
         onPointerDown(x, y);
       }}
       onPointerEnter={() => onPointerEnter(x, y)}
-      className="aspect-square border border-[#2b4c3f]/30 bg-[#e2f4e5] select-none flex items-center justify-center relative touch-none"
+      className="aspect-square border border-cozy-border bg-black text-cozy-text hover:bg-[#101010] select-none flex items-center justify-center relative touch-none"
       style={{ touchAction: "none" }}
     >
       {clue !== undefined && (

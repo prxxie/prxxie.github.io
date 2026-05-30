@@ -2,19 +2,6 @@ import { importShared } from './__federation_fn_import-0f6vq-VT.js';
 import { j as jsxRuntimeExports } from './jsx-runtime-CsM3lTE3.js';
 import { c as commonjsGlobal, g as getDefaultExportFromCjs } from './index-BxRxKft-.js';
 
-const PixelBookIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M1 2h6v11H1V2z M9 2h6v11H9V2z" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "5", x2: "5", y2: "5" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "8", x2: "5", y2: "8" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "5", x2: "13", y2: "5" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "8", x2: "13", y2: "8" })
-] });
-const PixelScrollIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M3 2h10v12H3V2z" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "6", y1: "5", x2: "10", y2: "5" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "6", y1: "8", x2: "10", y2: "8" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "6", y1: "11", x2: "10", y2: "11" })
-] });
 const PixelBackIcon = ({ className = "w-3 h-3 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className, viewBox: "0 0 8 8", fill: "currentColor", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M4 1L1 4l3 3V5h3V3H4V1z" }) });
 
 /**
@@ -4969,22 +4956,26 @@ function PostsApp() {
     enabled: !!selectedPost
   });
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-2 overflow-y-auto", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 flex items-center gap-1", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBookIcon, { className: "w-4 h-4 text-cozy-accent" }),
-      " BLOG CATALOG"
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-mono text-xs text-cozy-muted mb-2", children: [
+      "guest@prxxie:~$ ",
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-text", children: "ls -l blog/posts/" })
     ] }),
     selectedPost === null ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-2 pt-2", children: postsList.map((post) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
       {
         onClick: () => setSelectedPost(post.id),
-        className: "border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white flex justify-between items-center text-sm",
+        className: "group font-mono text-sm py-1 cursor-pointer flex justify-between items-center text-cozy-text hover:text-white",
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelScrollIcon, { className: "w-4 h-4 mr-2" }),
-            " ",
-            post.title
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center group-hover:blink-cursor", children: [
+            "> ",
+            post.title.toUpperCase().replace(/[\s,]+/g, "_").replace(/[!]+/g, ""),
+            ".MD"
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 font-mono", children: post.date })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-cozy-muted font-mono ml-4", children: [
+            "[",
+            post.date,
+            "]"
+          ] })
         ]
       },
       post.id
@@ -5002,27 +4993,23 @@ function PostsApp() {
       ),
       isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-[8px] pt-4 text-center", children: "LOADING POST CONTENT..." }),
       isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-500 text-sm", children: "Failed to load post." }),
-      postContent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "notebook-paper p-6 relative min-h-[300px]", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "notebook-margin" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "notebook-content relative z-10 pl-6", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold border-b border-cozy-border pb-1 mb-2 text-md text-[#5c3c24]", children: postContent.title }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-[10px] text-gray-500 mb-4 font-mono", children: [
-            "Date: ",
-            postContent.date,
-            " | Author:",
-            " ",
-            postContent.author || "prxxie"
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "div",
-            {
-              className: "markdown-body text-sm leading-relaxed",
-              dangerouslySetInnerHTML: {
-                __html: postContent.htmlContent
-              }
+      postContent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-[#050505] border-2 border-cozy-border p-6 min-h-[300px] font-mono text-cozy-text relative", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold border-b border-cozy-border pb-2 mb-2 text-md text-cozy-text uppercase", children: postContent.title }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-[10px] text-cozy-muted mb-4 font-mono", children: [
+          "DATE: ",
+          postContent.date,
+          " | AUTHOR: ",
+          postContent.author?.toUpperCase() || "PRXXIE"
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "markdown-body text-sm leading-relaxed",
+            dangerouslySetInnerHTML: {
+              __html: postContent.htmlContent
             }
-          )
-        ] })
+          }
+        )
       ] })
     ] })
   ] });

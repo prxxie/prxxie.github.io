@@ -365,7 +365,7 @@ function HUD({ onBack }) {
   const isMuted = useSokobanStore((state) => state.isMuted);
   const setMuted = useSokobanStore((state) => state.setMuted);
   const levelName = SOKOBAN_LEVELS[currentLevelIdx]?.name || `Level ${currentLevelIdx + 1}`;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-2 p-2 border-b-2 border-gray-400 font-press text-[10px] select-none text-[#2b4c3f]", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-2 p-2 border-b-2 border-cozy-border font-press text-[10px] select-none text-cozy-text", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center w-full", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onBack, className: "pixel-btn px-2 py-1 text-[8px]", "aria-label": "Back to level selection", children: "< MENU" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: levelName.toUpperCase() }),
@@ -412,7 +412,7 @@ function Board() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
-      className: "relative w-full border-4 border-[#2b4c3f] bg-[#c3e2c6] shadow-inner select-none overflow-hidden",
+      className: "relative w-full border-4 border-[#FFB000] bg-[#050505] shadow-inner select-none overflow-hidden",
       style: { aspectRatio: `${cols} / ${rows}` },
       children: [
         board.map(
@@ -429,9 +429,9 @@ function Board() {
                   height: `${tileHeightPercent}%`
                 },
                 children: [
-                  cell === TileType.WALL && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full border-[1.5px] border-[#2b4c3f] bg-[#5a7d6c]" }),
-                  cell === TileType.FLOOR && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#c3e2c6]" }),
-                  cell === TileType.TARGET && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#c3e2c6] flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-3 h-3 rounded-full bg-[#CC6666] border border-[#2b4c3f] opacity-80" }) })
+                  cell === TileType.WALL && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full border-[1.5px] border-[#FFB000] bg-[#805800]" }),
+                  cell === TileType.FLOOR && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#000000]" }),
+                  cell === TileType.TARGET && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#000000] flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-3 h-3 rounded-full bg-[#FFB000] border border-cozy-border opacity-80" }) })
                 ]
               },
               `tile-${x}-${y}`
@@ -454,17 +454,17 @@ function Board() {
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "div",
                 {
-                  className: `w-full h-full border-2 border-[#2b4c3f] flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
-                ${isOnTarget ? "bg-[#e5c060] text-[#5c3c24]" : "bg-[#b08b5c] text-[#eae3d5]"}
+                  className: `w-full h-full border-2 border-cozy-border flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
+                ${isOnTarget ? "bg-[#805800] text-black" : "bg-black text-[#FFB000]"}
                 ${isDeadlocked ? "opacity-60 border-dashed animate-pulse" : ""}
               `,
                   style: {
                     clipPath: "polygon(10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 10%)"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 border border-[#2b4c3f] pointer-events-none opacity-20 m-1" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 border border-cozy-border pointer-events-none opacity-20 m-1" }),
                     "📦",
-                    isDeadlocked && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-0 right-0 bg-[#CC6666] text-white text-[6px] px-0.5 rounded leading-none", children: "!" })
+                    isDeadlocked && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-0 right-0 bg-[#FFB000] text-black text-[6px] px-0.5 rounded leading-none", children: "!" })
                   ]
                 }
               )
@@ -485,13 +485,13 @@ function Board() {
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "div",
               {
-                className: "w-full h-full bg-[#CC6666] border-2 border-[#2b4c3f] flex items-center justify-center text-[12px] relative",
+                className: "w-full h-full bg-[#FFB000] border-2 border-cozy-border flex items-center justify-center text-[12px] relative",
                 style: {
                   borderRadius: "50%"
                 },
                 children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1 left-1.5 w-1 h-1 bg-white rounded-full" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1 right-1.5 w-1 h-1 bg-white rounded-full" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1 left-1.5 w-1 h-1 bg-black rounded-full" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1 right-1.5 w-1 h-1 bg-black rounded-full" }),
                   "🧑"
                 ]
               }
@@ -504,13 +504,13 @@ function Board() {
 }
 
 function LevelSelect({ onSelect }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4 text-[#2b4c3f] font-mono", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4 text-cozy-text font-mono", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[12px] text-center my-2", children: "SELECT LEVEL" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-5 gap-3 max-h-[300px] overflow-y-auto p-2", children: SOKOBAN_LEVELS.map((level, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
       "button",
       {
         onClick: () => onSelect(idx),
-        className: "w-10 h-10 border-2 border-[#2b4c3f] flex items-center justify-center font-press text-[11px] bg-white cursor-pointer hover:bg-[#e2f4e5] hover:scale-105 active:translate-y-0.5",
+        className: "w-10 h-10 border-2 border-cozy-border flex items-center justify-center font-press text-[11px] bg-black text-cozy-text cursor-pointer hover:bg-cozy-text hover:text-black hover:scale-105 active:translate-y-0.5 transition-colors",
         "aria-label": `Select level ${idx + 1}`,
         children: idx + 1
       },
@@ -589,7 +589,7 @@ function Controls() {
       window.removeEventListener("touchend", handleTouchEnd);
     };
   }, [move]);
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col items-center select-none font-press text-[8px] text-[#2b4c3f] mt-4", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col items-center select-none font-press text-[8px] text-cozy-text mt-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-3 gap-1.5 w-28 h-28 my-2", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", {}),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -611,7 +611,7 @@ function Controls() {
           children: "◀"
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-[#2b4c3f] border-2 border-[#2b4c3f] opacity-10" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-cozy-border border-2 border-cozy-border opacity-10" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
@@ -648,11 +648,11 @@ function WinModal({ onBack }) {
     }
   }, [isWon]);
   if (!isWon) return /* @__PURE__ */ jsxRuntimeExports.jsx(React.Fragment, {});
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-[#2b4c3f]/80 z-50 flex items-center justify-center p-4 select-none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-4 border-[#2b4c3f] bg-white p-6 shadow-md max-w-xs w-full text-center flex flex-col items-center gap-4", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[14px] text-[#CC6666] animate-bounce", children: "STAGE CLEAR!" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "font-mono text-sm text-[#2b4c3f]", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4 select-none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-4 border-[#FFB000] bg-[#050505] p-6 shadow-md max-w-xs w-full text-center flex flex-col items-center gap-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[14px] text-cozy-text animate-bounce", children: "STAGE CLEAR!" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "font-mono text-sm text-cozy-text", children: [
       "Finished in ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold font-press text-[11px] text-[#CC6666]", children: moves }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-bold font-press text-[11px] text-cozy-text", children: moves }),
       " movements."
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 mt-2", children: [
@@ -660,7 +660,7 @@ function WinModal({ onBack }) {
         "button",
         {
           onClick: nextLevel,
-          className: "pixel-btn text-[10px] text-[#2b4c3f]",
+          className: "pixel-btn text-[10px] text-cozy-text",
           "aria-label": "Next stage",
           children: "NEXT >"
         }
@@ -669,7 +669,7 @@ function WinModal({ onBack }) {
         "button",
         {
           onClick: onBack,
-          className: "pixel-btn text-[10px] text-gray-500",
+          className: "pixel-btn text-[10px] text-cozy-text/70",
           "aria-label": "Main menu",
           children: "MENU"
         }
@@ -686,7 +686,7 @@ function SokobanApp() {
     loadLevel(idx);
     setView("game");
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border-4 border-[#2b4c3f] bg-[#e2f4e5] p-4 shadow-md select-none relative flex flex-col items-center", children: view === "menu" ? /* @__PURE__ */ jsxRuntimeExports.jsx(LevelSelect, { onSelect: handleSelectLevel }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 items-center w-full relative", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border-4 border-cozy-border bg-black p-4 shadow-md select-none relative flex flex-col items-center text-cozy-text", children: view === "menu" ? /* @__PURE__ */ jsxRuntimeExports.jsx(LevelSelect, { onSelect: handleSelectLevel }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 items-center w-full relative", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(HUD, { onBack: () => setView("menu") }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Board, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Controls, {}),

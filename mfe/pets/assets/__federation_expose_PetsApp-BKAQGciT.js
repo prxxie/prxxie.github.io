@@ -59,6 +59,77 @@ const PixelHeartIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ 
   /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "12", width: "4", height: "2" })
 ] });
 
+function getBodyColor(status, isSleeping) {
+  if (isSleeping) return "#779988";
+  if (status === "eating") return "#CC6666";
+  if (status === "playing") return "#CC6666";
+  if (status === "moving") return "#CC9966";
+  return "#A0785A";
+}
+function getEyeOffset(direction) {
+  const baseX = direction === "left" ? -0.5 : direction === "right" ? 0.5 : 0;
+  const baseY = direction === "up" ? -0.5 : direction === "down" ? 0.5 : 0;
+  return { ex: baseX, ey: baseY };
+}
+function PetSprite({
+  size = 16,
+  status = "idle",
+  isSleeping = false,
+  direction = "down",
+  animationFrame = 0,
+  className = ""
+}) {
+  const bodyColor = getBodyColor(status, isSleeping);
+  const { ex, ey } = getEyeOffset(direction);
+  const bounceClass = status === "playing" || status === "moving" ? "animate-bounce" : "";
+  const legOffset = status === "moving" ? animationFrame === 0 ? 0 : 1 : 0;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "svg",
+    {
+      viewBox: "0 0 16 16",
+      className: `${bounceClass} ${className}`,
+      style: { width: size, height: size },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "3", width: "10", height: "10", rx: "2", ry: "2", fill: bodyColor }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "8", height: "8", fill: bodyColor }),
+        status === "moving" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: 11 + legOffset, width: "2", height: "2", fill: "var(--color-cozy-border)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: 11 + (1 - legOffset), width: "2", height: "2", fill: "var(--color-cozy-border)" })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "11", width: "8", height: "2", fill: "var(--color-cozy-border)" }),
+        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "rect",
+          {
+            x: "13",
+            y: animationFrame === 0 ? "4" : "6",
+            width: "2",
+            height: "2",
+            fill: bodyColor
+          }
+        ),
+        isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "1", width: "2", height: "2", fill: "var(--color-cozy-border)", opacity: "0.6" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "12", y: "3", width: "2", height: "1", fill: "var(--color-cozy-border)", opacity: "0.4" })
+        ] }),
+        !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 5 + ex, y: 6 + ey, width: "2", height: "2", fill: "#FFFFFF", rx: "0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 5.5 + ex, y: 6.5 + ey, width: "1", height: "1", fill: "#000000" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 9 + ex, y: 6 + ey, width: "2", height: "2", fill: "#FFFFFF", rx: "0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 9.5 + ex, y: 6.5 + ey, width: "1", height: "1", fill: "#000000" })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "3", height: "1", fill: "var(--color-cozy-border)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7", width: "3", height: "1", fill: "var(--color-cozy-border)" })
+        ] }),
+        !isSleeping && status !== "eating" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "9", width: "4", height: "1", fill: "var(--color-cozy-border)" }),
+        !isSleeping && status === "eating" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "9", width: "2", height: "2", fill: "var(--color-cozy-border)" }),
+        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "8", width: "1.5", height: "1", fill: "#FF8888", opacity: "0.5", rx: "0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11.5", y: "8", width: "1.5", height: "1", fill: "#FF8888", opacity: "0.5", rx: "0.5" })
+        ] })
+      ]
+    }
+  );
+}
+
 const {useEffect,useState} = await importShared('react');
 const {create} = await importShared('zustand');
 
@@ -122,100 +193,6 @@ function PetsApp({
       return () => clearTimeout(timer);
     }
   }, [status, setStatus]);
-  const renderPetSprite = () => {
-    let color = "oklch(20.8% 0.042 265.755)";
-    if (status === "eating") color = "#CC6666";
-    if (status === "playing") color = "#CC6666";
-    if (isSleeping) color = "#779988";
-    return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      "svg",
-      {
-        viewBox: "0 0 16 16",
-        className: `w-28 h-28 ${status === "playing" ? "animate-bounce" : ""}`,
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "8", height: "8", fill: color }),
-          animationFrame === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "rect",
-              {
-                x: "4",
-                y: "12",
-                width: "2",
-                height: "2",
-                fill: "var(--color-cozy-border)"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "rect",
-              {
-                x: "10",
-                y: "12",
-                width: "2",
-                height: "2",
-                fill: "var(--color-cozy-border)"
-              }
-            )
-          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "rect",
-              {
-                x: "5",
-                y: "12",
-                width: "2",
-                height: "2",
-                fill: "var(--color-cozy-border)"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "rect",
-              {
-                x: "9",
-                y: "12",
-                width: "2",
-                height: "2",
-                fill: "var(--color-cozy-border)"
-              }
-            )
-          ] }),
-          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "6", width: "1", height: "1", fill: "#fff" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "6", width: "1", height: "1", fill: "#fff" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "rect",
-              {
-                x: "7",
-                y: "9",
-                width: "2",
-                height: "1",
-                fill: "var(--color-cozy-border)"
-              }
-            )
-          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "rect",
-              {
-                x: "5",
-                y: "7",
-                width: "2",
-                height: "1",
-                fill: "var(--color-cozy-border)"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "rect",
-              {
-                x: "9",
-                y: "7",
-                width: "2",
-                height: "1",
-                fill: "var(--color-cozy-border)"
-              }
-            )
-          ] })
-        ]
-      }
-    );
-  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-between h-full py-2 box-border", children: [
     !usePetStore && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 text-xs font-press bg-black border border-cozy-border p-2 mb-2 box-border items-center text-cozy-text", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
@@ -248,7 +225,15 @@ function PetsApp({
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-1 right-2 text-[10px] text-cozy-text font-mono select-none", children: "+" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute bottom-1 left-2 text-[10px] text-cozy-text font-mono select-none", children: "+" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute bottom-1 right-2 text-[10px] text-cozy-text font-mono select-none", children: "+" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { filter: "sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2)" }, children: renderPetSprite() }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { filter: "sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2)" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            PetSprite,
+            {
+              size: 112,
+              status,
+              isSleeping,
+              animationFrame
+            }
+          ) }),
           isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-2 right-2 text-cozy-text font-press text-[8px] animate-pulse", children: "ZZZ..." })
         ]
       }

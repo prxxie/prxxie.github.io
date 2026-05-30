@@ -1,5 +1,5 @@
 import { importShared } from './__federation_fn_import-D-nfbenS.js';
-import SokobanApp, { j as jsxRuntimeExports } from './__federation_expose_SokobanApp-A9GvGztG.js';
+import SokobanApp, { j as jsxRuntimeExports } from './__federation_expose_SokobanApp-D-4E_B3j.js';
 import { r as reactDomExports } from './index-D9Af7wOI.js';
 
 true&&(function polyfill() {

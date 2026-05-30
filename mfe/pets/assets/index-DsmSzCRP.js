@@ -1,5 +1,5 @@
 import { importShared } from './__federation_fn_import-D-nfbenS.js';
-import PetsApp, { j as jsxRuntimeExports } from './__federation_expose_PetsApp-CEIlNWua.js';
+import PetsApp, { j as jsxRuntimeExports } from './__federation_expose_PetsApp-BKAQGciT.js';
 import { r as reactDomExports } from './index-D9Af7wOI.js';
 
 true&&(function polyfill() {

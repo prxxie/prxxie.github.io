@@ -32,9 +32,10 @@ var TileType = /* @__PURE__ */ ((TileType2) => {
 })(TileType || {});
 
 const SOKOBAN_LEVELS = [
+  // ── Easy: 1–5 (1–2 boxes, small grids) ───────────────────────────
   {
-    id: "microban-01",
-    name: "Microban #1",
+    id: "soko-01",
+    name: "First Steps",
     grid: [
       "  ####  ",
       "###  ###",
@@ -45,8 +46,8 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "microban-02",
-    name: "Microban #2",
+    id: "soko-02",
+    name: "Tiny Trial",
     grid: [
       "#####",
       "#@  #",
@@ -56,8 +57,8 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "microban-03",
-    name: "Microban #3",
+    id: "soko-03",
+    name: "Side by Side",
     grid: [
       "######",
       "#@  .#",
@@ -67,8 +68,8 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "microban-04",
-    name: "Microban #4",
+    id: "soko-04",
+    name: "Cross Paths",
     grid: [
       "######",
       "#  . #",
@@ -79,14 +80,216 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "microban-05",
-    name: "Microban #5",
+    id: "soko-05",
+    name: "Box Duo",
     grid: [
       "######",
       "#@   #",
       "# $$ #",
       "# .. #",
       "######"
+    ]
+  },
+  // ── Medium: 6–10 (2–3 boxes) ─────────────────────────────────────
+  {
+    id: "soko-06",
+    name: "L-Shaped",
+    grid: [
+      " #####",
+      "## . #",
+      "# $  #",
+      "#  $ #",
+      "# .  #",
+      "#@   #",
+      "######"
+    ]
+  },
+  {
+    id: "soko-07",
+    name: "Zigzag",
+    grid: [
+      " ######",
+      "##  . #",
+      "#  .  #",
+      "# $   #",
+      "#  $  #",
+      "#   @ #",
+      "#######"
+    ]
+  },
+  {
+    id: "soko-08",
+    name: "Two Corners",
+    grid: [
+      "#########",
+      "#  . .  #",
+      "#  $ $  #",
+      "#       #",
+      "#   @   #",
+      "#########"
+    ]
+  },
+  {
+    id: "soko-09",
+    name: "The Alley",
+    grid: [
+      " #######",
+      "##     #",
+      "# $ $  #",
+      "#  . . #",
+      "#   @  #",
+      "########"
+    ]
+  },
+  {
+    id: "soko-10",
+    name: "Trio",
+    grid: [
+      "#######",
+      "#  $ .#",
+      "#$  . #",
+      "#  $  #",
+      "# . @ #",
+      "#######"
+    ]
+  },
+  // ── Hard: 11–15 (3–4 boxes) ──────────────────────────────────────
+  {
+    id: "soko-11",
+    name: "Crossing",
+    grid: [
+      " #######",
+      "##     #",
+      "# $  . #",
+      "# .  $ #",
+      "#  $   #",
+      "#   . @#",
+      "########"
+    ]
+  },
+  {
+    id: "soko-12",
+    name: "Staircase",
+    grid: [
+      "########",
+      "#   .  #",
+      "# $    #",
+      "#   $  #",
+      "# .    #",
+      "#  $   #",
+      "#   .@ #",
+      "########"
+    ]
+  },
+  {
+    id: "soko-13",
+    name: "Deadlock Danger",
+    grid: [
+      "#########",
+      "#  . $. #",
+      "# $  .  #",
+      "#       #",
+      "#  $    #",
+      "#  @    #",
+      "#########"
+    ]
+  },
+  {
+    id: "soko-14",
+    name: "The Wall",
+    grid: [
+      " #######",
+      "##     #",
+      "#  $.  #",
+      "#  . $ #",
+      "#   $  #",
+      "#  .  @#",
+      "########"
+    ]
+  },
+  {
+    id: "soko-15",
+    name: "Four Corners",
+    grid: [
+      "#########",
+      "# .  .  #",
+      "#       #",
+      "# $  $  #",
+      "#       #",
+      "# .  .  #",
+      "# $  $  #",
+      "#    @  #",
+      "#########"
+    ]
+  },
+  // ── Expert: 16–20 (4–5 boxes) ────────────────────────────────────
+  {
+    id: "soko-16",
+    name: "The Knot",
+    grid: [
+      "########",
+      "#  .   #",
+      "#      #",
+      "# .$$  #",
+      "#  $   #",
+      "#  . @ #",
+      "########"
+    ]
+  },
+  {
+    id: "soko-17",
+    name: "Traverse",
+    grid: [
+      "########",
+      "#   .  #",
+      "#  $   #",
+      "# .  $ #",
+      "#   .  #",
+      "#  $   #",
+      "#   @  #",
+      "########"
+    ]
+  },
+  {
+    id: "soko-18",
+    name: "Spiral",
+    grid: [
+      " #######",
+      "##     #",
+      "#  . $ #",
+      "# $ .  #",
+      "#   $  #",
+      "#  .   #",
+      "#    @ #",
+      "########"
+    ]
+  },
+  {
+    id: "soko-19",
+    name: "Gauntlet",
+    grid: [
+      "########",
+      "# .  . #",
+      "# $  $ #",
+      "#   .  #",
+      "#  $   #",
+      "# .  $ #",
+      "#   @  #",
+      "########"
+    ]
+  },
+  {
+    id: "soko-20",
+    name: "The Grand",
+    grid: [
+      "##########",
+      "#  .  .  #",
+      "# $  $   #",
+      "#   .    #",
+      "#  $  $  #",
+      "# .      #",
+      "#    @   #",
+      "##########"
     ]
   }
 ];
@@ -213,6 +416,8 @@ const useSokobanStore = create((set, get) => ({
   isWon: false,
   isMuted: false,
   deadlockedBoxIds: [],
+  lastDirection: "down",
+  isMoving: false,
   loadLevel: (levelIdx) => {
     synth.init();
     const normalizedIdx = Math.max(0, Math.min(levelIdx, SOKOBAN_LEVELS.length - 1));
@@ -255,12 +460,18 @@ const useSokobanStore = create((set, get) => ({
       moves: 0,
       history: [],
       isWon: false,
-      deadlockedBoxIds: []
+      deadlockedBoxIds: [],
+      lastDirection: "down",
+      isMoving: false
     });
   },
   move: (dx, dy) => {
     const { board, player, boxes, history, moves, isWon } = get();
     if (isWon) return;
+    const dirMap = { "0,-1": "up", "0,1": "down", "-1,0": "left", "1,0": "right" };
+    const dirKey = `${dx},${dy}`;
+    const newDir = dirMap[dirKey] || get().lastDirection;
+    set({ lastDirection: newDir, isMoving: true });
     const tx = player.x + dx;
     const ty = player.y + dy;
     if (ty < 0 || ty >= board.length || tx < 0 || tx >= board[ty].length) {
@@ -307,7 +518,8 @@ const useSokobanStore = create((set, get) => ({
         moves: moves + 1,
         history: [...history, snapshot],
         isWon: win,
-        deadlockedBoxIds: newDeadlocks
+        deadlockedBoxIds: newDeadlocks,
+        isMoving: false
       });
     } else {
       const snapshot = {
@@ -324,7 +536,8 @@ const useSokobanStore = create((set, get) => ({
         player: { x: tx, y: ty },
         moves: moves + 1,
         history: [...history, snapshot],
-        isWon: win
+        isWon: win,
+        isMoving: false
       });
     }
   },
@@ -399,12 +612,83 @@ function HUD({ onBack }) {
   ] });
 }
 
+function getBodyColor(status, isSleeping) {
+  if (isSleeping) return "#779988";
+  if (status === "eating") return "#CC6666";
+  if (status === "playing") return "#CC6666";
+  if (status === "moving") return "#CC9966";
+  return "#A0785A";
+}
+function getEyeOffset(direction) {
+  const baseX = direction === "left" ? -0.5 : direction === "right" ? 0.5 : 0;
+  const baseY = direction === "up" ? -0.5 : direction === "down" ? 0.5 : 0;
+  return { ex: baseX, ey: baseY };
+}
+function PetSprite({
+  size = 16,
+  status = "idle",
+  isSleeping = false,
+  direction = "down",
+  animationFrame = 0,
+  className = ""
+}) {
+  const bodyColor = getBodyColor(status, isSleeping);
+  const { ex, ey } = getEyeOffset(direction);
+  const bounceClass = status === "playing" || status === "moving" ? "animate-bounce" : "";
+  const legOffset = status === "moving" ? animationFrame === 0 ? 0 : 1 : 0;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "svg",
+    {
+      viewBox: "0 0 16 16",
+      className: `${bounceClass} ${className}`,
+      style: { width: size, height: size },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "3", width: "10", height: "10", rx: "2", ry: "2", fill: bodyColor }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "8", height: "8", fill: bodyColor }),
+        status === "moving" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: 11 + legOffset, width: "2", height: "2", fill: "var(--color-cozy-border)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: 11 + (1 - legOffset), width: "2", height: "2", fill: "var(--color-cozy-border)" })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "11", width: "8", height: "2", fill: "var(--color-cozy-border)" }),
+        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "13", y: animationFrame === 0 ? "4" : "6", width: "2", height: "2", fill: bodyColor }),
+        isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "1", width: "2", height: "2", fill: "var(--color-cozy-border)", opacity: "0.6" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "12", y: "3", width: "2", height: "1", fill: "var(--color-cozy-border)", opacity: "0.4" })
+        ] }),
+        !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 5 + ex, y: 6 + ey, width: "2", height: "2", fill: "#FFFFFF", rx: "0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 5.5 + ex, y: 6.5 + ey, width: "1", height: "1", fill: "#000000" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 9 + ex, y: 6 + ey, width: "2", height: "2", fill: "#FFFFFF", rx: "0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 9.5 + ex, y: 6.5 + ey, width: "1", height: "1", fill: "#000000" })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "3", height: "1", fill: "var(--color-cozy-border)" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7", width: "3", height: "1", fill: "var(--color-cozy-border)" })
+        ] }),
+        !isSleeping && status !== "eating" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "9", width: "4", height: "1", fill: "var(--color-cozy-border)" }),
+        !isSleeping && status === "eating" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "9", width: "2", height: "2", fill: "var(--color-cozy-border)" }),
+        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "8", width: "1.5", height: "1", fill: "#FF8888", opacity: "0.5", rx: "0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11.5", y: "8", width: "1.5", height: "1", fill: "#FF8888", opacity: "0.5", rx: "0.5" })
+        ] })
+      ]
+    }
+  );
+}
+
+const React$1 = await importShared('react');
+const {useEffect: useEffect$2} = React$1;
 function Board() {
   const board = useSokobanStore((state) => state.board);
   const player = useSokobanStore((state) => state.player);
   const boxes = useSokobanStore((state) => state.boxes);
   const deadlockedBoxIds = useSokobanStore((state) => state.deadlockedBoxIds);
-  if (board.length === 0) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "No Board Loaded" });
+  const lastDirection = useSokobanStore((state) => state.lastDirection);
+  const isMoving = useSokobanStore((state) => state.isMoving);
+  const [animFrame, setAnimFrame] = React$1.useState(0);
+  useEffect$2(() => {
+    const timer = setInterval(() => setAnimFrame((f) => (f + 1) % 2), 400);
+    return () => clearInterval(timer);
+  }, []);
+  if (board.length === 0) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-mono text-cozy-text p-4 text-[10px]", children: "LOADING BOARD..." });
   const rows = board.length;
   const cols = board[0].length;
   const tileWidthPercent = 100 / cols;
@@ -412,12 +696,13 @@ function Board() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
-      className: "relative w-full border border-[#FFB000] bg-[#050505] select-none overflow-hidden",
+      className: "relative w-full border border-[#FFB000] bg-[#0a0a0a] select-none overflow-hidden rounded-sm",
       style: { aspectRatio: `${cols} / ${rows}` },
       children: [
         board.map(
           (row, y) => row.map((cell, x) => {
             if (cell === TileType.EMPTY) return null;
+            const isTarget = cell === TileType.TARGET;
             return /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "div",
               {
@@ -429,9 +714,18 @@ function Board() {
                   height: `${tileHeightPercent}%`
                 },
                 children: [
-                  cell === TileType.WALL && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full border-[1.5px] border-[#FFB000] bg-[#805800]" }),
-                  cell === TileType.FLOOR && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#000000]" }),
-                  cell === TileType.TARGET && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#000000] flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-3 h-3 rounded-full bg-[#FFB000] border border-cozy-border opacity-80" }) })
+                  cell === TileType.WALL && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#1a1200] border border-[#FFB000]/40 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-1/2 h-1/2 border border-[#FFB000]/20 rotate-45" }) }),
+                  cell === TileType.FLOOR && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#0a0a0a] flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-[1px] h-[1px] bg-[#FFB000]/10 rounded-full" }) }),
+                  isTarget && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#0a0a0a] flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "div",
+                    {
+                      className: "w-2/5 h-2/5 rounded-full border border-[#FFB000]/70 bg-[#FFB000]/10",
+                      style: {
+                        animation: "targetPulse 1.5s ease-in-out infinite",
+                        boxShadow: "0 0 6px rgba(255, 176, 0, 0.2)"
+                      }
+                    }
+                  ) })
                 ]
               },
               `tile-${x}-${y}`
@@ -444,27 +738,29 @@ function Board() {
           return /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
             {
-              className: "absolute p-[2px] transition-all duration-[120ms] ease-out z-10",
+              className: "absolute p-[1.5px] z-10",
               style: {
                 left: `${box.x * tileWidthPercent}%`,
                 top: `${box.y * tileHeightPercent}%`,
                 width: `${tileWidthPercent}%`,
-                height: `${tileHeightPercent}%`
+                height: `${tileHeightPercent}%`,
+                transition: "left 100ms ease-out, top 100ms ease-out"
               },
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "div",
                 {
-                  className: `w-full h-full border border-cozy-border flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
-                ${isOnTarget ? "bg-[#805800] text-black" : "bg-black text-[#FFB000]"}
-                ${isDeadlocked ? "opacity-60 border-dashed animate-pulse" : ""}
+                  className: `w-full h-full flex items-center justify-center font-press text-[7px] relative
+                ${isOnTarget ? "bg-[#805800] text-black border border-[#FFB000]/80" : "bg-[#1a1400] text-[#FFB000] border border-[#FFB000]/50"}
+                ${isDeadlocked ? "opacity-50 border-dashed" : ""}
               `,
                   style: {
-                    clipPath: "polygon(10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 10%)"
+                    clipPath: "polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%)"
                   },
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 border border-cozy-border pointer-events-none opacity-20 m-1" }),
-                    "📦",
-                    isDeadlocked && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-0 right-0 bg-[#FFB000] text-black text-[6px] px-0.5 rounded leading-none", children: "!" })
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-[3px] border border-[#FFB000]/20 pointer-events-none" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute left-1/2 top-1/4 w-[1px] h-1/2 bg-[#FFB000]/20 -translate-x-1/2" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1/2 left-1/4 h-[1px] w-1/2 bg-[#FFB000]/20 -translate-y-1/2" }),
+                    isDeadlocked && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute -top-0.5 -right-0.5 bg-[#FF4444] text-black text-[5px] w-2.5 h-2.5 flex items-center justify-center rounded-full font-bold leading-none", style: { fontSize: "5px" }, children: "!" })
                   ]
                 }
               )
@@ -475,29 +771,32 @@ function Board() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
-            className: "absolute p-[2px] transition-all duration-[100ms] ease-out z-20",
+            className: "absolute z-20",
             style: {
               left: `${player.x * tileWidthPercent}%`,
               top: `${player.y * tileHeightPercent}%`,
               width: `${tileWidthPercent}%`,
-              height: `${tileHeightPercent}%`
+              height: `${tileHeightPercent}%`,
+              transition: "left 80ms ease-out, top 80ms ease-out"
             },
-            children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "div",
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              PetSprite,
               {
-                className: "w-full h-full bg-[#FFB000] border border-cozy-border flex items-center justify-center text-[12px] relative",
-                style: {
-                  borderRadius: "50%"
-                },
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1 left-1.5 w-1 h-1 bg-black rounded-full" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1 right-1.5 w-1 h-1 bg-black rounded-full" }),
-                  "🧑"
-                ]
+                size: Math.min(tileWidthPercent * cols / 100 * 16, 16),
+                status: isMoving ? "moving" : "idle",
+                direction: lastDirection,
+                animationFrame: animFrame,
+                className: "drop-shadow-[0_0_4px_rgba(255,176,0,0.3)]"
               }
-            )
+            ) })
           }
-        )
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("style", { children: `
+        @keyframes targetPulse {
+          0%, 100% { opacity: 0.6; transform: scale(0.95); }
+          50% { opacity: 1; transform: scale(1.05); }
+        }
+      ` })
       ]
     }
   );

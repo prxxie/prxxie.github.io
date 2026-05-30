@@ -54,7 +54,7 @@ export default function ConsoleFrame({
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-cozy-bg box-border">
-      <header className="bg-white border-b-4 border-cozy-border p-3 shadow-[0_3px_0px_var(--color-cozy-accent)] box-border w-full relative z-30">
+      <header className="bg-black border-b-4 border-cozy-border p-3 shadow-[0_3px_0px_var(--color-cozy-accent)] box-border w-full relative z-30">
         <div className="max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border">
           <div className="flex items-center gap-2">
             <svg
@@ -80,7 +80,7 @@ export default function ConsoleFrame({
               <button
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
-                className={`pixel-btn text-[9px] px-3 py-1 ${currentTab === item.id ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`}
+                className={`pixel-btn text-[9px] px-3 py-1 ${currentTab === item.id ? "bg-cozy-accent text-cozy-bg border-cozy-border shadow-none translate-y-[2px]" : ""}`}
               >
                 {item.label}
               </button>
@@ -94,7 +94,7 @@ export default function ConsoleFrame({
             aria-controls="mobile-menu-drawer"
             aria-label="Toggle navigation menu"
           >
-            [MENU.EXE]
+            [MENU]
           </button>
         </div>
       </header>
@@ -113,11 +113,11 @@ export default function ConsoleFrame({
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
-          className="fixed top-0 right-0 bottom-0 w-64 bg-white border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden"
+          className="fixed top-0 right-0 bottom-0 w-64 bg-black border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden"
         >
           <div className="flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2">
             <span className="font-press text-[10px] text-cozy-accent flex items-center gap-1">
-              <PixelFolderIcon className="w-3.5 h-3.5" /> MENU.EXE
+              <PixelFolderIcon className="w-3.5 h-3.5" /> MENU
             </span>
             <button
               onClick={() => setMenuOpen(false)}
@@ -132,7 +132,7 @@ export default function ConsoleFrame({
               <button
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
-                className={`pixel-btn w-full text-[10px] text-left py-2 px-3 ${currentTab === item.id ? "bg-cozy-accent text-white border-cozy-border shadow-none" : ""}`}
+                className={`pixel-btn w-full text-[10px] text-left py-2 px-3 ${currentTab === item.id ? "bg-cozy-accent text-cozy-bg border-cozy-border shadow-none" : ""}`}
               >
                 {currentTab === item.id ? "[x]" : "[ ]"} {item.label}
               </button>

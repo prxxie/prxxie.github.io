@@ -18,7 +18,7 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
   const levelName = SOKOBAN_LEVELS[currentLevelIdx]?.name || `Level ${currentLevelIdx + 1}`;
 
   return (
-    <div className="w-full flex flex-col gap-2 p-2 border-b-2 border-gray-400 font-press text-[10px] select-none text-[#2b4c3f]">
+    <div className="w-full flex flex-col gap-2 p-2 border-b-2 border-cozy-border font-press text-[10px] select-none text-cozy-text">
       <div className="flex justify-between items-center w-full">
         <button onClick={onBack} className="pixel-btn px-2 py-1 text-[8px]" aria-label="Back to level selection">
           &lt; MENU

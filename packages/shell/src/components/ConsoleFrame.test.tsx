@@ -26,7 +26,7 @@ describe("ConsoleFrame Responsive Menu", () => {
     expect(menuBtn).toHaveClass("md:hidden");
   });
 
-  it("opens offcanvas menu drawer when clicking [MENU.EXE]", () => {
+  it("opens offcanvas menu drawer when clicking [MENU]", () => {
     render(
       <ConsoleFrame currentTab="home" setTab={() => {}}>
         <div>test</div>
@@ -40,7 +40,7 @@ describe("ConsoleFrame Responsive Menu", () => {
 
     expect(useUiStore.getState().isMenuOpen).toBe(true);
 
-    expect(screen.getByText((content, el) => el?.tagName === "SPAN" && content.includes("MENU.EXE"))).toBeInTheDocument();
+    expect(screen.getByText((content, el) => el?.tagName === "SPAN" && content.includes("MENU"))).toBeInTheDocument();
 
     const closeBtn = screen.getByRole("button", {
       name: "Close navigation menu",
@@ -57,7 +57,7 @@ describe("ConsoleFrame Responsive Menu", () => {
       </ConsoleFrame>
     );
 
-    expect(screen.getByText((content, el) => el?.tagName === "SPAN" && content.includes("MENU.EXE"))).toBeInTheDocument();
+    expect(screen.getByText((content, el) => el?.tagName === "SPAN" && content.includes("MENU"))).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: "Escape", code: "Escape" });
 

@@ -73,7 +73,7 @@ This is a **bold** word.
 
     render(<PostsApp />, { wrapper: createWrapper() });
 
-    const postItem = screen.getByText(/Hello, Retro World!/i);
+    const postItem = screen.getByText(/HELLO_RETRO_WORLD/i);
     expect(postItem).toBeInTheDocument();
 
     fetchMock.mockResolvedValueOnce({
@@ -87,7 +87,7 @@ This is a **bold** word.
       expect(screen.getByText("Integrated Test Post")).toBeInTheDocument();
     });
     expect(
-      screen.getByText(/Date: 2026-05-29 | Author: testauthor/i)
+      screen.getByText(/DATE: 2026-05-29 | AUTHOR: TESTAUTHOR/i)
     ).toBeInTheDocument();
 
     const heading = screen.getByRole("heading", {

@@ -85,7 +85,7 @@ export default function Controls(): React.ReactElement {
   }, [move]);
 
   return (
-    <div className="w-full flex flex-col items-center select-none font-press text-[8px] text-[#2b4c3f] mt-4">
+    <div className="w-full flex flex-col items-center select-none font-press text-[8px] text-cozy-text mt-4">
       <div className="grid grid-cols-3 gap-1.5 w-28 h-28 my-2">
         <div />
         <button
@@ -103,7 +103,7 @@ export default function Controls(): React.ReactElement {
         >
           ◀
         </button>
-        <div className="bg-[#2b4c3f] border-2 border-[#2b4c3f] opacity-10" />
+        <div className="bg-cozy-border border-2 border-cozy-border opacity-10" />
         <button
           onClick={() => move(1, 0)}
           className="pixel-btn flex items-center justify-center text-[10px]"

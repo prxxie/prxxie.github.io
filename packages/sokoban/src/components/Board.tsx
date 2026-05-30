@@ -18,7 +18,7 @@ export default function Board(): React.ReactElement {
 
   return (
     <div
-      className="relative w-full border-4 border-[#2b4c3f] bg-[#c3e2c6] shadow-inner select-none overflow-hidden"
+      className="relative w-full border-4 border-[#FFB000] bg-[#050505] shadow-inner select-none overflow-hidden"
       style={{ aspectRatio: `${cols} / ${rows}` }}
     >
       {/* Render Static Tiles (Wall, Floor, Target) */}
@@ -38,14 +38,14 @@ export default function Board(): React.ReactElement {
               }}
             >
               {cell === TileType.WALL && (
-                <div className="w-full h-full border-[1.5px] border-[#2b4c3f] bg-[#5a7d6c]" />
+                <div className="w-full h-full border-[1.5px] border-[#FFB000] bg-[#805800]" />
               )}
               {cell === TileType.FLOOR && (
-                <div className="w-full h-full bg-[#c3e2c6]" />
+                <div className="w-full h-full bg-[#000000]" />
               )}
               {cell === TileType.TARGET && (
-                <div className="w-full h-full bg-[#c3e2c6] flex items-center justify-center">
-                  <div className="w-3 h-3 rounded-full bg-[#CC6666] border border-[#2b4c3f] opacity-80" />
+                <div className="w-full h-full bg-[#000000] flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-[#FFB000] border border-cozy-border opacity-80" />
                 </div>
               )}
             </div>
@@ -70,18 +70,18 @@ export default function Board(): React.ReactElement {
             }}
           >
             <div
-              className={`w-full h-full border-2 border-[#2b4c3f] flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
-                ${isOnTarget ? "bg-[#e5c060] text-[#5c3c24]" : "bg-[#b08b5c] text-[#eae3d5]"}
+              className={`w-full h-full border-2 border-cozy-border flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
+                ${isOnTarget ? "bg-[#805800] text-black" : "bg-black text-[#FFB000]"}
                 ${isDeadlocked ? "opacity-60 border-dashed animate-pulse" : ""}
               `}
               style={{
                 clipPath: "polygon(10% 0%, 90% 0%, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0% 90%, 0% 10%)"
               }}
             >
-              <div className="absolute inset-0 border border-[#2b4c3f] pointer-events-none opacity-20 m-1" />
+              <div className="absolute inset-0 border border-cozy-border pointer-events-none opacity-20 m-1" />
               📦
               {isDeadlocked && (
-                <span className="absolute top-0 right-0 bg-[#CC6666] text-white text-[6px] px-0.5 rounded leading-none">
+                <span className="absolute top-0 right-0 bg-[#FFB000] text-black text-[6px] px-0.5 rounded leading-none">
                   !
                 </span>
               )}
@@ -101,13 +101,13 @@ export default function Board(): React.ReactElement {
         }}
       >
         <div
-          className="w-full h-full bg-[#CC6666] border-2 border-[#2b4c3f] flex items-center justify-center text-[12px] relative"
+          className="w-full h-full bg-[#FFB000] border-2 border-cozy-border flex items-center justify-center text-[12px] relative"
           style={{
             borderRadius: "50%"
           }}
         >
-          <div className="absolute top-1 left-1.5 w-1 h-1 bg-white rounded-full" />
-          <div className="absolute top-1 right-1.5 w-1 h-1 bg-white rounded-full" />
+          <div className="absolute top-1 left-1.5 w-1 h-1 bg-black rounded-full" />
+          <div className="absolute top-1 right-1.5 w-1 h-1 bg-black rounded-full" />
           🧑
         </div>
       </div>

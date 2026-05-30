@@ -54,6 +54,13 @@ interface PetsAppProps {
   usePetStore?: PetStore;
 }
 
+const getAsciiBar = (value: number): string => {
+  const totalSegments = 12;
+  const filledSegments = Math.round((value / 100) * totalSegments);
+  const emptySegments = totalSegments - filledSegments;
+  return `[${"█".repeat(filledSegments)}${"░".repeat(emptySegments)}] ${value}%`;
+};
+
 export default function PetsApp({
   usePetStore,
 }: PetsAppProps): React.ReactElement {
@@ -170,58 +177,61 @@ export default function PetsApp({
   return (
     <div className="flex flex-col items-center justify-between h-full py-2 box-border">
       {!usePetStore && (
-        <div className="flex gap-4 text-xs font-press bg-[#f8f9fa] border-2 border-cozy-border p-2 mb-2 box-border items-center">
+        <div className="flex gap-4 text-xs font-press bg-black border-2 border-cozy-border p-2 mb-2 box-border items-center text-cozy-text">
           <span className="flex items-center gap-1"><PixelChickenIcon className="w-3.5 h-3.5" /> HNG: {hunger}</span>
           <span className="flex items-center gap-1"><PixelHeartIcon className="w-3.5 h-3.5" /> HPP: {happiness}</span>
         </div>
       )}
 
       {usePetStore && (
-        <div className="w-full flex flex-col gap-2 text-xs mb-4">
+        <div className="w-full flex flex-col gap-2 text-xs font-mono mb-4 text-cozy-text">
           <div className="flex justify-between items-center">
-            <span className="flex items-center gap-1"><PixelChickenIcon className="w-3.5 h-3.5" /> HUNGER</span>
-            <span>{hunger}/100</span>
+            <span>HUNGER:</span>
+            <span className="font-mono">{getAsciiBar(hunger)}</span>
           </div>
-          <div className="h-4 border-2 border-cozy-border bg-gray-100 relative">
-            <div
-              className="h-full bg-cozy-accent"
-              style={{ width: `${hunger}%` }}
-            ></div>
-          </div>
-          <div className="flex justify-between items-center mt-1">
-            <span className="flex items-center gap-1"><PixelHeartIcon className="w-3.5 h-3.5" /> HAPPINESS</span>
-            <span>{happiness}/100</span>
-          </div>
-          <div className="h-4 border-2 border-cozy-border bg-gray-100 relative">
-            <div
-              className="h-full bg-cozy-accent"
-              style={{ width: `${happiness}%` }}
-            ></div>
+          <div className="flex justify-between items-center">
+            <span>HAPPINESS:</span>
+            <span className="font-mono">{getAsciiBar(happiness)}</span>
           </div>
         </div>
       )}
 
       <div
-        className={`p-4 border-4 border-cozy-border bg-white rounded flex items-center justify-center w-36 h-36 relative ${isSleeping ? "bg-slate-900" : ""}`}
+        className={`p-4 border-4 border-cozy-border bg-black rounded flex items-center justify-center w-36 h-36 relative overflow-hidden`}
       >
-        {renderPetSprite()}
+        {/* Corner Crosshairs */}
+        <span className="absolute top-1 left-2 text-[10px] text-cozy-text font-mono select-none">+</span>
+        <span className="absolute top-1 right-2 text-[10px] text-cozy-text font-mono select-none">+</span>
+        <span className="absolute bottom-1 left-2 text-[10px] text-cozy-text font-mono select-none">+</span>
+        <span className="absolute bottom-1 right-2 text-[10px] text-cozy-text font-mono select-none">+</span>
+
+        <div style={{ filter: "sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2)" }}>
+          {renderPetSprite()}
+        </div>
+
         {isSleeping && (
-          <span className="absolute top-2 right-2 text-white font-press text-[8px] animate-pulse">
-            Zzz...
+          <span className="absolute top-2 right-2 text-cozy-text font-press text-[8px] animate-pulse">
+            ZZZ...
           </span>
         )}
       </div>
 
       <div className="flex gap-2 w-full mt-4">
-        <button onClick={feed} className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1">
+        <button
+          onClick={feed}
+          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]"
+        >
           FEED <PixelChickenIcon className="w-3.5 h-3.5" />
         </button>
-        <button onClick={play} className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1">
+        <button
+          onClick={play}
+          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]"
+        >
           PLAY <PixelBearIcon className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={toggleSleep}
-          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1"
+          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]"
         >
           {isSleeping ? (
             <>

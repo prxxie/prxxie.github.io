@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PixelBookIcon, PixelScrollIcon, PixelBackIcon } from "./Icons";
+import { PixelBackIcon } from "./Icons";
 import { useQuery } from "@tanstack/react-query";
 import { parsePost, renderMarkdown } from "./utils/markdown";
 
@@ -52,9 +52,9 @@ export default function PostsApp(): React.ReactElement {
 
   return (
     <div className="flex flex-col h-full gap-2 overflow-y-auto">
-      <h2 className="font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 flex items-center gap-1">
-        <PixelBookIcon className="w-4 h-4 text-cozy-accent" /> BLOG CATALOG
-      </h2>
+      <div className="font-mono text-xs text-cozy-muted mb-2">
+        guest@prxxie:~$ <span className="text-cozy-text">ls -l blog/posts/</span>
+      </div>
 
       {selectedPost === null ? (
         <div className="flex flex-col gap-2 pt-2">
@@ -62,11 +62,13 @@ export default function PostsApp(): React.ReactElement {
             <div
               key={post.id}
               onClick={() => setSelectedPost(post.id)}
-              className="border-2 border-cozy-border p-2 bg-white cursor-pointer hover:bg-cozy-accent hover:text-white flex justify-between items-center text-sm"
+              className="group font-mono text-sm py-1 cursor-pointer flex justify-between items-center text-cozy-text hover:text-white"
             >
-              <span className="flex items-center"><PixelScrollIcon className="w-4 h-4 mr-2" /> {post.title}</span>
-              <span className="text-xs text-gray-500 font-mono">
-                {post.date}
+              <span className="flex items-center group-hover:blink-cursor">
+                &gt; {post.title.toUpperCase().replace(/[\s,]+/g, "_").replace(/[!]+/g, "")}.MD
+              </span>
+              <span className="text-xs text-cozy-muted font-mono ml-4">
+                [{post.date}]
               </span>
             </div>
           ))}
@@ -88,23 +90,19 @@ export default function PostsApp(): React.ReactElement {
             <div className="text-red-500 text-sm">Failed to load post.</div>
           )}
           {postContent && (
-            <div className="notebook-paper p-6 relative min-h-[300px]">
-              <div className="notebook-margin"></div>
-              <div className="notebook-content relative z-10 pl-6">
-                <h3 className="font-bold border-b border-cozy-border pb-1 mb-2 text-md text-[#5c3c24]">
-                  {postContent.title}
-                </h3>
-                <p className="text-[10px] text-gray-500 mb-4 font-mono">
-                  Date: {postContent.date} | Author:{" "}
-                  {postContent.author || "prxxie"}
-                </p>
-                <div
-                  className="markdown-body text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={{
-                    __html: postContent.htmlContent,
-                  }}
-                />
-              </div>
+            <div className="bg-[#050505] border-2 border-cozy-border p-6 min-h-[300px] font-mono text-cozy-text relative">
+              <h3 className="font-bold border-b border-cozy-border pb-2 mb-2 text-md text-cozy-text uppercase">
+                {postContent.title}
+              </h3>
+              <p className="text-[10px] text-cozy-muted mb-4 font-mono">
+                DATE: {postContent.date} | AUTHOR: {postContent.author?.toUpperCase() || "PRXXIE"}
+              </p>
+              <div
+                className="markdown-body text-sm leading-relaxed"
+                dangerouslySetInnerHTML={{
+                  __html: postContent.htmlContent,
+                }}
+              />
             </div>
           )}
         </div>

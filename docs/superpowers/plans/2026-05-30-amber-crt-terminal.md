@@ -257,7 +257,7 @@
 - Modify: `packages/posts/src/PostsApp.tsx`
 - Modify: `packages/shell/src/index.css`
 
-- [ ] **Step 1: RESTYLE BLOG post listing with bash prompt & blinking cursors**
+- [x] **Step 1: RESTYLE BLOG post listing with bash prompt & blinking cursors**
   Edit `packages/posts/src/PostsApp.tsx` to render terminal prompt lines and clean up the list layout. Add active states for hover blinking.
   ```tsx
   // Inside packages/posts/src/PostsApp.tsx
@@ -288,7 +288,7 @@
   ))}
   ```
 
-- [ ] **Step 2: Rewrite markdown reader element layout**
+- [x] **Step 2: Rewrite markdown reader element layout**
   Replace notebook sheets with a pure dark terminal background reader frame in `packages/posts/src/PostsApp.tsx`.
   ```tsx
   // Replace the .notebook-paper element with a dark console terminal box:
@@ -308,7 +308,7 @@
   </div>
   ```
 
-- [ ] **Step 3: Add markdown parser overrides inside index.css**
+- [x] **Step 3: Add markdown parser overrides inside index.css**
   Configure the markdown styles in `packages/shell/src/index.css` to be dark-CRT themed.
   ```css
   /* Target: packages/shell/src/index.css */
@@ -349,11 +349,11 @@
   }
   ```
 
-- [ ] **Step 4: Run unit tests**
+- [x] **Step 4: Run unit tests**
   Run: `npm test`
   Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   ```bash
   git add packages/posts/src/PostsApp.tsx packages/shell/src/index.css
   git commit -m "feat: convert posts catalog to terminal rows and restyle markdown reader to dark CRT"
@@ -365,7 +365,7 @@
 **Files:**
 - Modify: `packages/pets/src/PetsApp.tsx`
 
-- [ ] **Step 1: Write ASCII indicator block generator**
+- [x] **Step 1: Write ASCII indicator block generator**
   Modify `packages/pets/src/PetsApp.tsx` to add helper logic to construct ASCII progress bars.
   ```typescript
   const getAsciiBar = (value: number): string => {
@@ -376,7 +376,7 @@
   };
   ```
 
-- [ ] **Step 2: Render ASCII status labels**
+- [x] **Step 2: Render ASCII status labels**
   Replace progress elements inside `PetsApp.tsx` with ASCII labels:
   ```tsx
   {usePetStore && (
@@ -393,7 +393,7 @@
   )}
   ```
 
-- [ ] **Step 3: Modify sprite viewer box (Filter & Crosshairs)**
+- [x] **Step 3: Modify sprite viewer box (Filter & Crosshairs)**
   Apply the target locking `+` crosshairs and sepia amber-glow color filter around the sprite viewport.
   ```tsx
   <div
@@ -417,14 +417,14 @@
   </div>
   ```
 
-- [ ] **Step 4: Update action buttons color scheme**
+- [x] **Step 4: Update action buttons color scheme**
   Modify FEED, PLAY, and WAKE button classes to map to CRT theme-inverts. Ensure button labels are uppercase.
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
   Run: `npm test`
   Expected: PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
   ```bash
   git add packages/pets/src/PetsApp.tsx
   git commit -m "feat: implement ASCII status bars and tracking crosshairs in PET_HUD"
@@ -440,7 +440,7 @@
 - Modify: `packages/shikaku/src/components/Cell.tsx`
 - Modify: `packages/shikaku/src/components/HUD.tsx`
 
-- [ ] **Step 1: Convert Sokoban colors to monochrome**
+- [x] **Step 1: Convert Sokoban colors to monochrome**
   Edit `packages/sokoban/src/components/Board.tsx` to map brick textures and cell spaces:
   - Board border/bg: `border-cozy-border bg-[#050505]`
   - Wall: `border-[#FFB000] bg-[#805800]`
@@ -454,10 +454,10 @@
     ```
   - Player: `bg-[#FFB000] border-cozy-border`
 
-- [ ] **Step 2: Restyle Sokoban WinModal**
+- [x] **Step 2: Restyle Sokoban WinModal**
   Update `packages/sokoban/src/components/WinModal.tsx` text labels from `#CC6666` to `text-cozy-text` (amber) with `#050505` window backgrounds.
 
-- [ ] **Step 3: Convert Shikaku Board grids and regions**
+- [x] **Step 3: Convert Shikaku Board grids and regions**
   Edit `packages/shikaku/src/components/Board.tsx`:
   - Board border/bg: `border-cozy-border bg-black`
   - Active drag rect: `border-dashed border-[#FFB000] bg-[#FFB000]/15`
@@ -472,18 +472,18 @@
     ```
   - Win Modal overlay: `bg-black/95 text-cozy-text`
 
-- [ ] **Step 4: Update Shikaku Cell background colors**
+- [x] **Step 4: Update Shikaku Cell background colors**
   Edit `packages/shikaku/src/components/Cell.tsx` cell default color classes:
   - Default: `border-cozy-muted/30 bg-black text-cozy-text`
 
-- [ ] **Step 5: Restyle Shikaku HUD action panels**
+- [x] **Step 5: Restyle Shikaku HUD action panels**
   Edit `packages/shikaku/src/components/HUD.tsx` text details and progress bars to use amber CRT color variables instead of pastel greens/reds.
 
-- [ ] **Step 6: Run full project tests**
+- [x] **Step 6: Run full project tests**
   Run: `npm test`
   Expected: PASS
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
   ```bash
   git add packages/sokoban/src/components/Board.tsx packages/sokoban/src/components/WinModal.tsx packages/shikaku/src/components/Board.tsx packages/shikaku/src/components/Cell.tsx packages/shikaku/src/components/HUD.tsx
   git commit -m "feat: complete Sokoban and Shikaku gameplay conversion to monochrome Amber CRT"

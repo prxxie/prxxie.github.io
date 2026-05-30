@@ -12,6 +12,8 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
   const undo = useSokobanStore((state) => state.undo);
   const restart = useSokobanStore((state) => state.restart);
   const history = useSokobanStore((state) => state.history);
+  const isMuted = useSokobanStore((state) => state.isMuted);
+  const setMuted = useSokobanStore((state) => state.setMuted);
 
   const levelName = SOKOBAN_LEVELS[currentLevelIdx]?.name || `Level ${currentLevelIdx + 1}`;
 
@@ -35,6 +37,13 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
         </button>
         <button onClick={restart} className="pixel-btn" aria-label="Restart Level">
           RESET
+        </button>
+        <button
+          onClick={() => setMuted(!isMuted)}
+          className="pixel-btn"
+          aria-label={isMuted ? "Unmute Audio" : "Mute Audio"}
+        >
+          {isMuted ? "🔇" : "🔊"}
         </button>
       </div>
     </div>

@@ -14,7 +14,7 @@ export default function LevelSelect({ onSelect }: LevelSelectProps): React.React
           <button
             key={level.id}
             onClick={() => onSelect(idx)}
-            className="w-10 h-10 border-2 border-cozy-border flex items-center justify-center font-press text-[11px] bg-black text-cozy-text cursor-pointer hover:bg-cozy-text hover:text-black hover:scale-105 active:translate-y-0.5 transition-colors"
+            className="w-10 h-10 border border-cozy-border flex items-center justify-center font-press text-[11px] bg-black text-cozy-text cursor-pointer hover:bg-cozy-text hover:text-black hover:scale-105 active:translate-y-0.5 transition-colors"
             aria-label={`Select level ${idx + 1}`}
           >
             {idx + 1}

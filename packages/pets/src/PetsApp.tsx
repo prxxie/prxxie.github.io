@@ -177,7 +177,7 @@ export default function PetsApp({
   return (
     <div className="flex flex-col items-center justify-between h-full py-2 box-border">
       {!usePetStore && (
-        <div className="flex gap-4 text-xs font-press bg-black border-2 border-cozy-border p-2 mb-2 box-border items-center text-cozy-text">
+        <div className="flex gap-4 text-xs font-press bg-black border border-cozy-border p-2 mb-2 box-border items-center text-cozy-text">
           <span className="flex items-center gap-1"><PixelChickenIcon className="w-3.5 h-3.5" /> HNG: {hunger}</span>
           <span className="flex items-center gap-1"><PixelHeartIcon className="w-3.5 h-3.5" /> HPP: {happiness}</span>
         </div>
@@ -197,7 +197,7 @@ export default function PetsApp({
       )}
 
       <div
-        className={`p-4 border-4 border-cozy-border bg-black rounded flex items-center justify-center w-36 h-36 relative overflow-hidden`}
+        className={`p-4 border border-cozy-border bg-black rounded flex items-center justify-center w-36 h-36 relative overflow-hidden`}
       >
         {/* Corner Crosshairs */}
         <span className="absolute top-1 left-2 text-[10px] text-cozy-text font-mono select-none">+</span>

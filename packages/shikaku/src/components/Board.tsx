@@ -109,7 +109,7 @@ export default function Board(): React.ReactElement | null {
       `}</style>
       <div
         ref={boardRef}
-        className="relative border-4 border-cozy-border bg-black overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform"
+        className="relative border border-cozy-border bg-black overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform"
         style={{
           maxWidth: "min(85vw, 60vh, 400px)",
           maxHeight: "min(85vw, 60vh, 400px)",

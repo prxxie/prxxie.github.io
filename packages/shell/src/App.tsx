@@ -201,11 +201,11 @@ export default function App(): React.ReactElement {
             />
           )}
           <div
-            className={`fixed top-0 right-0 bottom-0 w-80 bg-black border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${
+            className={`fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${
               isPetHudOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2">
+            <div className="flex justify-between items-center border-b border-dashed border-cozy-border pb-2">
               <span className="font-press text-[9px] text-cozy-text flex items-center gap-1">
                 <PixelPawIcon className="w-3.5 h-3.5" /> MOBILE_HUD
               </span>

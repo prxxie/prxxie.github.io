@@ -57,7 +57,7 @@ export default function ConsoleFrame({
 
   return (
     <div className="w-full min-h-screen flex flex-col bg-cozy-bg box-border">
-      <header className="bg-black border-b-4 border-cozy-border p-3 box-border w-full relative z-30">
+      <header className="bg-black border-b border-cozy-border p-3 box-border w-full relative z-30">
         <div className="max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border">
           <div className="flex items-center gap-2">
             <svg
@@ -119,9 +119,9 @@ export default function ConsoleFrame({
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
-          className="fixed top-0 right-0 bottom-0 w-64 bg-black border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 animate-[slideIn_0.2s_ease-out] md:hidden"
+          className="fixed top-0 right-0 bottom-0 w-64 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 animate-[slideIn_0.2s_ease-out] md:hidden"
         >
-          <div className="flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2">
+          <div className="flex justify-between items-center border-b border-dashed border-cozy-border pb-2">
             <span className="font-press text-[10px] text-cozy-accent flex items-center gap-1">
               <PixelFolderIcon className="w-3.5 h-3.5" /> MOBILE_CTRL
             </span>

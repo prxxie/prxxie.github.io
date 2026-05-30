@@ -90,7 +90,7 @@ export default function PostsApp(): React.ReactElement {
             <div className="text-red-500 text-sm">Failed to load post.</div>
           )}
           {postContent && (
-            <div className="bg-[#050505] border-2 border-cozy-border p-6 min-h-[300px] font-mono text-cozy-text relative">
+            <div className="bg-[#050505] border border-cozy-border p-6 min-h-[300px] font-mono text-cozy-text relative">
               <h3 className="font-bold border-b border-cozy-border pb-2 mb-2 text-md text-cozy-text uppercase">
                 {postContent.title}
               </h3>

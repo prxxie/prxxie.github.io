@@ -30,6 +30,7 @@ export function getValidPlacements(
           height: h,
           area: val,
           color: "",
+          borderColor: "",
           clueX: 0,
           clueY: 0,
         };

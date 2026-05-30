@@ -21,7 +21,7 @@ function makeRegion(
   h: number,
   id = "r1"
 ): Region {
-  return { id, x, y, width: w, height: h, area: w * h, color: "", clueX: 0, clueY: 0 };
+  return { id, x, y, width: w, height: h, area: w * h, color: "", borderColor: "", clueX: 0, clueY: 0 };
 }
 
 describe("Shikaku Validation Engine", () => {

@@ -64,6 +64,7 @@ describe("Board Component", () => {
           width: 3,
           height: 1,
           color: "#ff0000",
+          borderColor: "#ff0000",
           area: 3,
           clueX: 0,
           clueY: 0,

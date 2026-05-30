@@ -32,6 +32,7 @@ export interface Region {
   height: number;
   area: number;
   color: string;
+  borderColor: string;
   clueX: number;
   clueY: number;
 }

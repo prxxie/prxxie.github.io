@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { useShikakuStore } from "../store/useShikakuStore";
+import { useShikakuStore, DEFAULT_COLORS } from "../store/useShikakuStore";
 import Cell from "./Cell";
 import { synth } from "../engine/synth";
 import { motion, AnimatePresence } from "framer-motion";
@@ -142,9 +142,9 @@ export default function Board(): React.ReactElement | null {
                 top: `calc((${r.y} / ${puzzle.height}) * 100%)`,
                 width: `calc((${r.width} / ${puzzle.width}) * 100%)`,
                 height: `calc((${r.height} / ${puzzle.height}) * 100%)`,
-                border: "2px solid #FFB000",
-                backgroundColor: "rgba(255, 176, 0, 0.15)",
-                color: "#FFB000",
+                border: `2px solid ${r.borderColor}`,
+                backgroundColor: r.color,
+                color: r.borderColor,
               }}
             >
               <span>{r.width * r.height}</span>
@@ -152,17 +152,22 @@ export default function Board(): React.ReactElement | null {
           ))}
         </AnimatePresence>
 
-        {dragRect && (
+        {dragRect && (() => {
+          const nextPalette = DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length];
+          return (
           <div
-            className="absolute border border-dashed border-[#FFB000] bg-[#FFB000]/15 pointer-events-none"
+            className="absolute border-2 border-dashed pointer-events-none"
             style={{
               left: `calc((${dragRect.x} / ${puzzle.width}) * 100%)`,
               top: `calc((${dragRect.y} / ${puzzle.height}) * 100%)`,
               width: `calc((${dragRect.width} / ${puzzle.width}) * 100%)`,
               height: `calc((${dragRect.height} / ${puzzle.height}) * 100%)`,
+              borderColor: nextPalette.border,
+              backgroundColor: nextPalette.bg,
             }}
           />
-        )}
+          );
+        })()}
 
         {isWon && (
           <motion.div

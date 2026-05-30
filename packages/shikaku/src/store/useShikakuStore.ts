@@ -9,13 +9,13 @@ import type {
   ValidationResult,
 } from "../types";
 
-const DEFAULT_COLORS = [
-  "rgba(245, 158, 11, 0.3)",
-  "rgba(16, 185, 129, 0.3)",
-  "rgba(59, 130, 246, 0.3)",
-  "rgba(236, 72, 153, 0.3)",
-  "rgba(139, 92, 246, 0.3)",
-  "rgba(20, 184, 166, 0.3)",
+export const DEFAULT_COLORS = [
+  { bg: "rgba(245, 158, 11, 0.25)", border: "rgba(245, 158, 11, 0.7)" },
+  { bg: "rgba(16, 185, 129, 0.25)", border: "rgba(16, 185, 129, 0.7)" },
+  { bg: "rgba(59, 130, 246, 0.25)", border: "rgba(59, 130, 246, 0.7)" },
+  { bg: "rgba(236, 72, 153, 0.25)", border: "rgba(236, 72, 153, 0.7)" },
+  { bg: "rgba(139, 92, 246, 0.25)", border: "rgba(139, 92, 246, 0.7)" },
+  { bg: "rgba(20, 184, 166, 0.25)", border: "rgba(20, 184, 166, 0.7)" },
 ];
 
 interface CommitResult {
@@ -136,6 +136,7 @@ export const useShikakuStore = create<ShikakuState>()((set, get) => ({
     const width = Math.abs(dragStart.x - dragEnd.x) + 1;
     const height = Math.abs(dragStart.y - dragEnd.y) + 1;
 
+    const palette = DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length];
     const proposed: Region = {
       id: `reg-${Date.now()}`,
       x,
@@ -143,7 +144,8 @@ export const useShikakuStore = create<ShikakuState>()((set, get) => ({
       width,
       height,
       area: width * height,
-      color: DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length],
+      color: palette.bg,
+      borderColor: palette.border,
       clueX: 0,
       clueY: 0,
     };
@@ -289,7 +291,8 @@ export const useShikakuStore = create<ShikakuState>()((set, get) => ({
       const committedHint: Region = {
         ...missingRegion,
         id: `hint-${Date.now()}`,
-        color: "rgba(16, 185, 129, 0.4)",
+        color: "rgba(16, 185, 129, 0.25)",
+        borderColor: "rgba(16, 185, 129, 0.7)",
       };
 
       const finalRegions = [...nextRegions, committedHint];

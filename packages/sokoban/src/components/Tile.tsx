@@ -9,76 +9,95 @@ interface TileProps {
   heightPercent: number;
 }
 
-function Tile({ cell, x, y, widthPercent, heightPercent }: TileProps) {
+function Tile({
+  cell,
+  x,
+  y,
+  widthPercent,
+  heightPercent,
+}: TileProps) {
   if (cell === TileType.EMPTY) return null;
 
-  const isTarget = cell === TileType.TARGET;
-  const isWall = cell === TileType.WALL;
+  const tileStyle: React.CSSProperties = {
+    left: `${x * widthPercent}%`,
+    top: `${y * heightPercent}%`,
+    width: `${widthPercent}%`,
+    height: `${heightPercent}%`,
+  };
 
   return (
-    <div
-      className="absolute"
-      style={{
-        left: `${x * widthPercent}%`,
-        top: `${y * heightPercent}%`,
-        width: `${widthPercent}%`,
-        height: `${heightPercent}%`,
-      }}
-    >
-      {/* Floor (all non-empty tiles) */}
-      <div className="w-full h-full bg-[#080703]">
+    <div className="absolute" style={tileStyle}>
+      {/* Network Floor */}
+      <div className="absolute inset-0 bg-[#080808]">
         <div
-          className="absolute bottom-0 right-0 w-[1px] h-[1px] bg-[#FFB000]/8"
-          style={{ boxShadow: "-1px -1px 0 0 rgba(255,176,0,0.04)" }}
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,176,0,0.15) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,176,0,0.15) 1px, transparent 1px)
+            `,
+            backgroundSize: "6px 6px",
+          }}
         />
       </div>
 
-      {/* WALL: Stone brick */}
-      {isWall && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-[85%] h-[85%] bg-gradient-to-br from-[#1a1410] via-[#15100a] to-[#0f0b06] border border-[#FFB000]/25 rounded-[1px] relative overflow-hidden">
-            <div className="absolute inset-x-[15%] top-1/2 h-[1px] bg-[#FFB000]/8 -translate-y-1/2" />
-            <div className="absolute top-0 bottom-1/2 w-[1px] bg-[#FFB000]/8 left-1/3" />
-            <div className="absolute top-1/2 bottom-0 w-[1px] bg-[#FFB000]/8 left-2/3" />
-            <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-b from-[#FFB000]/15 to-transparent" />
-            <div className="absolute bottom-0 inset-x-0 h-[2px] bg-gradient-to-t from-black/60 to-transparent" />
-            <div className="absolute inset-[15%] opacity-[0.04]">
-              <div
-                className="w-full h-full"
-                style={{
-                  backgroundImage:
-                    "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,176,0,0.3) 2px, rgba(255,176,0,0.3) 3px)",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {cell === TileType.WALL && <FirewallTile />}
 
-      {/* TARGET: Glowing landing pad */}
-      {isTarget && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="absolute w-3/5 h-3/5 rounded-full opacity-40"
-            style={{
-              background: "radial-gradient(circle, rgba(255,176,0,0.5) 0%, transparent 70%)",
-              animation: "targetPulse 2s ease-in-out infinite",
-            }}
-          />
-          <div className="relative flex items-center justify-center">
-            <div
-              className="w-[40%] h-[40%] rotate-45 border border-[#FFB000]/60"
-              style={{
-                background: "linear-gradient(135deg, rgba(255,176,0,0.15), rgba(255,176,0,0.05))",
-                boxShadow: "inset 0 0 6px rgba(255,176,0,0.1)",
-              }}
-            >
-              <div className="w-[60%] h-[60%] m-[20%] rotate-45 border border-[#FFB000]/30 bg-[#FFB000]/5" />
-            </div>
-            <div className="absolute w-[6px] h-[6px] rounded-full bg-[#FFB000]/40" />
-          </div>
+      {cell === TileType.TARGET && <SignalPortTile />}
+    </div>
+  );
+}
+
+function FirewallTile() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center">
+      <div className="relative w-[88%] h-[88%] overflow-hidden border border-[#FFB000]/30 bg-gradient-to-b from-[#161616] to-[#0D0D0D]">
+
+        {/* Scanline texture */}
+        <div
+          className="absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(180deg, transparent, transparent 2px, rgba(255,176,0,0.5) 2px, rgba(255,176,0,0.5) 3px)",
+          }}
+        />
+
+        {/* Top status light */}
+        <div className="absolute top-[2px] left-[2px] w-[3px] h-[3px] rounded-full bg-[#FFB000]/60" />
+
+        {/* Firewall label */}
+        <div className="absolute inset-0 flex items-center justify-center font-mono text-[8px] font-bold tracking-tight text-[#FFB000]/75">
+          FW
         </div>
-      )}
+
+        {/* Edge glow */}
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-[#FFB000]/20" />
+      </div>
+    </div>
+  );
+}
+
+function SignalPortTile() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center">
+      {/* Signal pulse */}
+      <div
+        className="absolute w-[70%] h-[70%] rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(0,255,153,0.25), transparent 70%)",
+          animation: "signalPulse 2s ease-in-out infinite",
+        }}
+      />
+
+      {/* Port body */}
+      <div className="relative flex items-center justify-center w-[55%] h-[55%] border border-[#00FF99]/50 bg-[#07110D]">
+        <span className="font-mono text-[7px] font-bold text-[#00FF99]/80">
+          RX
+        </span>
+
+        <div className="absolute inset-x-0 bottom-0 h-[1px] bg-[#00FF99]/30" />
+      </div>
     </div>
   );
 }

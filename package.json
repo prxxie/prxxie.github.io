@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w packages/shell\" \"npm run dev -w packages/about\" \"npm run dev -w packages/posts\" \"npm run dev -w packages/pets\" \"npm run dev -w packages/shikaku\" \"npm run dev -w packages/sokoban\"",
+    "dev": "concurrently -n shell,about,posts,pets,shikaku,sokoban -c blue,green,yellow,magenta,cyan,white \"npm run dev -w packages/shell\" \"npm run dev:watch -w packages/about\" \"npm run dev:watch -w packages/posts\" \"npm run dev:watch -w packages/pets\" \"npm run dev:watch -w packages/shikaku\" \"npm run dev:watch -w packages/sokoban\"",
     "build": "npm run build --workspaces",
     "build:static": "bash scripts/build-static.sh",
     "test": "vitest run",

@@ -52,7 +52,8 @@ const remotesMap = {
 'about':{url:'/mfe/about/assets/remoteEntry.js',format:'esm',from:'vite'},
   'posts':{url:'/mfe/posts/assets/remoteEntry.js',format:'esm',from:'vite'},
   'pets':{url:'/mfe/pets/assets/remoteEntry.js',format:'esm',from:'vite'},
-  'shikaku':{url:'/mfe/shikaku/assets/remoteEntry.js',format:'esm',from:'vite'}
+  'shikaku':{url:'/mfe/shikaku/assets/remoteEntry.js',format:'esm',from:'vite'},
+  'sokoban':{url:'/mfe/sokoban/assets/remoteEntry.js',format:'esm',from:'vite'}
 };
                 const currentImports = {};
                 const loadJS = async (url, fn) => {
@@ -180,7 +181,8 @@ const NAV_ITEMS = [
   { id: "about", label: "ABOUT" },
   { id: "posts", label: "POSTS" },
   { id: "pets", label: "PETS" },
-  { id: "shikaku", label: "SHIKAKU" }
+  { id: "shikaku", label: "SHIKAKU" },
+  { id: "sokoban", label: "SOKOBAN" }
 ];
 function ConsoleFrame({
   children,
@@ -384,6 +386,11 @@ const ShikakuApp = lazy(
     default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Shikaku" })
   }))
 );
+const SokobanApp = lazy(
+  () => __federation_method_getRemote("sokoban" , "./SokobanApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({
+    default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Sokoban" })
+  }))
+);
 function Fallback({ name }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full gap-2 p-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-press text-[10px] text-red-600", children: "⚠ MFE LOAD ERROR" }),
@@ -437,6 +444,8 @@ function App() {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { usePetStore });
       case "shikaku":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(ShikakuApp, {});
+      case "sokoban":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(SokobanApp, {});
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center p-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "font-press text-[14px] mb-4 text-cozy-accent", children: "WELCOME HOME" }),

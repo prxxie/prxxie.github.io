@@ -8,6 +8,7 @@ describe("Shell Host App", () => {
   let originalFullscreenElementDescriptor: PropertyDescriptor | undefined;
 
   beforeEach(() => {
+    window.location.hash = "";
     Object.defineProperty(HTMLDivElement.prototype, "requestFullscreen", {
       value: vi.fn().mockResolvedValue(undefined),
       writable: true,
@@ -33,6 +34,7 @@ describe("Shell Host App", () => {
   });
 
   afterEach(() => {
+    window.location.hash = "";
     // @ts-expect-error - test cleanup
     delete HTMLDivElement.prototype.requestFullscreen;
     // @ts-expect-error - test cleanup
@@ -51,16 +53,28 @@ describe("Shell Host App", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders welcoming header text", () => {
+  it("renders HOME_VIEW window header on initial mount", () => {
     render(<App />);
-    expect(screen.getByText("WELCOME HOME")).toBeInTheDocument();
+    expect(screen.getByText("HOME_VIEW")).toBeInTheDocument();
   });
 
-  it("navigates to different tabs on button clicks", () => {
+  it("renders the HomeDashboard planet on initial mount", () => {
     render(<App />);
+    expect(screen.getByText("BYRIA-RR9")).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByText("ABOUT"));
-    expect(screen.getByText("LOADING MFE...")).toBeInTheDocument();
+  it("renders the side-panel MatrixMenu on desktop", () => {
+    render(<App />);
+    const buttons = screen.getAllByRole("button", { name: /\[AB\]\s+about/i });
+    expect(buttons.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("navigates to ABOUT when matrix item is clicked", () => {
+    render(<App />);
+    const aboutBtns = screen.getAllByRole("button", { name: /\[AB\]\s+about/i });
+    fireEvent.click(aboutBtns[0]);
+    expect(window.location.hash).toBe("#/about");
+    expect(screen.getByText("ABOUT_VIEW")).toBeInTheDocument();
   });
 
   it("toggles fullscreen state when button is clicked", () => {

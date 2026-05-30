@@ -20,7 +20,7 @@ export default function AboutApp(): React.ReactElement {
 
   return (
     <div className="flex flex-col h-full gap-2 overflow-y-auto">
-      <h2 className="font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 flex items-center gap-1">
+      <h2 className="font-press text-[12px] border-b border-dashed border-cozy-border pb-1 flex items-center gap-1">
         <PixelBioIcon className="w-4 h-4 text-cozy-accent" /> BIO DIRECTORY
       </h2>
 
@@ -28,13 +28,13 @@ export default function AboutApp(): React.ReactElement {
         <div className="flex flex-col gap-2 pt-2 text-cozy-text">
           <div
             onClick={() => setOpenFolder("bio")}
-            className="border-2 border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors"
+            className="border border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors"
           >
             <PixelFolderIcon className="w-4 h-4 mr-2" /> [BIO] - Who is prxxie?
           </div>
           <div
             onClick={() => setOpenFolder("skills")}
-            className="border-2 border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors"
+            className="border border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors"
           >
             <PixelFolderIcon className="w-4 h-4 mr-2" /> [SKILLS] - Character Stats
           </div>
@@ -48,7 +48,7 @@ export default function AboutApp(): React.ReactElement {
             <PixelBackIcon className="w-3.5 h-3.5 mr-1" /> BACK
           </button>
           {openFolder === "bio" && (
-            <div className="border-2 border-cozy-border p-3 bg-black text-cozy-text text-sm leading-relaxed">
+            <div className="border border-cozy-border p-3 bg-black text-cozy-text text-sm leading-relaxed">
               <p className="mb-2">
                 <strong>NAME:</strong> prxxie
               </p>
@@ -63,7 +63,7 @@ export default function AboutApp(): React.ReactElement {
             </div>
           )}
           {openFolder === "skills" && (
-            <div className="border-2 border-cozy-border p-3 bg-black text-cozy-text text-sm">
+            <div className="border border-cozy-border p-3 bg-black text-cozy-text text-sm">
               <h4 className="font-bold mb-2">CHARACTER LEVELS:</h4>
               <div className="flex flex-col gap-2">
                 {skills.map((skill) => (
@@ -72,7 +72,7 @@ export default function AboutApp(): React.ReactElement {
                       <span>{skill.name}</span>
                       <span>LV.{skill.level}</span>
                     </div>
-                    <div className="h-4 border-2 border-cozy-border bg-[#201500] relative">
+                    <div className="h-4 border border-cozy-border bg-[#201500] relative">
                       <div
                         className="h-full bg-cozy-accent"
                         style={{ width: `${skill.level * 10}%` }}

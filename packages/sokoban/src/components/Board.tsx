@@ -18,7 +18,7 @@ export default function Board(): React.ReactElement {
 
   return (
     <div
-      className="relative w-full border-4 border-[#FFB000] bg-[#050505] shadow-inner select-none overflow-hidden"
+      className="relative w-full border border-[#FFB000] bg-[#050505] select-none overflow-hidden"
       style={{ aspectRatio: `${cols} / ${rows}` }}
     >
       {/* Render Static Tiles (Wall, Floor, Target) */}
@@ -70,7 +70,7 @@ export default function Board(): React.ReactElement {
             }}
           >
             <div
-              className={`w-full h-full border-2 border-cozy-border flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
+              className={`w-full h-full border border-cozy-border flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
                 ${isOnTarget ? "bg-[#805800] text-black" : "bg-black text-[#FFB000]"}
                 ${isDeadlocked ? "opacity-60 border-dashed animate-pulse" : ""}
               `}
@@ -101,7 +101,7 @@ export default function Board(): React.ReactElement {
         }}
       >
         <div
-          className="w-full h-full bg-[#FFB000] border-2 border-cozy-border flex items-center justify-center text-[12px] relative"
+          className="w-full h-full bg-[#FFB000] border border-cozy-border flex items-center justify-center text-[12px] relative"
           style={{
             borderRadius: "50%"
           }}

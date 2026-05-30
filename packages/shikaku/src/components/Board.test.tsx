@@ -124,7 +124,7 @@ describe("Board Component", () => {
 
   it("applies responsive sizing inline styles to the board container", () => {
     const { container } = render(<Board />);
-    const boardContainer = container.querySelector(".relative.border-4");
+    const boardContainer = container.querySelector(".relative.border");
     expect(boardContainer).toBeInTheDocument();
     expect(boardContainer).toHaveStyle({
       maxWidth: "min(85vw, 60vh, 400px)",

@@ -109,7 +109,7 @@ export default function Board(): React.ReactElement | null {
       `}</style>
       <div
         ref={boardRef}
-        className="relative border-4 border-cozy-border bg-black overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform"
+        className="relative border border-cozy-border bg-black overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform"
         style={{
           maxWidth: "min(85vw, 60vh, 400px)",
           maxHeight: "min(85vw, 60vh, 400px)",
@@ -136,7 +136,7 @@ export default function Board(): React.ReactElement | null {
                 synth.playClick();
                 removeRegionAt(r.x, r.y);
               }}
-              className="absolute cursor-pointer flex items-center justify-center font-press text-[8px] select-none shadow-inner hover:brightness-95 active:scale-95"
+              className="absolute cursor-pointer flex items-center justify-center font-press text-[8px] select-none hover:brightness-95 active:scale-95"
               style={{
                 left: `calc((${r.x} / ${puzzle.width}) * 100%)`,
                 top: `calc((${r.y} / ${puzzle.height}) * 100%)`,

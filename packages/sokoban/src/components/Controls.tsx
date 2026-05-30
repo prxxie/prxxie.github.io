@@ -103,7 +103,7 @@ export default function Controls(): React.ReactElement {
         >
           ◀
         </button>
-        <div className="bg-cozy-border border-2 border-cozy-border opacity-10" />
+        <div className="bg-cozy-border border border-cozy-border opacity-10" />
         <button
           onClick={() => move(1, 0)}
           className="pixel-btn flex items-center justify-center text-[10px]"

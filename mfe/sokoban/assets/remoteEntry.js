@@ -3,7 +3,7 @@ const currentImports = {};
       let moduleMap = {
 "./SokobanApp":()=>{
       dynamicLoadingCss([], false, './SokobanApp');
-      return __federation_import('/mfe/sokoban/assets/__federation_expose_SokobanApp-Cg8bdPKg.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      return __federation_import('/mfe/sokoban/assets/__federation_expose_SokobanApp-A9GvGztG.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
         const metaUrl = import.meta.url;

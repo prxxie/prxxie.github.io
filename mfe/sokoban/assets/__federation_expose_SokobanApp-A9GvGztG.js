@@ -365,7 +365,7 @@ function HUD({ onBack }) {
   const isMuted = useSokobanStore((state) => state.isMuted);
   const setMuted = useSokobanStore((state) => state.setMuted);
   const levelName = SOKOBAN_LEVELS[currentLevelIdx]?.name || `Level ${currentLevelIdx + 1}`;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-2 p-2 border-b-2 border-cozy-border font-press text-[10px] select-none text-cozy-text", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-2 p-2 border-b border-cozy-border font-press text-[10px] select-none text-cozy-text", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center w-full", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("button", { onClick: onBack, className: "pixel-btn px-2 py-1 text-[8px]", "aria-label": "Back to level selection", children: "< MENU" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: levelName.toUpperCase() }),
@@ -412,7 +412,7 @@ function Board() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
-      className: "relative w-full border-4 border-[#FFB000] bg-[#050505] shadow-inner select-none overflow-hidden",
+      className: "relative w-full border border-[#FFB000] bg-[#050505] select-none overflow-hidden",
       style: { aspectRatio: `${cols} / ${rows}` },
       children: [
         board.map(
@@ -454,7 +454,7 @@ function Board() {
               children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "div",
                 {
-                  className: `w-full h-full border-2 border-cozy-border flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
+                  className: `w-full h-full border border-cozy-border flex items-center justify-center font-bold font-press text-[8px] transition-colors relative
                 ${isOnTarget ? "bg-[#805800] text-black" : "bg-black text-[#FFB000]"}
                 ${isDeadlocked ? "opacity-60 border-dashed animate-pulse" : ""}
               `,
@@ -485,7 +485,7 @@ function Board() {
             children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
               "div",
               {
-                className: "w-full h-full bg-[#FFB000] border-2 border-cozy-border flex items-center justify-center text-[12px] relative",
+                className: "w-full h-full bg-[#FFB000] border border-cozy-border flex items-center justify-center text-[12px] relative",
                 style: {
                   borderRadius: "50%"
                 },
@@ -510,7 +510,7 @@ function LevelSelect({ onSelect }) {
       "button",
       {
         onClick: () => onSelect(idx),
-        className: "w-10 h-10 border-2 border-cozy-border flex items-center justify-center font-press text-[11px] bg-black text-cozy-text cursor-pointer hover:bg-cozy-text hover:text-black hover:scale-105 active:translate-y-0.5 transition-colors",
+        className: "w-10 h-10 border border-cozy-border flex items-center justify-center font-press text-[11px] bg-black text-cozy-text cursor-pointer hover:bg-cozy-text hover:text-black hover:scale-105 active:translate-y-0.5 transition-colors",
         "aria-label": `Select level ${idx + 1}`,
         children: idx + 1
       },
@@ -611,7 +611,7 @@ function Controls() {
           children: "◀"
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-cozy-border border-2 border-cozy-border opacity-10" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-cozy-border border border-cozy-border opacity-10" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
         {
@@ -648,7 +648,7 @@ function WinModal({ onBack }) {
     }
   }, [isWon]);
   if (!isWon) return /* @__PURE__ */ jsxRuntimeExports.jsx(React.Fragment, {});
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4 select-none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-4 border-[#FFB000] bg-[#050505] p-6 shadow-md max-w-xs w-full text-center flex flex-col items-center gap-4", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4 select-none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-[#FFB000] bg-[#050505] p-6 max-w-xs w-full text-center flex flex-col items-center gap-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[14px] text-cozy-text animate-bounce", children: "STAGE CLEAR!" }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "font-mono text-sm text-cozy-text", children: [
       "Finished in ",
@@ -686,7 +686,7 @@ function SokobanApp() {
     loadLevel(idx);
     setView("game");
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border-4 border-cozy-border bg-black p-4 shadow-md select-none relative flex flex-col items-center text-cozy-text", children: view === "menu" ? /* @__PURE__ */ jsxRuntimeExports.jsx(LevelSelect, { onSelect: handleSelectLevel }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 items-center w-full relative", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border border-cozy-border bg-black p-4 select-none relative flex flex-col items-center text-cozy-text", children: view === "menu" ? /* @__PURE__ */ jsxRuntimeExports.jsx(LevelSelect, { onSelect: handleSelectLevel }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 items-center w-full relative", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(HUD, { onBack: () => setView("menu") }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Board, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Controls, {}),

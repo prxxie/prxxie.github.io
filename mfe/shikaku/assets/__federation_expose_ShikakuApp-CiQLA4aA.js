@@ -854,7 +854,7 @@ function HUD({ onBack }) {
     const secs = sec % 60;
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-4 border-b-2 border-cozy-border pb-4 font-press text-[10px] text-cozy-text", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-4 border-b border-cozy-border pb-4 font-press text-[10px] text-cozy-text", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(
         "button",
@@ -863,7 +863,7 @@ function HUD({ onBack }) {
             synth.playClick();
             onBack();
           },
-          className: "border-2 border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5",
+          className: "border border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5",
           children: "◀ BACK"
         }
       ),
@@ -882,7 +882,7 @@ function HUD({ onBack }) {
               synth.playClick();
               undo();
             },
-            className: "border-2 border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5",
+            className: "border border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5",
             children: "UNDO"
           }
         ),
@@ -893,7 +893,7 @@ function HUD({ onBack }) {
               synth.playClick();
               resetLevel();
             },
-            className: "border-2 border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5",
+            className: "border border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5",
             children: "RESET"
           }
         ),
@@ -904,7 +904,7 @@ function HUD({ onBack }) {
               synth.playClick();
               getHint();
             },
-            className: "border-2 border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5",
+            className: "border border-cozy-border bg-black text-cozy-text hover:bg-[#101010] px-2 py-1 cursor-pointer active:translate-y-0.5",
             children: "HINT"
           }
         )
@@ -10802,7 +10802,7 @@ function Board() {
       "div",
       {
         ref: boardRef,
-        className: "relative border-4 border-cozy-border bg-black overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform",
+        className: "relative border border-cozy-border bg-black overflow-hidden select-none touch-none w-full aspect-square mx-auto transition-transform",
         style: {
           maxWidth: "min(85vw, 60vh, 400px)",
           maxHeight: "min(85vw, 60vh, 400px)"
@@ -10829,7 +10829,7 @@ function Board() {
                 synth.playClick();
                 removeRegionAt(r.x, r.y);
               },
-              className: "absolute cursor-pointer flex items-center justify-center font-press text-[8px] select-none shadow-inner hover:brightness-95 active:scale-95",
+              className: "absolute cursor-pointer flex items-center justify-center font-press text-[8px] select-none hover:brightness-95 active:scale-95",
               style: {
                 left: `calc((${r.x} / ${puzzle.width}) * 100%)`,
                 top: `calc((${r.y} / ${puzzle.height}) * 100%)`,
@@ -10883,7 +10883,7 @@ function LevelSelect({
     loadSave();
   }, [loadSave]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-6 text-cozy-text font-press", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-[12px] text-center border-b-2 border-cozy-border pb-3", children: "SELECT LEVEL" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-[12px] text-center border-b border-cozy-border pb-3", children: "SELECT LEVEL" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-3", children: SHIKAKU_LEVELS.map((lvl, index) => {
       const save = completedLevels[lvl.id];
       const stars = save ? save.stars : 0;
@@ -10894,7 +10894,7 @@ function LevelSelect({
             synth.playClick();
             onSelect(index);
           },
-          className: "border-2 border-cozy-border bg-black text-cozy-text p-3 flex flex-col items-center justify-center cursor-pointer active:translate-y-0.5 hover:bg-cozy-text hover:text-black transition-colors",
+          className: "border border-cozy-border bg-black text-cozy-text p-3 flex flex-col items-center justify-center cursor-pointer active:translate-y-0.5 hover:bg-cozy-text hover:text-black transition-colors",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px]", children: index + 1 }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[6px] mt-1 text-cozy-muted font-sans", children: [
@@ -10928,7 +10928,7 @@ function ShikakuApp() {
     setSelectedIdx(idx);
     loadLevel(SHIKAKU_LEVELS, idx);
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border-4 border-cozy-border bg-black p-6 shadow-md select-none text-cozy-text", children: selectedIdx === null ? /* @__PURE__ */ jsxRuntimeExports.jsx(LevelSelect, { onSelect: handleSelectLevel }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-6 items-center", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border border-cozy-border bg-black p-6 select-none text-cozy-text", children: selectedIdx === null ? /* @__PURE__ */ jsxRuntimeExports.jsx(LevelSelect, { onSelect: handleSelectLevel }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-6 items-center", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(HUD, { onBack: () => setSelectedIdx(null) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Board, {})
   ] }) });

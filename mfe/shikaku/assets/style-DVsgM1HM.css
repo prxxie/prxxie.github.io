@@ -1,4 +1,4 @@
-@import "https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap";
+@import "https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap";
 
 /*! tailwindcss v4.3.0 | MIT License | https://tailwindcss.com */
 @layer properties {
@@ -11,20 +11,6 @@
       --tw-skew-y: initial;
       --tw-border-style: solid;
       --tw-font-weight: initial;
-      --tw-shadow: 0 0 #0000;
-      --tw-shadow-color: initial;
-      --tw-shadow-alpha: 100%;
-      --tw-inset-shadow: 0 0 #0000;
-      --tw-inset-shadow-color: initial;
-      --tw-inset-shadow-alpha: 100%;
-      --tw-ring-color: initial;
-      --tw-ring-shadow: 0 0 #0000;
-      --tw-inset-ring-color: initial;
-      --tw-inset-ring-shadow: 0 0 #0000;
-      --tw-ring-inset: initial;
-      --tw-ring-offset-width: 0px;
-      --tw-ring-offset-color: #fff;
-      --tw-ring-offset-shadow: 0 0 #0000;
       --tw-ease: initial;
       --tw-blur: initial;
       --tw-brightness: initial;
@@ -52,8 +38,7 @@
   :root, :host {
     --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-      "Courier New", monospace;
+    --font-mono: "Geist Mono", ui-monospace, monospace;
     --color-slate-900: oklch(20.8% .042 265.755);
     --color-black: #000;
     --color-white: #fff;
@@ -67,8 +52,8 @@
     --default-transition-timing-function: cubic-bezier(.4, 0, .2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
-    --font-pixel: "VT323", monospace;
-    --font-press: "Press Start 2P", monospace;
+    --font-pixel: "Geist Mono", ui-monospace, monospace;
+    --font-press: "Geist Mono", ui-monospace, monospace;
     --color-cozy-bg: #000;
     --color-cozy-text: #ffb000;
     --color-cozy-border: #ffb000;
@@ -480,19 +465,9 @@
     border-width: 1px;
   }
 
-  .border-2 {
-    border-style: var(--tw-border-style);
-    border-width: 2px;
-  }
-
-  .border-4 {
-    border-style: var(--tw-border-style);
-    border-width: 4px;
-  }
-
-  .border-b-2 {
+  .border-b {
     border-bottom-style: var(--tw-border-style);
-    border-bottom-width: 2px;
+    border-bottom-width: 1px;
   }
 
   .border-dashed {
@@ -616,16 +591,6 @@
     opacity: .3;
   }
 
-  .shadow-inner {
-    --tw-shadow: inset 0 2px 4px 0 var(--tw-shadow-color, #0000000d);
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
-
-  .shadow-md {
-    --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, #0000001a), 0 2px 4px -2px var(--tw-shadow-color, #0000001a);
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
-  }
-
   .transition-colors {
     transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -682,63 +647,46 @@
 body {
   background-color: var(--color-cozy-bg);
   color: var(--color-cozy-text);
-  font-family: var(--font-pixel);
-  image-rendering: pixelated;
-  text-shadow: 0 0 2px #ffb00059;
-  font-size: 20px;
+  font-family: var(--font-mono);
+  font-size: 14px;
   position: relative;
   overflow-x: hidden;
 }
-body:after {
-  content: " ";
-  z-index: 9999;
-  pointer-events: none;
-  opacity: .85;
-  background: linear-gradient(#12101000 50%, #00000040 50%) 0 0 / 100% 4px, linear-gradient(90deg, #ffb00008, #00000005, #ffb00008) 0 0 / 6px 100%;
-  display: block;
-  position: fixed;
-  inset: 0;
-}
 .pixel-border {
-  border: 4px solid var(--color-cozy-border);
-  box-shadow: 4px 4px 0px var(--color-cozy-muted);
+  border: 1px solid var(--color-cozy-border);
 }
 .pixel-btn {
-  border: 3px solid var(--color-cozy-border);
-  font-family: var(--font-press);
+  border: 1px solid var(--color-cozy-border);
+  font-family: var(--font-mono);
   cursor: pointer;
-  box-shadow: 2px 2px 0px var(--color-cozy-muted);
   color: var(--color-cozy-text);
   background-color: #000;
   padding: 6px 12px;
-  font-size: 10px;
+  font-size: 11px;
   transition: all .15s ease-in-out;
 }
 .pixel-btn:hover, .pixel-btn:focus-visible {
   background-color: var(--color-cozy-text);
   color: #000;
-  box-shadow: 2px 2px 0px var(--color-cozy-border);
 }
 .pixel-btn:active {
-  box-shadow: 0px 0px 0px var(--color-cozy-border);
-  transform: translate(2px, 2px);
+  opacity: .85;
 }
 .retro-window {
-  border: 4px solid var(--color-cozy-border);
+  border: 1px solid var(--color-cozy-border);
   background-color: var(--color-terminal-bg);
-  box-shadow: 4px 4px 0px var(--color-cozy-muted);
   flex-direction: column;
   display: flex;
 }
 .window-header {
   color: var(--color-cozy-text);
-  border-bottom: 3px solid var(--color-cozy-border);
-  font-family: var(--font-press);
+  border-bottom: 1px solid var(--color-cozy-border);
+  font-family: var(--font-mono);
   background-color: #000;
   justify-content: space-between;
   align-items: center;
   padding: 8px 10px;
-  font-size: 9px;
+  font-size: 10px;
   display: flex;
 }
 .window-header-accent {
@@ -935,71 +883,6 @@ button:focus-visible, [role="button"]:focus-visible, .pixel-btn:focus-visible {
 @property --tw-font-weight {
   syntax: "*";
   inherits: false
-}
-@property --tw-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-shadow-color {
-  syntax: "*";
-  inherits: false
-}
-@property --tw-shadow-alpha {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 100%;
-}
-@property --tw-inset-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-inset-shadow-color {
-  syntax: "*";
-  inherits: false
-}
-@property --tw-inset-shadow-alpha {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 100%;
-}
-@property --tw-ring-color {
-  syntax: "*";
-  inherits: false
-}
-@property --tw-ring-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-inset-ring-color {
-  syntax: "*";
-  inherits: false
-}
-@property --tw-inset-ring-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
-}
-@property --tw-ring-inset {
-  syntax: "*";
-  inherits: false
-}
-@property --tw-ring-offset-width {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 0;
-}
-@property --tw-ring-offset-color {
-  syntax: "*";
-  inherits: false;
-  initial-value: #fff;
-}
-@property --tw-ring-offset-shadow {
-  syntax: "*";
-  inherits: false;
-  initial-value: 0 0 #0000;
 }
 @property --tw-ease {
   syntax: "*";

@@ -217,7 +217,7 @@ function PetsApp({
     );
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-between h-full py-2 box-border", children: [
-    !usePetStore && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 text-xs font-press bg-black border-2 border-cozy-border p-2 mb-2 box-border items-center text-cozy-text", children: [
+    !usePetStore && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 text-xs font-press bg-black border border-cozy-border p-2 mb-2 box-border items-center text-cozy-text", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx(PixelChickenIcon, { className: "w-3.5 h-3.5" }),
         " HNG: ",
@@ -242,7 +242,7 @@ function PetsApp({
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
       {
-        className: `p-4 border-4 border-cozy-border bg-black rounded flex items-center justify-center w-36 h-36 relative overflow-hidden`,
+        className: `p-4 border border-cozy-border bg-black rounded flex items-center justify-center w-36 h-36 relative overflow-hidden`,
         children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-1 left-2 text-[10px] text-cozy-text font-mono select-none", children: "+" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-1 right-2 text-[10px] text-cozy-text font-mono select-none", children: "+" }),
@@ -258,7 +258,7 @@ function PetsApp({
         "button",
         {
           onClick: feed,
-          className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]",
+          className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text",
           children: [
             "FEED ",
             /* @__PURE__ */ jsxRuntimeExports.jsx(PixelChickenIcon, { className: "w-3.5 h-3.5" })
@@ -269,7 +269,7 @@ function PetsApp({
         "button",
         {
           onClick: play,
-          className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]",
+          className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text",
           children: [
             "PLAY ",
             /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBearIcon, { className: "w-3.5 h-3.5" })
@@ -280,7 +280,7 @@ function PetsApp({
         "button",
         {
           onClick: toggleSleep,
-          className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border shadow-none hover:bg-black hover:text-cozy-text hover:shadow-[2px_2px_0px_var(--color-cozy-muted)]",
+          className: "pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text",
           children: isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
             "WAKE ",
             /* @__PURE__ */ jsxRuntimeExports.jsx(PixelSunIcon, { className: "w-3.5 h-3.5" })

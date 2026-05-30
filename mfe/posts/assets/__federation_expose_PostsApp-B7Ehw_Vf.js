@@ -4993,7 +4993,7 @@ function PostsApp() {
       ),
       isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-[8px] pt-4 text-center", children: "LOADING POST CONTENT..." }),
       isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-500 text-sm", children: "Failed to load post." }),
-      postContent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-[#050505] border-2 border-cozy-border p-6 min-h-[300px] font-mono text-cozy-text relative", children: [
+      postContent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-[#050505] border border-cozy-border p-6 min-h-[300px] font-mono text-cozy-text relative", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold border-b border-cozy-border pb-2 mb-2 text-md text-cozy-text uppercase", children: postContent.title }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-[10px] text-cozy-muted mb-4 font-mono", children: [
           "DATE: ",

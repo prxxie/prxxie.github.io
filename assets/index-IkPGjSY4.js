@@ -247,7 +247,7 @@ function MatrixMenu({
       "button",
       {
         onClick: () => handleButtonClick(item.tab),
-        className: `pixel-btn text-[9px] py-2 px-1 text-center font-press capitalize ${currentTab === item.tab ? "bg-cozy-accent text-black shadow-none border-cozy-border" : "bg-transparent text-cozy-text hover:bg-cozy-muted/20"}`,
+        className: `pixel-btn text-[9px] py-2 px-1 text-center font-press capitalize ${currentTab === item.tab ? "bg-cozy-accent text-black border-cozy-border" : "bg-transparent text-cozy-text hover:bg-cozy-muted/20"}`,
         children: [
           "[",
           item.key,
@@ -301,7 +301,7 @@ function ConsoleFrame({
     setMenuOpen(false);
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full min-h-screen flex flex-col bg-cozy-bg box-border", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "bg-black border-b-4 border-cozy-border p-3 shadow-[0_3px_0px_var(--color-cozy-accent)] box-border w-full relative z-30", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "bg-black border-b border-cozy-border p-3 box-border w-full relative z-30", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "svg",
@@ -366,9 +366,9 @@ function ConsoleFrame({
         role: "dialog",
         "aria-modal": "true",
         "aria-label": "Navigation menu",
-        className: "fixed top-0 right-0 bottom-0 w-64 bg-black border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-[-4px_0_0_var(--color-cozy-border)] animate-[slideIn_0.2s_ease-out] md:hidden",
+        className: "fixed top-0 right-0 bottom-0 w-64 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 animate-[slideIn_0.2s_ease-out] md:hidden",
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b border-dashed border-cozy-border pb-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[10px] text-cozy-accent flex items-center gap-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-3.5 h-3.5" }),
               " MOBILE_CTRL"
@@ -882,7 +882,7 @@ function App() {
       "button",
       {
         onClick: () => setIsPetHudOpen(true),
-        className: "md:hidden fixed bottom-6 right-6 z-40 pixel-btn text-[9px] shadow-lg",
+        className: "md:hidden fixed bottom-6 right-6 z-40 pixel-btn text-[9px]",
         children: "[ MOBILE HUD ]"
       }
     ),
@@ -896,9 +896,9 @@ function App() {
     /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "div",
       {
-        className: `fixed top-0 right-0 bottom-0 w-80 bg-black border-l-4 border-cozy-border z-50 p-4 flex flex-col gap-4 shadow-2xl transition-transform duration-300 md:hidden ${isPetHudOpen ? "translate-x-0" : "translate-x-full"}`,
+        className: `fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${isPetHudOpen ? "translate-x-0" : "translate-x-full"}`,
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b border-dashed border-cozy-border pb-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[9px] text-cozy-text flex items-center gap-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
               " MOBILE_HUD"

@@ -44,7 +44,7 @@ function AboutApp() {
     { name: "GitHub Actions", level: 6 }
   ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-2 overflow-y-auto", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "font-press text-[12px] border-b-2 border-dashed border-cozy-border pb-1 flex items-center gap-1", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "font-press text-[12px] border-b border-dashed border-cozy-border pb-1 flex items-center gap-1", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBioIcon, { className: "w-4 h-4 text-cozy-accent" }),
       " BIO DIRECTORY"
     ] }),
@@ -53,7 +53,7 @@ function AboutApp() {
         "div",
         {
           onClick: () => setOpenFolder("bio"),
-          className: "border-2 border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors",
+          className: "border border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-4 h-4 mr-2" }),
             " [BIO] - Who is prxxie?"
@@ -64,7 +64,7 @@ function AboutApp() {
         "div",
         {
           onClick: () => setOpenFolder("skills"),
-          className: "border-2 border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors",
+          className: "border border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-4 h-4 mr-2" }),
             " [SKILLS] - Character Stats"
@@ -83,7 +83,7 @@ function AboutApp() {
           ]
         }
       ),
-      openFolder === "bio" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-2 border-cozy-border p-3 bg-black text-cozy-text text-sm leading-relaxed", children: [
+      openFolder === "bio" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-cozy-border p-3 bg-black text-cozy-text text-sm leading-relaxed", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mb-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "NAME:" }),
           " prxxie"
@@ -94,7 +94,7 @@ function AboutApp() {
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Hello! I build highly interactive websites. I love combining clean engineering practices (like micro frontends) with rich visual game designs." })
       ] }),
-      openFolder === "skills" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-2 border-cozy-border p-3 bg-black text-cozy-text text-sm", children: [
+      openFolder === "skills" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-cozy-border p-3 bg-black text-cozy-text text-sm", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold mb-2", children: "CHARACTER LEVELS:" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-2", children: skills.map((skill) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between font-bold text-xs mb-1", children: [
@@ -104,7 +104,7 @@ function AboutApp() {
               skill.level
             ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 border-2 border-cozy-border bg-[#201500] relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 border border-cozy-border bg-[#201500] relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
             {
               className: "h-full bg-cozy-accent",

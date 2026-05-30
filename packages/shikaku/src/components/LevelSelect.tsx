@@ -18,8 +18,8 @@ export default function LevelSelect({
   }, [loadSave]);
 
   return (
-    <div className="w-full flex flex-col gap-6 text-[#2b4c3f] font-press">
-      <h2 className="text-[12px] text-center border-b-2 border-[#2b4c3f] pb-3">
+    <div className="w-full flex flex-col gap-6 text-cozy-text font-press">
+      <h2 className="text-[12px] text-center border-b-2 border-cozy-border pb-3">
         SELECT LEVEL
       </h2>
 
@@ -34,10 +34,10 @@ export default function LevelSelect({
                 synth.playClick();
                 onSelect(index);
               }}
-              className="border-2 border-[#2b4c3f] bg-[#e2f4e5] p-3 flex flex-col items-center justify-center cursor-pointer active:translate-y-0.5 hover:bg-[#cce8d0] transition-colors"
+              className="border-2 border-cozy-border bg-black text-cozy-text p-3 flex flex-col items-center justify-center cursor-pointer active:translate-y-0.5 hover:bg-cozy-text hover:text-black transition-colors"
             >
               <span className="text-[10px]">{index + 1}</span>
-              <span className="text-[6px] mt-1 text-slate-700 font-sans">
+              <span className="text-[6px] mt-1 text-cozy-muted font-sans">
                 {lvl.width}x{lvl.height}
               </span>
               <div className="text-[8px] mt-2">

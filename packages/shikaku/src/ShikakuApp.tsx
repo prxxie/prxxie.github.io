@@ -23,7 +23,7 @@ export default function ShikakuApp(): React.ReactElement {
   };
 
   return (
-    <div className="w-full max-w-[450px] border-4 border-[#2b4c3f] bg-[#e2f4e5] p-6 shadow-md select-none">
+    <div className="w-full max-w-[450px] border-4 border-cozy-border bg-black p-6 shadow-md select-none text-cozy-text">
       {selectedIdx === null ? (
         <LevelSelect onSelect={handleSelectLevel} />
       ) : (

@@ -30,7 +30,7 @@
 **Files:**
 - Modify: `packages/shell/src/index.css`
 
-- [ ] **Step 1: Update theme colors & add CRT scanlines**
+- [x] **Step 1: Update theme colors & add CRT scanlines**
   Replace root variables and add CSS scanline effects and animations in `packages/shell/src/index.css`.
   ```css
   /* Target: packages/shell/src/index.css */
@@ -147,11 +147,11 @@
   }
   ```
 
-- [ ] **Step 2: Run test suite to verify no syntax compilation failures**
+- [x] **Step 2: Run test suite to verify no syntax compilation failures**
   Run: `npm test`
   Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
   ```bash
   git add packages/shell/src/index.css
   git commit -m "style: define central amber crt theme and scanlines"
@@ -164,7 +164,7 @@
 - Modify: `packages/shell/src/App.tsx`
 - Modify: `packages/shell/src/components/ConsoleFrame.tsx`
 
-- [ ] **Step 1: Clean window header suffixes & prepare layouts**
+- [x] **Step 1: Clean window header suffixes & prepare layouts**
   Modify `packages/shell/src/App.tsx` to remove `.EXE` from view window names, configure asymmetric layout spans (`col-span-13` / `col-span-7`), and integrate mobile drawer parameters.
   ```typescript
   // Target: packages/shell/src/App.tsx
@@ -233,18 +233,18 @@
   </div>
   ```
 
-- [ ] **Step 2: Clean mobile menu header in ConsoleFrame**
+- [x] **Step 2: Clean mobile menu header in ConsoleFrame**
   Modify `packages/shell/src/components/ConsoleFrame.tsx` to remove `.EXE` from `MENU.EXE`. Change hover/active state selectors for the desktop navigation item tabs.
   ```typescript
   // Replace MENU.EXE with MENU
   // Replace hover text styling to match theme-invert
   ```
 
-- [ ] **Step 3: Run unit tests**
+- [x] **Step 3: Run unit tests**
   Run: `npm test`
   Expected: PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
   ```bash
   git add packages/shell/src/App.tsx packages/shell/src/components/ConsoleFrame.tsx
   git commit -m "feat: remove exe window suffixes and add mobile drawer panel"

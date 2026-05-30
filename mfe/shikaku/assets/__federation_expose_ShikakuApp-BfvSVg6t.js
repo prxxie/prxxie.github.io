@@ -75,6 +75,7 @@ function getValidPlacements(clue, puzzle, placed = []) {
           height: h,
           area: val,
           color: "",
+          borderColor: "",
           clueX: 0,
           clueY: 0
         };
@@ -130,12 +131,12 @@ function solvePuzzle(puzzle) {
 
 const {create} = await importShared('zustand');
 const DEFAULT_COLORS = [
-  "rgba(245, 158, 11, 0.3)",
-  "rgba(16, 185, 129, 0.3)",
-  "rgba(59, 130, 246, 0.3)",
-  "rgba(236, 72, 153, 0.3)",
-  "rgba(139, 92, 246, 0.3)",
-  "rgba(20, 184, 166, 0.3)"
+  { bg: "rgba(245, 158, 11, 0.25)", border: "rgba(245, 158, 11, 0.7)" },
+  { bg: "rgba(16, 185, 129, 0.25)", border: "rgba(16, 185, 129, 0.7)" },
+  { bg: "rgba(59, 130, 246, 0.25)", border: "rgba(59, 130, 246, 0.7)" },
+  { bg: "rgba(236, 72, 153, 0.25)", border: "rgba(236, 72, 153, 0.7)" },
+  { bg: "rgba(139, 92, 246, 0.25)", border: "rgba(139, 92, 246, 0.7)" },
+  { bg: "rgba(20, 184, 166, 0.25)", border: "rgba(20, 184, 166, 0.7)" }
 ];
 const useShikakuStore = create()((set, get) => ({
   levels: [],
@@ -213,6 +214,7 @@ const useShikakuStore = create()((set, get) => ({
     const y = Math.min(dragStart.y, dragEnd.y);
     const width = Math.abs(dragStart.x - dragEnd.x) + 1;
     const height = Math.abs(dragStart.y - dragEnd.y) + 1;
+    const palette = DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length];
     const proposed = {
       id: `reg-${Date.now()}`,
       x,
@@ -220,7 +222,8 @@ const useShikakuStore = create()((set, get) => ({
       width,
       height,
       area: width * height,
-      color: DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length],
+      color: palette.bg,
+      borderColor: palette.border,
       clueX: 0,
       clueY: 0
     };
@@ -331,7 +334,8 @@ const useShikakuStore = create()((set, get) => ({
       const committedHint = {
         ...missingRegion,
         id: `hint-${Date.now()}`,
-        color: "rgba(16, 185, 129, 0.4)"
+        color: "rgba(16, 185, 129, 0.25)",
+        borderColor: "rgba(16, 185, 129, 0.7)"
       };
       const finalRegions = [...nextRegions, committedHint];
       const nextHistory = [...get().history, regions];
@@ -10835,26 +10839,31 @@ function Board() {
                 top: `calc((${r.y} / ${puzzle.height}) * 100%)`,
                 width: `calc((${r.width} / ${puzzle.width}) * 100%)`,
                 height: `calc((${r.height} / ${puzzle.height}) * 100%)`,
-                border: "2px solid #FFB000",
-                backgroundColor: "rgba(255, 176, 0, 0.15)",
-                color: "#FFB000"
+                border: `2px solid ${r.borderColor}`,
+                backgroundColor: r.color,
+                color: r.borderColor
               },
               children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: r.width * r.height })
             },
             r.id
           )) }),
-          dragRect && /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "div",
-            {
-              className: "absolute border border-dashed border-[#FFB000] bg-[#FFB000]/15 pointer-events-none",
-              style: {
-                left: `calc((${dragRect.x} / ${puzzle.width}) * 100%)`,
-                top: `calc((${dragRect.y} / ${puzzle.height}) * 100%)`,
-                width: `calc((${dragRect.width} / ${puzzle.width}) * 100%)`,
-                height: `calc((${dragRect.height} / ${puzzle.height}) * 100%)`
+          dragRect && (() => {
+            const nextPalette = DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length];
+            return /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "absolute border-2 border-dashed pointer-events-none",
+                style: {
+                  left: `calc((${dragRect.x} / ${puzzle.width}) * 100%)`,
+                  top: `calc((${dragRect.y} / ${puzzle.height}) * 100%)`,
+                  width: `calc((${dragRect.width} / ${puzzle.width}) * 100%)`,
+                  height: `calc((${dragRect.height} / ${puzzle.height}) * 100%)`,
+                  borderColor: nextPalette.border,
+                  backgroundColor: nextPalette.bg
+                }
               }
-            }
-          ),
+            );
+          })(),
           isWon && /* @__PURE__ */ jsxRuntimeExports.jsxs(
             motion.div,
             {

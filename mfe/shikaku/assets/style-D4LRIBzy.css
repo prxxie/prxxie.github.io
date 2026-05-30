@@ -465,6 +465,11 @@
     border-width: 1px;
   }
 
+  .border-2 {
+    border-style: var(--tw-border-style);
+    border-width: 2px;
+  }
+
   .border-b {
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
@@ -475,16 +480,8 @@
     border-style: dashed;
   }
 
-  .border-\[\#FFB000\] {
-    border-color: #ffb000;
-  }
-
   .border-cozy-border {
     border-color: var(--color-cozy-border);
-  }
-
-  .bg-\[\#FFB000\]\/15 {
-    background-color: oklab(81.2419% .0400898 .165595 / .15);
   }
 
   .bg-black {

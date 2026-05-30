@@ -27,7 +27,7 @@ export default function Board(): React.ReactElement {
 
   return (
     <div
-      className="relative w-full border border-[#FFB000] bg-[#0a0a0a] select-none overflow-hidden rounded-sm"
+      className="relative w-full border border-[#FFB000] bg-[#050505] select-none overflow-hidden rounded-sm"
       style={{ aspectRatio: `${cols} / ${rows}` }}
     >
       {/* ── Render Static Tiles ── */}
@@ -35,6 +35,7 @@ export default function Board(): React.ReactElement {
         row.map((cell, x) => {
           if (cell === TileType.EMPTY) return null;
           const isTarget = cell === TileType.TARGET;
+          const isWall = cell === TileType.WALL;
 
           return (
             <div
@@ -47,25 +48,71 @@ export default function Board(): React.ReactElement {
                 height: `${tileHeightPercent}%`,
               }}
             >
-              {cell === TileType.WALL && (
-                <div className="w-full h-full bg-[#1a1200] border border-[#FFB000]/40 flex items-center justify-center">
-                  <div className="w-1/2 h-1/2 border border-[#FFB000]/20 rotate-45" />
+              {/* ── Floor (all non-empty tiles) ── */}
+              <div className="w-full h-full bg-[#080703]">
+                {/* Subtle floor grid dots at intersections */}
+                <div
+                  className="absolute bottom-0 right-0 w-[1px] h-[1px] bg-[#FFB000]/8"
+                  style={{ boxShadow: "-1px -1px 0 0 rgba(255,176,0,0.04)" }}
+                />
+              </div>
+
+              {/* ── WALL: Stone brick ── */}
+              {isWall && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Base stone block */}
+                  <div className="w-[85%] h-[85%] bg-gradient-to-br from-[#1a1410] via-[#15100a] to-[#0f0b06] border border-[#FFB000]/25 rounded-[1px] relative overflow-hidden">
+                    {/* Brick pattern — horizontal mortar line */}
+                    <div className="absolute inset-x-[15%] top-1/2 h-[1px] bg-[#FFB000]/8 -translate-y-1/2" />
+                    {/* Brick pattern — vertical mortar line (offset for staggered look) */}
+                    <div
+                      className="absolute top-0 bottom-1/2 w-[1px] bg-[#FFB000]/8 left-1/3"
+                    />
+                    <div
+                      className="absolute top-1/2 bottom-0 w-[1px] bg-[#FFB000]/8 left-2/3"
+                    />
+                    {/* Stone highlight (top edge) */}
+                    <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-b from-[#FFB000]/15 to-transparent" />
+                    {/* Stone shadow (bottom edge) */}
+                    <div className="absolute bottom-0 inset-x-0 h-[2px] bg-gradient-to-t from-black/60 to-transparent" />
+                    {/* Surface grain */}
+                    <div className="absolute inset-[15%] opacity-[0.04]">
+                      <div className="w-full h-full" style={{
+                        backgroundImage:
+                          "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,176,0,0.3) 2px, rgba(255,176,0,0.3) 3px)",
+                      }} />
+                    </div>
+                  </div>
                 </div>
               )}
-              {cell === TileType.FLOOR && (
-                <div className="w-full h-full bg-[#0a0a0a] flex items-center justify-center">
-                  <div className="w-[1px] h-[1px] bg-[#FFB000]/10 rounded-full" />
-                </div>
-              )}
+
+              {/* ── TARGET / GOAL: Glowing landing pad ── */}
               {isTarget && (
-                <div className="w-full h-full bg-[#0a0a0a] flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Outer glow ring */}
                   <div
-                    className="w-2/5 h-2/5 rounded-full border border-[#FFB000]/70 bg-[#FFB000]/10"
+                    className="absolute w-3/5 h-3/5 rounded-full opacity-40"
                     style={{
-                      animation: "targetPulse 1.5s ease-in-out infinite",
-                      boxShadow: "0 0 6px rgba(255, 176, 0, 0.2)",
+                      background: "radial-gradient(circle, rgba(255,176,0,0.5) 0%, transparent 70%)",
+                      animation: "targetPulse 2s ease-in-out infinite",
                     }}
                   />
+                  {/* Diamond target indicator */}
+                  <div className="relative flex items-center justify-center">
+                    {/* Diamond outer */}
+                    <div
+                      className="w-[40%] h-[40%] rotate-45 border border-[#FFB000]/60"
+                      style={{
+                        background: "linear-gradient(135deg, rgba(255,176,0,0.15), rgba(255,176,0,0.05))",
+                        boxShadow: "inset 0 0 6px rgba(255,176,0,0.1)",
+                      }}
+                    >
+                      {/* Diamond inner */}
+                      <div className="w-[60%] h-[60%] m-[20%] rotate-45 border border-[#FFB000]/30 bg-[#FFB000]/5" />
+                    </div>
+                    {/* Center dot */}
+                    <div className="absolute w-[6px] h-[6px] rounded-full bg-[#FFB000]/40" />
+                  </div>
                 </div>
               )}
             </div>
@@ -73,7 +120,7 @@ export default function Board(): React.ReactElement {
         })
       )}
 
-      {/* ── Boxes ── */}
+      {/* ── Boxes: Wooden crate ── */}
       {boxes.map((box) => {
         const isOnTarget = board[box.y]?.[box.x] === TileType.TARGET;
         const isDeadlocked = deadlockedBoxIds.includes(box.id);
@@ -81,7 +128,7 @@ export default function Board(): React.ReactElement {
         return (
           <div
             key={box.id}
-            className="absolute p-[1.5px] z-10"
+            className="absolute p-[2px] z-10"
             style={{
               left: `${box.x * tileWidthPercent}%`,
               top: `${box.y * tileHeightPercent}%`,
@@ -91,26 +138,90 @@ export default function Board(): React.ReactElement {
             }}
           >
             <div
-              className={`w-full h-full flex items-center justify-center font-press text-[7px] relative
-                ${isOnTarget
-                  ? "bg-[#805800] text-black border border-[#FFB000]/80"
-                  : "bg-[#1a1400] text-[#FFB000] border border-[#FFB000]/50"
-                }
-                ${isDeadlocked ? "opacity-50 border-dashed" : ""}
+              className={`w-full h-full relative overflow-hidden
+                ${isDeadlocked ? "opacity-60" : ""}
               `}
-              style={{
-                clipPath: "polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%)",
-              }}
             >
-              {/* Cross pattern on crate */}
-              <div className="absolute inset-[3px] border border-[#FFB000]/20 pointer-events-none" />
-              <div className="absolute left-1/2 top-1/4 w-[1px] h-1/2 bg-[#FFB000]/20 -translate-x-1/2" />
-              <div className="absolute top-1/2 left-1/4 h-[1px] w-1/2 bg-[#FFB000]/20 -translate-y-1/2" />
-              {isDeadlocked && (
-                <span className="absolute -top-0.5 -right-0.5 bg-[#FF4444] text-black text-[5px] w-2.5 h-2.5 flex items-center justify-center rounded-full font-bold leading-none" style={{ fontSize: "5px" }}>
-                  !
-                </span>
-              )}
+              {/* Crate body */}
+              <div
+                className={`w-full h-full rounded-[1px] relative overflow-hidden
+                  ${isOnTarget
+                    ? "bg-gradient-to-br from-[#3a2a00] via-[#2a1a00] to-[#1a0e00] border border-[#FFB000]/70"
+                    : "bg-gradient-to-br from-[#2a1a0a] via-[#1f1205] to-[#150d03] border border-[#FFB000]/35"
+                  }
+                `}
+                style={{
+                  boxShadow: isOnTarget
+                    ? "inset 0 0 10px rgba(255,176,0,0.12), 0 0 6px rgba(255,176,0,0.08)"
+                    : "inset 0 1px 0 rgba(255,176,0,0.08), inset 0 -1px 0 rgba(0,0,0,0.3)",
+                }}
+              >
+                {/* Wood plank lines (horizontal) */}
+                <div className="absolute inset-x-[8%] top-[30%] h-[1px] bg-[#FFB000]/10" />
+                <div className="absolute inset-x-[8%] top-[55%] h-[1px] bg-[#FFB000]/10" />
+                <div className="absolute inset-x-[8%] top-[80%] h-[1px] bg-[#FFB000]/10" />
+
+                {/* Wood grain stripes */}
+                <div className="absolute inset-0 opacity-[0.06]"
+                  style={{
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255,176,0,0.5) 3px, rgba(255,176,0,0.5) 4px)",
+                  }}
+                />
+
+                {/* Cross bracing (diagonal) */}
+                <div
+                  className="absolute top-0 left-0 w-[35%] h-[1px] bg-[#FFB000]/10"
+                  style={{ transform: "rotate(35deg)", transformOrigin: "top left" }}
+                />
+                <div
+                  className="absolute bottom-0 right-0 w-[35%] h-[1px] bg-[#FFB000]/10"
+                  style={{ transform: "rotate(35deg)", transformOrigin: "bottom right" }}
+                />
+                <div
+                  className="absolute top-0 right-0 w-[35%] h-[1px] bg-[#FFB000]/10"
+                  style={{ transform: "rotate(-35deg)", transformOrigin: "top right" }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 w-[35%] h-[1px] bg-[#FFB000]/10"
+                  style={{ transform: "rotate(-35deg)", transformOrigin: "bottom left" }}
+                />
+
+                {/* Metal corner brackets */}
+                <div className="absolute top-[2px] left-[2px] w-[5px] h-[5px] border-l-[1.5px] border-t-[1.5px] border-[#FFB000]/25 rounded-tl-[1px]" />
+                <div className="absolute top-[2px] right-[2px] w-[5px] h-[5px] border-r-[1.5px] border-t-[1.5px] border-[#FFB000]/25 rounded-tr-[1px]" />
+                <div className="absolute bottom-[2px] left-[2px] w-[5px] h-[5px] border-l-[1.5px] border-b-[1.5px] border-[#FFB000]/25 rounded-bl-[1px]" />
+                <div className="absolute bottom-[2px] right-[2px] w-[5px] h-[5px] border-r-[1.5px] border-b-[1.5px] border-[#FFB000]/25 rounded-br-[1px]" />
+
+                {/* Top highlight */}
+                <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-b from-[#FFB000]/10 to-transparent" />
+
+                {/* On-target golden glow overlay */}
+                {isOnTarget && (
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: "radial-gradient(circle at 50% 50%, rgba(255,176,0,0.08), transparent 70%)",
+                      animation: "targetPulse 2s ease-in-out infinite",
+                    }}
+                  />
+                )}
+
+                {/* Deadlocked indicator */}
+                {isDeadlocked && (
+                  <div className="absolute inset-0 bg-[#FF4444]/10 flex items-center justify-center">
+                    <span
+                      className="text-[#FF4444] font-bold leading-none select-none"
+                      style={{
+                        fontSize: "clamp(4px, 30%, 10px)",
+                        textShadow: "0 0 4px rgba(255,68,68,0.5)",
+                      }}
+                    >
+                      ✗
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         );
@@ -140,8 +251,8 @@ export default function Board(): React.ReactElement {
 
       <style>{`
         @keyframes targetPulse {
-          0%, 100% { opacity: 0.6; transform: scale(0.95); }
-          50% { opacity: 1; transform: scale(1.05); }
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(1.08); }
         }
       `}</style>
     </div>

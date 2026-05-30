@@ -80,7 +80,7 @@ export default function ConsoleFrame({
               <button
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
-                className={`pixel-btn text-[9px] px-3 py-1 ${currentTab === item.id ? "bg-cozy-accent text-white border-cozy-border shadow-none translate-y-[2px]" : ""}`}
+                className={`pixel-btn text-[9px] px-3 py-1 ${currentTab === item.id ? "bg-cozy-accent text-cozy-bg border-cozy-border shadow-none translate-y-[2px]" : ""}`}
               >
                 {item.label}
               </button>
@@ -94,7 +94,7 @@ export default function ConsoleFrame({
             aria-controls="mobile-menu-drawer"
             aria-label="Toggle navigation menu"
           >
-            [MENU.EXE]
+            [MENU]
           </button>
         </div>
       </header>
@@ -117,7 +117,7 @@ export default function ConsoleFrame({
         >
           <div className="flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2">
             <span className="font-press text-[10px] text-cozy-accent flex items-center gap-1">
-              <PixelFolderIcon className="w-3.5 h-3.5" /> MENU.EXE
+              <PixelFolderIcon className="w-3.5 h-3.5" /> MENU
             </span>
             <button
               onClick={() => setMenuOpen(false)}
@@ -132,7 +132,7 @@ export default function ConsoleFrame({
               <button
                 key={item.id}
                 onClick={() => handleTabClick(item.id)}
-                className={`pixel-btn w-full text-[10px] text-left py-2 px-3 ${currentTab === item.id ? "bg-cozy-accent text-white border-cozy-border shadow-none" : ""}`}
+                className={`pixel-btn w-full text-[10px] text-left py-2 px-3 ${currentTab === item.id ? "bg-cozy-accent text-cozy-bg border-cozy-border shadow-none" : ""}`}
               >
                 {currentTab === item.id ? "[x]" : "[ ]"} {item.label}
               </button>

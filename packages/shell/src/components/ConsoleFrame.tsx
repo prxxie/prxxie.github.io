@@ -1,22 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { PixelFolderIcon } from "./Icons";
 import { useUiStore } from "../store/uiStore";
 import type { Tab } from "../types";
+import { getAudioMuted, setAudioMuted, playBeepSound } from "../utils/audio";
+import MatrixMenu from "./MatrixMenu";
 
 interface ConsoleFrameProps {
   children: React.ReactNode;
   currentTab: Tab;
   setTab: (tab: Tab) => void;
 }
-
-const NAV_ITEMS: Array<{ id: Tab; label: string }> = [
-  { id: "home", label: "HOME" },
-  { id: "about", label: "ABOUT" },
-  { id: "posts", label: "POSTS" },
-  { id: "pets", label: "PETS" },
-  { id: "shikaku", label: "SHIKAKU" },
-  { id: "sokoban", label: "SOKOBAN" },
-];
 
 export default function ConsoleFrame({
   children,
@@ -26,6 +19,7 @@ export default function ConsoleFrame({
   const isMenuOpen = useUiStore((state) => state.isMenuOpen);
   const setMenuOpen = useUiStore((state) => state.setMenuOpen);
   const toggleMenu = useUiStore((state) => state.toggleMenu);
+  const [muted, setMuted] = useState<boolean>(getAudioMuted);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -47,8 +41,17 @@ export default function ConsoleFrame({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isMenuOpen, setMenuOpen]);
 
-  const handleTabClick = (tabName: Tab): void => {
-    setTab(tabName);
+  const handleAudioToggle = (): void => {
+    const nextMuted = !muted;
+    setAudioMuted(nextMuted);
+    setMuted(nextMuted);
+    if (!nextMuted) {
+      playBeepSound(520, 0.08);
+    }
+  };
+
+  const handleNavigate = (tab: Tab): void => {
+    setTab(tab);
     setMenuOpen(false);
   };
 
@@ -70,32 +73,35 @@ export default function ConsoleFrame({
               <path d="M3,4 L8,8 L3,12" />
               <line x1="9" y1="12" x2="14" y2="12" />
             </svg>
-            <span className="font-press text-xs font-bold text-cozy-accent">
-              PRXXIE
+            <span className="font-press text-xs font-bold text-cozy-accent uppercase">
+              PRXXIE_OS v4.7
             </span>
           </div>
 
-          <nav className="hidden md:flex gap-2">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleTabClick(item.id)}
-                className={`pixel-btn text-[9px] px-3 py-1 ${currentTab === item.id ? "bg-cozy-accent text-cozy-bg border-cozy-border shadow-none translate-y-[2px]" : ""}`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleAudioToggle}
+              className={`pixel-btn text-[9px] px-3 py-1 ${
+                !muted ? "bg-cozy-accent text-black border-cozy-border" : ""
+              }`}
+              aria-label="Toggle Audio Beeps"
+            >
+              SOUND: {!muted ? "ON" : "OFF"}
+            </button>
 
-          <button
-            onClick={toggleMenu}
-            className="md:hidden pixel-btn text-[9px] px-3 py-1"
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu-drawer"
-            aria-label="Toggle navigation menu"
-          >
-            [MENU]
-          </button>
+            <button
+              onClick={() => {
+                playBeepSound(440, 0.05);
+                toggleMenu();
+              }}
+              className="md:hidden pixel-btn text-[9px] px-3 py-1"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu-drawer"
+              aria-label="Toggle navigation menu"
+            >
+              [MENU]
+            </button>
+          </div>
         </div>
       </header>
 
@@ -117,7 +123,7 @@ export default function ConsoleFrame({
         >
           <div className="flex justify-between items-center border-b-2 border-dashed border-cozy-border pb-2">
             <span className="font-press text-[10px] text-cozy-accent flex items-center gap-1">
-              <PixelFolderIcon className="w-3.5 h-3.5" /> MENU
+              <PixelFolderIcon className="w-3.5 h-3.5" /> MOBILE_CTRL
             </span>
             <button
               onClick={() => setMenuOpen(false)}
@@ -127,17 +133,8 @@ export default function ConsoleFrame({
               [X]
             </button>
           </div>
-          <nav className="flex flex-col gap-3">
-            {NAV_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleTabClick(item.id)}
-                className={`pixel-btn w-full text-[10px] text-left py-2 px-3 ${currentTab === item.id ? "bg-cozy-accent text-cozy-bg border-cozy-border shadow-none" : ""}`}
-              >
-                {currentTab === item.id ? "[x]" : "[ ]"} {item.label}
-              </button>
-            ))}
-          </nav>
+
+          <MatrixMenu currentTab={currentTab} navigate={handleNavigate} />
         </div>
       )}
 

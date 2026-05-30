@@ -1,55 +1,114 @@
 import React from "react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ConsoleFrame from "./ConsoleFrame";
 import { useUiStore } from "../store/uiStore";
+import { setAudioMuted } from "../utils/audio";
 
-describe("ConsoleFrame Responsive Menu", () => {
-  beforeEach(() => {
-    useUiStore.setState({ isMenuOpen: false });
-  });
+const originalAudioCtor = (globalThis as { AudioContext?: typeof AudioContext })
+  .AudioContext;
 
-  it("renders standard horizontal buttons and hides mobile menu button by default", () => {
+beforeEach(() => {
+  useUiStore.setState({ isMenuOpen: false });
+  localStorage.clear();
+  setAudioMuted(true);
+  (globalThis as { AudioContext?: typeof AudioContext }).AudioContext = vi
+    .fn()
+    .mockImplementation(() => ({
+      state: "running",
+      currentTime: 0,
+      destination: {},
+      resume: vi.fn(),
+      createOscillator: vi.fn(() => ({
+        type: "",
+        frequency: { value: 0 },
+        connect: vi.fn(),
+        start: vi.fn(),
+        stop: vi.fn(),
+      })),
+      createGain: vi.fn(() => ({
+        gain: {
+          setValueAtTime: vi.fn(),
+          exponentialRampToValueAtTime: vi.fn(),
+        },
+        connect: vi.fn(),
+      })),
+    }));
+});
+
+afterEach(() => {
+  setAudioMuted(true);
+  localStorage.clear();
+});
+
+afterAll(() => {
+  if (originalAudioCtor) {
+    (globalThis as { AudioContext?: typeof AudioContext }).AudioContext =
+      originalAudioCtor;
+  } else {
+    delete (globalThis as { AudioContext?: typeof AudioContext }).AudioContext;
+  }
+});
+
+describe("ConsoleFrame", () => {
+  it("does not render top horizontal nav buttons (matrix moved to side panels)", () => {
     render(
       <ConsoleFrame currentTab="home" setTab={() => {}}>
         <div>test</div>
       </ConsoleFrame>
     );
 
-    expect(screen.getByText("HOME")).toBeInTheDocument();
-
-    const menuBtn = screen.getByRole("button", {
-      name: "Toggle navigation menu",
-    });
-    expect(menuBtn).toBeInTheDocument();
-    expect(menuBtn).toHaveClass("md:hidden");
+    expect(screen.queryByRole("button", { name: "HOME" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "ABOUT" })).not.toBeInTheDocument();
   });
 
-  it("opens offcanvas menu drawer when clicking [MENU]", () => {
+  it("renders the audio toggle button defaulting to OFF", () => {
     render(
       <ConsoleFrame currentTab="home" setTab={() => {}}>
         <div>test</div>
       </ConsoleFrame>
     );
 
-    const menuBtn = screen.getByRole("button", {
-      name: "Toggle navigation menu",
-    });
+    const audioBtn = screen.getByRole("button", { name: "Toggle Audio Beeps" });
+    expect(audioBtn).toBeInTheDocument();
+    expect(audioBtn).toHaveTextContent("SOUND: OFF");
+  });
+
+  it("toggles audio state when clicking the SOUND button", () => {
+    render(
+      <ConsoleFrame currentTab="home" setTab={() => {}}>
+        <div>test</div>
+      </ConsoleFrame>
+    );
+
+    const audioBtn = screen.getByRole("button", { name: "Toggle Audio Beeps" });
+    fireEvent.click(audioBtn);
+    expect(audioBtn).toHaveTextContent("SOUND: ON");
+
+    fireEvent.click(audioBtn);
+    expect(audioBtn).toHaveTextContent("SOUND: OFF");
+  });
+
+  it("opens the offcanvas drawer when clicking [MENU]", () => {
+    render(
+      <ConsoleFrame currentTab="home" setTab={() => {}}>
+        <div>test</div>
+      </ConsoleFrame>
+    );
+
+    const menuBtn = screen.getByRole("button", { name: "Toggle navigation menu" });
     fireEvent.click(menuBtn);
-
     expect(useUiStore.getState().isMenuOpen).toBe(true);
 
-    expect(screen.getByText((content, el) => el?.tagName === "SPAN" && content.includes("MENU"))).toBeInTheDocument();
+    expect(screen.getByText("MOBILE_CTRL")).toBeInTheDocument();
 
-    const closeBtn = screen.getByRole("button", {
-      name: "Close navigation menu",
-    });
+    const closeBtn = screen.getByRole("button", { name: "Close navigation menu" });
     fireEvent.click(closeBtn);
     expect(useUiStore.getState().isMenuOpen).toBe(false);
   });
 
-  it("closes the drawer when pressing the Escape key", () => {
+  it("closes the drawer when pressing Escape", () => {
     useUiStore.setState({ isMenuOpen: true });
     render(
       <ConsoleFrame currentTab="home" setTab={() => {}}>
@@ -57,14 +116,12 @@ describe("ConsoleFrame Responsive Menu", () => {
       </ConsoleFrame>
     );
 
-    expect(screen.getByText((content, el) => el?.tagName === "SPAN" && content.includes("MENU"))).toBeInTheDocument();
-
+    expect(screen.getByText("MOBILE_CTRL")).toBeInTheDocument();
     fireEvent.keyDown(window, { key: "Escape", code: "Escape" });
-
     expect(useUiStore.getState().isMenuOpen).toBe(false);
   });
 
-  it("closes the drawer when clicking the backdrop overlay", () => {
+  it("closes the drawer when clicking the backdrop", () => {
     useUiStore.setState({ isMenuOpen: true });
     const { container } = render(
       <ConsoleFrame currentTab="home" setTab={() => {}}>
@@ -74,13 +131,11 @@ describe("ConsoleFrame Responsive Menu", () => {
 
     const backdrop = container.querySelector(".bg-black\\/45");
     expect(backdrop).toBeInTheDocument();
-
     fireEvent.click(backdrop!);
-
     expect(useUiStore.getState().isMenuOpen).toBe(false);
   });
 
-  it("toggles overflow-hidden class on document body and removes it on unmount", () => {
+  it("manages overflow-hidden on body across menu state changes", () => {
     const { unmount } = render(
       <ConsoleFrame currentTab="home" setTab={() => {}}>
         <div>test</div>
@@ -88,29 +143,17 @@ describe("ConsoleFrame Responsive Menu", () => {
     );
 
     expect(document.body).not.toHaveClass("overflow-hidden");
-
-    act(() => {
-      useUiStore.setState({ isMenuOpen: true });
-    });
+    act(() => useUiStore.setState({ isMenuOpen: true }));
     expect(document.body).toHaveClass("overflow-hidden");
-
-    act(() => {
-      useUiStore.setState({ isMenuOpen: false });
-    });
+    act(() => useUiStore.setState({ isMenuOpen: false }));
     expect(document.body).not.toHaveClass("overflow-hidden");
-
-    act(() => {
-      useUiStore.setState({ isMenuOpen: true });
-    });
+    act(() => useUiStore.setState({ isMenuOpen: true }));
     expect(document.body).toHaveClass("overflow-hidden");
-
-    act(() => {
-      unmount();
-    });
+    act(() => unmount());
     expect(document.body).not.toHaveClass("overflow-hidden");
   });
 
-  it("updates tab and closes drawer when a mobile navigation item is clicked", () => {
+  it("calls setTab and closes drawer when matrix item in drawer is clicked", () => {
     const setTabSpy = vi.fn();
     useUiStore.setState({ isMenuOpen: true });
 
@@ -120,13 +163,10 @@ describe("ConsoleFrame Responsive Menu", () => {
       </ConsoleFrame>
     );
 
-    const aboutBtn = screen.getByRole("button", { name: "[ ] ABOUT" });
-    expect(aboutBtn).toBeInTheDocument();
-
+    const aboutBtn = screen.getByRole("button", { name: /\[AB\]\s+about/i });
     fireEvent.click(aboutBtn);
 
     expect(setTabSpy).toHaveBeenCalledWith("about");
-
     expect(useUiStore.getState().isMenuOpen).toBe(false);
   });
 });

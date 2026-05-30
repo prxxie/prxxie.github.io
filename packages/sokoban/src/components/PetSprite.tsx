@@ -1,23 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export type PetStatus = "idle" | "eating" | "playing" | "sleeping" | "moving";
 export type PetDirection = "down" | "up" | "left" | "right";
 
 interface PetSpriteProps {
-  size?: number;
+  size?: number | string;
   status?: PetStatus;
   isSleeping?: boolean;
   direction?: PetDirection;
-  animationFrame?: number;
   className?: string;
 }
 
 function getBodyColor(status: PetStatus, isSleeping: boolean): string {
   if (isSleeping) return "#779988";
-  if (status === "eating") return "#CC6666";
-  if (status === "playing") return "#CC6666";
+  if (status === "eating" || status === "playing") return "#CC6666";
   if (status === "moving") return "#CC9966";
-  return "#A0785A"; // idle — warm brown
+  return "#A0785A";
 }
 
 function getEyeOffset(direction: PetDirection): { ex: number; ey: number } {
@@ -26,19 +24,27 @@ function getEyeOffset(direction: PetDirection): { ex: number; ey: number } {
   return { ex: baseX, ey: baseY };
 }
 
-export default function PetSprite({
-  size = 16,
+function PetSprite({
+  size = "100%",
   status = "idle",
   isSleeping = false,
   direction = "down",
-  animationFrame = 0,
   className = "",
-}: PetSpriteProps): React.ReactElement {
+}: PetSpriteProps) {
+  const [animFrame, setAnimFrame] = useState(0);
+
+  useEffect(() => {
+    if (status === "moving" || status === "playing") {
+      const timer = setInterval(() => setAnimFrame((f) => (f + 1) % 2), 400);
+      return () => clearInterval(timer);
+    }
+    setAnimFrame(0);
+  }, [status]);
+
   const bodyColor = getBodyColor(status, isSleeping);
   const { ex, ey } = getEyeOffset(direction);
   const bounceClass = status === "playing" || status === "moving" ? "animate-bounce" : "";
-
-  const legOffset = status === "moving" ? (animationFrame === 0 ? 0 : 1) : 0;
+  const legOffset = status === "moving" ? (animFrame === 0 ? 0 : 1) : 0;
 
   return (
     <svg
@@ -46,11 +52,9 @@ export default function PetSprite({
       className={`${bounceClass} ${className}`}
       style={{ width: size, height: size }}
     >
-      {/* Body */}
       <rect x="3" y="3" width="10" height="10" rx="2" ry="2" fill={bodyColor} />
       <rect x="4" y="4" width="8" height="8" fill={bodyColor} />
 
-      {/* Legs */}
       {status === "moving" ? (
         <>
           <rect x="4" y={11 + legOffset} width="2" height="2" fill="var(--color-cozy-border)" />
@@ -60,12 +64,10 @@ export default function PetSprite({
         <rect x="4" y="11" width="8" height="2" fill="var(--color-cozy-border)" />
       )}
 
-      {/* Tail */}
       {status === "playing" && (
-        <rect x="13" y={animationFrame === 0 ? "4" : "6"} width="2" height="2" fill={bodyColor} />
+        <rect x="13" y={animFrame === 0 ? "4" : "6"} width="2" height="2" fill={bodyColor} />
       )}
 
-      {/* Sleeping ZZZ */}
       {isSleeping && (
         <>
           <rect x="11" y="1" width="2" height="2" fill="var(--color-cozy-border)" opacity="0.6" />
@@ -73,7 +75,6 @@ export default function PetSprite({
         </>
       )}
 
-      {/* Eyes */}
       {!isSleeping ? (
         <>
           <rect x={5 + ex} y={6 + ey} width="2" height="2" fill="#FFFFFF" rx="0.5" />
@@ -88,7 +89,6 @@ export default function PetSprite({
         </>
       )}
 
-      {/* Mouth */}
       {!isSleeping && status !== "eating" && (
         <rect x="6" y="9" width="4" height="1" fill="var(--color-cozy-border)" />
       )}
@@ -96,7 +96,6 @@ export default function PetSprite({
         <rect x="7" y="9" width="2" height="2" fill="var(--color-cozy-border)" />
       )}
 
-      {/* Blush cheeks */}
       {status === "playing" && (
         <>
           <rect x="3" y="8" width="1.5" height="1" fill="#FF8888" opacity="0.5" rx="0.5" />
@@ -106,3 +105,5 @@ export default function PetSprite({
     </svg>
   );
 }
+
+export default React.memo(PetSprite);

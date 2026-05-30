@@ -390,7 +390,7 @@ const synth = new SokobanSynth();
 
 const {create} = await importShared('zustand');
 const computeDeadlocks = (board, boxes) => {
-  const deadlocked = [];
+  const deadlocked = /* @__PURE__ */ new Set();
   for (const box of boxes) {
     const { x, y } = box;
     if (y < 0 || y >= board.length || x < 0 || x >= board[y].length) continue;
@@ -401,7 +401,7 @@ const computeDeadlocks = (board, boxes) => {
     const downWall = board[y + 1]?.[x] === TileType.WALL;
     const inCorner = (leftWall || rightWall) && (upWall || downWall);
     if (inCorner) {
-      deadlocked.push(box.id);
+      deadlocked.add(box.id);
     }
   }
   return deadlocked;
@@ -415,7 +415,7 @@ const useSokobanStore = create((set, get) => ({
   history: [],
   isWon: false,
   isMuted: false,
-  deadlockedBoxIds: [],
+  deadlockedBoxIds: /* @__PURE__ */ new Set(),
   lastDirection: "down",
   isMoving: false,
   loadLevel: (levelIdx) => {
@@ -460,7 +460,7 @@ const useSokobanStore = create((set, get) => ({
       moves: 0,
       history: [],
       isWon: false,
-      deadlockedBoxIds: [],
+      deadlockedBoxIds: /* @__PURE__ */ new Set(),
       lastDirection: "down",
       isMoving: false
     });
@@ -612,10 +612,216 @@ function HUD({ onBack }) {
   ] });
 }
 
+function shallow$1(objA, objB) {
+  if (Object.is(objA, objB)) {
+    return true;
+  }
+  if (typeof objA !== "object" || objA === null || typeof objB !== "object" || objB === null) {
+    return false;
+  }
+  if (objA instanceof Map && objB instanceof Map) {
+    if (objA.size !== objB.size) return false;
+    for (const [key, value] of objA) {
+      if (!Object.is(value, objB.get(key))) {
+        return false;
+      }
+    }
+    return true;
+  }
+  if (objA instanceof Set && objB instanceof Set) {
+    if (objA.size !== objB.size) return false;
+    for (const value of objA) {
+      if (!objB.has(value)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  const keysA = Object.keys(objA);
+  if (keysA.length !== Object.keys(objB).length) {
+    return false;
+  }
+  for (const keyA of keysA) {
+    if (!Object.prototype.hasOwnProperty.call(objB, keyA) || !Object.is(objA[keyA], objB[keyA])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+const React$4 = await importShared('react');
+function Tile({ cell, x, y, widthPercent, heightPercent }) {
+  if (cell === TileType.EMPTY) return null;
+  const isTarget = cell === TileType.TARGET;
+  const isWall = cell === TileType.WALL;
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      className: "absolute",
+      style: {
+        left: `${x * widthPercent}%`,
+        top: `${y * heightPercent}%`,
+        width: `${widthPercent}%`,
+        height: `${heightPercent}%`
+      },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#080703]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "absolute bottom-0 right-0 w-[1px] h-[1px] bg-[#FFB000]/8",
+            style: { boxShadow: "-1px -1px 0 0 rgba(255,176,0,0.04)" }
+          }
+        ) }),
+        isWall && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-[85%] h-[85%] bg-gradient-to-br from-[#1a1410] via-[#15100a] to-[#0f0b06] border border-[#FFB000]/25 rounded-[1px] relative overflow-hidden", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[15%] top-1/2 h-[1px] bg-[#FFB000]/8 -translate-y-1/2" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 bottom-1/2 w-[1px] bg-[#FFB000]/8 left-1/3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-1/2 bottom-0 w-[1px] bg-[#FFB000]/8 left-2/3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 inset-x-0 h-[2px] bg-gradient-to-b from-[#FFB000]/15 to-transparent" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute bottom-0 inset-x-0 h-[2px] bg-gradient-to-t from-black/60 to-transparent" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-[15%] opacity-[0.04]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "w-full h-full",
+              style: {
+                backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,176,0,0.3) 2px, rgba(255,176,0,0.3) 3px)"
+              }
+            }
+          ) })
+        ] }) }),
+        isTarget && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex items-center justify-center", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "absolute w-3/5 h-3/5 rounded-full opacity-40",
+              style: {
+                background: "radial-gradient(circle, rgba(255,176,0,0.5) 0%, transparent 70%)",
+                animation: "targetPulse 2s ease-in-out infinite"
+              }
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-center justify-center", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "w-[40%] h-[40%] rotate-45 border border-[#FFB000]/60",
+                style: {
+                  background: "linear-gradient(135deg, rgba(255,176,0,0.15), rgba(255,176,0,0.05))",
+                  boxShadow: "inset 0 0 6px rgba(255,176,0,0.1)"
+                },
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-[60%] h-[60%] m-[20%] rotate-45 border border-[#FFB000]/30 bg-[#FFB000]/5" })
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute w-[6px] h-[6px] rounded-full bg-[#FFB000]/40" })
+          ] })
+        ] })
+      ]
+    }
+  );
+}
+const Tile$1 = React$4.memo(Tile);
+
+const React$3 = await importShared('react');
+function Box({ box, board, isDeadlocked, tileWidthPercent, tileHeightPercent }) {
+  const isOnTarget = board[box.y]?.[box.x] === TileType.TARGET;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      className: "absolute p-[2px] z-10",
+      style: {
+        left: `${box.x * tileWidthPercent}%`,
+        top: `${box.y * tileHeightPercent}%`,
+        width: `${tileWidthPercent}%`,
+        height: `${tileHeightPercent}%`,
+        transition: "left 100ms ease-out, top 100ms ease-out"
+      },
+      children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `w-full h-full relative overflow-hidden ${isDeadlocked ? "opacity-60" : ""}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: `w-full h-full rounded-[1px] relative overflow-hidden ${isOnTarget ? "bg-gradient-to-br from-[#3a2a00] via-[#2a1a00] to-[#1a0e00] border border-[#FFB000]/70" : "bg-gradient-to-br from-[#2a1a0a] via-[#1f1205] to-[#150d03] border border-[#FFB000]/35"}`,
+          style: {
+            boxShadow: isOnTarget ? "inset 0 0 10px rgba(255,176,0,0.12), 0 0 6px rgba(255,176,0,0.08)" : "inset 0 1px 0 rgba(255,176,0,0.08), inset 0 -1px 0 rgba(0,0,0,0.3)"
+          },
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[8%] top-[30%] h-[1px] bg-[#FFB000]/10" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[8%] top-[55%] h-[1px] bg-[#FFB000]/10" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[8%] top-[80%] h-[1px] bg-[#FFB000]/10" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "absolute inset-0 opacity-[0.06]",
+                style: {
+                  backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255,176,0,0.5) 3px, rgba(255,176,0,0.5) 4px)"
+                }
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "absolute top-0 left-0 w-[35%] h-[1px] bg-[#FFB000]/10",
+                style: { transform: "rotate(35deg)", transformOrigin: "top left" }
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "absolute bottom-0 right-0 w-[35%] h-[1px] bg-[#FFB000]/10",
+                style: { transform: "rotate(35deg)", transformOrigin: "bottom right" }
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "absolute top-0 right-0 w-[35%] h-[1px] bg-[#FFB000]/10",
+                style: { transform: "rotate(-35deg)", transformOrigin: "top right" }
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "absolute bottom-0 left-0 w-[35%] h-[1px] bg-[#FFB000]/10",
+                style: { transform: "rotate(-35deg)", transformOrigin: "bottom left" }
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-[2px] left-[2px] w-[5px] h-[5px] border-l-[1.5px] border-t-[1.5px] border-[#FFB000]/25 rounded-tl-[1px]" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-[2px] right-[2px] w-[5px] h-[5px] border-r-[1.5px] border-t-[1.5px] border-[#FFB000]/25 rounded-tr-[1px]" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute bottom-[2px] left-[2px] w-[5px] h-[5px] border-l-[1.5px] border-b-[1.5px] border-[#FFB000]/25 rounded-bl-[1px]" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute bottom-[2px] right-[2px] w-[5px] h-[5px] border-r-[1.5px] border-b-[1.5px] border-[#FFB000]/25 rounded-br-[1px]" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-b from-[#FFB000]/10 to-transparent" }),
+            isOnTarget && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: "absolute inset-0",
+                style: {
+                  background: "radial-gradient(circle at 50% 50%, rgba(255,176,0,0.08), transparent 70%)",
+                  animation: "targetPulse 2s ease-in-out infinite"
+                }
+              }
+            ),
+            isDeadlocked && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-[#FF4444]/10 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "span",
+              {
+                className: "text-[#FF4444] font-bold leading-none select-none",
+                style: {
+                  fontSize: "clamp(4px, 30%, 10px)",
+                  textShadow: "0 0 4px rgba(255,68,68,0.5)"
+                },
+                children: "✗"
+              }
+            ) })
+          ]
+        }
+      ) })
+    }
+  );
+}
+const BoxTile = React$3.memo(Box);
+
+const React$2 = await importShared('react');
+const {useEffect: useEffect$2,useState: useState$1} = React$2;
+
 function getBodyColor(status, isSleeping) {
   if (isSleeping) return "#779988";
-  if (status === "eating") return "#CC6666";
-  if (status === "playing") return "#CC6666";
+  if (status === "eating" || status === "playing") return "#CC6666";
   if (status === "moving") return "#CC9966";
   return "#A0785A";
 }
@@ -625,17 +831,24 @@ function getEyeOffset(direction) {
   return { ex: baseX, ey: baseY };
 }
 function PetSprite({
-  size = 16,
+  size = "100%",
   status = "idle",
   isSleeping = false,
   direction = "down",
-  animationFrame = 0,
   className = ""
 }) {
+  const [animFrame, setAnimFrame] = useState$1(0);
+  useEffect$2(() => {
+    if (status === "moving" || status === "playing") {
+      const timer = setInterval(() => setAnimFrame((f) => (f + 1) % 2), 400);
+      return () => clearInterval(timer);
+    }
+    setAnimFrame(0);
+  }, [status]);
   const bodyColor = getBodyColor(status, isSleeping);
   const { ex, ey } = getEyeOffset(direction);
   const bounceClass = status === "playing" || status === "moving" ? "animate-bounce" : "";
-  const legOffset = status === "moving" ? animationFrame === 0 ? 0 : 1 : 0;
+  const legOffset = status === "moving" ? animFrame === 0 ? 0 : 1 : 0;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "svg",
     {
@@ -649,7 +862,7 @@ function PetSprite({
           /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: 11 + legOffset, width: "2", height: "2", fill: "var(--color-cozy-border)" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: 11 + (1 - legOffset), width: "2", height: "2", fill: "var(--color-cozy-border)" })
         ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "11", width: "8", height: "2", fill: "var(--color-cozy-border)" }),
-        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "13", y: animationFrame === 0 ? "4" : "6", width: "2", height: "2", fill: bodyColor }),
+        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "13", y: animFrame === 0 ? "4" : "6", width: "2", height: "2", fill: bodyColor }),
         isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "1", width: "2", height: "2", fill: "var(--color-cozy-border)", opacity: "0.6" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "12", y: "3", width: "2", height: "1", fill: "var(--color-cozy-border)", opacity: "0.4" })
@@ -673,241 +886,86 @@ function PetSprite({
     }
   );
 }
+const PetSprite$1 = React$2.memo(PetSprite);
 
 const React$1 = await importShared('react');
-const {useEffect: useEffect$2} = React$1;
+function PlayerLayer({ x, y, tileWidthPercent, tileHeightPercent, status, direction }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "div",
+    {
+      className: "absolute z-20",
+      style: {
+        left: `${x * tileWidthPercent}%`,
+        top: `${y * tileHeightPercent}%`,
+        width: `${tileWidthPercent}%`,
+        height: `${tileHeightPercent}%`,
+        transition: "left 80ms ease-out, top 80ms ease-out"
+      },
+      children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PetSprite$1,
+        {
+          status,
+          direction,
+          className: "drop-shadow-[0_0_4px_rgba(255,176,0,0.3)]"
+        }
+      ) })
+    }
+  );
+}
+const PlayerLayer$1 = React$1.memo(PlayerLayer);
+
 function Board() {
-  const board = useSokobanStore((state) => state.board);
-  const player = useSokobanStore((state) => state.player);
-  const boxes = useSokobanStore((state) => state.boxes);
-  const deadlockedBoxIds = useSokobanStore((state) => state.deadlockedBoxIds);
-  const lastDirection = useSokobanStore((state) => state.lastDirection);
-  const isMoving = useSokobanStore((state) => state.isMoving);
-  const [animFrame, setAnimFrame] = React$1.useState(0);
-  useEffect$2(() => {
-    const timer = setInterval(() => setAnimFrame((f) => (f + 1) % 2), 400);
-    return () => clearInterval(timer);
-  }, []);
-  if (board.length === 0) return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-mono text-cozy-text p-4 text-[10px]", children: "LOADING BOARD..." });
+  const { board, player, boxes, deadlockedBoxIds, lastDirection, isMoving } = useSokobanStore(
+    (s) => ({
+      board: s.board,
+      player: s.player,
+      boxes: s.boxes,
+      deadlockedBoxIds: s.deadlockedBoxIds,
+      lastDirection: s.lastDirection,
+      isMoving: s.isMoving
+    }),
+    shallow$1
+  );
+  if (board.length === 0)
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-mono text-cozy-text p-4 text-[10px]", children: "LOADING BOARD..." });
   const rows = board.length;
   const cols = board[0].length;
-  const tileWidthPercent = 100 / cols;
-  const tileHeightPercent = 100 / rows;
+  const tw = 100 / cols;
+  const th = 100 / rows;
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "div",
     {
       className: "relative w-full border border-[#FFB000] bg-[#050505] select-none overflow-hidden rounded-sm",
       style: { aspectRatio: `${cols} / ${rows}` },
+      role: "grid",
+      "aria-label": "Sokoban game board",
+      tabIndex: 0,
       children: [
         board.map(
-          (row, y) => row.map((cell, x) => {
-            if (cell === TileType.EMPTY) return null;
-            const isTarget = cell === TileType.TARGET;
-            const isWall = cell === TileType.WALL;
-            return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "div",
-              {
-                className: "absolute",
-                style: {
-                  left: `${x * tileWidthPercent}%`,
-                  top: `${y * tileHeightPercent}%`,
-                  width: `${tileWidthPercent}%`,
-                  height: `${tileHeightPercent}%`
-                },
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full bg-[#080703]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "div",
-                    {
-                      className: "absolute bottom-0 right-0 w-[1px] h-[1px] bg-[#FFB000]/8",
-                      style: { boxShadow: "-1px -1px 0 0 rgba(255,176,0,0.04)" }
-                    }
-                  ) }),
-                  isWall && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-[85%] h-[85%] bg-gradient-to-br from-[#1a1410] via-[#15100a] to-[#0f0b06] border border-[#FFB000]/25 rounded-[1px] relative overflow-hidden", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[15%] top-1/2 h-[1px] bg-[#FFB000]/8 -translate-y-1/2" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "div",
-                      {
-                        className: "absolute top-0 bottom-1/2 w-[1px] bg-[#FFB000]/8 left-1/3"
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "div",
-                      {
-                        className: "absolute top-1/2 bottom-0 w-[1px] bg-[#FFB000]/8 left-2/3"
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 inset-x-0 h-[2px] bg-gradient-to-b from-[#FFB000]/15 to-transparent" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute bottom-0 inset-x-0 h-[2px] bg-gradient-to-t from-black/60 to-transparent" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-[15%] opacity-[0.04]", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full", style: {
-                      backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,176,0,0.3) 2px, rgba(255,176,0,0.3) 3px)"
-                    } }) })
-                  ] }) }),
-                  isTarget && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute inset-0 flex items-center justify-center", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "div",
-                      {
-                        className: "absolute w-3/5 h-3/5 rounded-full opacity-40",
-                        style: {
-                          background: "radial-gradient(circle, rgba(255,176,0,0.5) 0%, transparent 70%)",
-                          animation: "targetPulse 2s ease-in-out infinite"
-                        }
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-center justify-center", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        "div",
-                        {
-                          className: "w-[40%] h-[40%] rotate-45 border border-[#FFB000]/60",
-                          style: {
-                            background: "linear-gradient(135deg, rgba(255,176,0,0.15), rgba(255,176,0,0.05))",
-                            boxShadow: "inset 0 0 6px rgba(255,176,0,0.1)"
-                          },
-                          children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-[60%] h-[60%] m-[20%] rotate-45 border border-[#FFB000]/30 bg-[#FFB000]/5" })
-                        }
-                      ),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute w-[6px] h-[6px] rounded-full bg-[#FFB000]/40" })
-                    ] })
-                  ] })
-                ]
-              },
-              `tile-${x}-${y}`
-            );
-          })
+          (row, y) => row.map((cell, x) => /* @__PURE__ */ jsxRuntimeExports.jsx(Tile$1, { cell, x, y, widthPercent: tw, heightPercent: th }, `tile-${x}-${y}`))
         ),
-        boxes.map((box) => {
-          const isOnTarget = board[box.y]?.[box.x] === TileType.TARGET;
-          const isDeadlocked = deadlockedBoxIds.includes(box.id);
-          return /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "div",
-            {
-              className: "absolute p-[2px] z-10",
-              style: {
-                left: `${box.x * tileWidthPercent}%`,
-                top: `${box.y * tileHeightPercent}%`,
-                width: `${tileWidthPercent}%`,
-                height: `${tileHeightPercent}%`,
-                transition: "left 100ms ease-out, top 100ms ease-out"
-              },
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                "div",
-                {
-                  className: `w-full h-full relative overflow-hidden
-                ${isDeadlocked ? "opacity-60" : ""}
-              `,
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                    "div",
-                    {
-                      className: `w-full h-full rounded-[1px] relative overflow-hidden
-                  ${isOnTarget ? "bg-gradient-to-br from-[#3a2a00] via-[#2a1a00] to-[#1a0e00] border border-[#FFB000]/70" : "bg-gradient-to-br from-[#2a1a0a] via-[#1f1205] to-[#150d03] border border-[#FFB000]/35"}
-                `,
-                      style: {
-                        boxShadow: isOnTarget ? "inset 0 0 10px rgba(255,176,0,0.12), 0 0 6px rgba(255,176,0,0.08)" : "inset 0 1px 0 rgba(255,176,0,0.08), inset 0 -1px 0 rgba(0,0,0,0.3)"
-                      },
-                      children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[8%] top-[30%] h-[1px] bg-[#FFB000]/10" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[8%] top-[55%] h-[1px] bg-[#FFB000]/10" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-x-[8%] top-[80%] h-[1px] bg-[#FFB000]/10" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "div",
-                          {
-                            className: "absolute inset-0 opacity-[0.06]",
-                            style: {
-                              backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255,176,0,0.5) 3px, rgba(255,176,0,0.5) 4px)"
-                            }
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "div",
-                          {
-                            className: "absolute top-0 left-0 w-[35%] h-[1px] bg-[#FFB000]/10",
-                            style: { transform: "rotate(35deg)", transformOrigin: "top left" }
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "div",
-                          {
-                            className: "absolute bottom-0 right-0 w-[35%] h-[1px] bg-[#FFB000]/10",
-                            style: { transform: "rotate(35deg)", transformOrigin: "bottom right" }
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "div",
-                          {
-                            className: "absolute top-0 right-0 w-[35%] h-[1px] bg-[#FFB000]/10",
-                            style: { transform: "rotate(-35deg)", transformOrigin: "top right" }
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "div",
-                          {
-                            className: "absolute bottom-0 left-0 w-[35%] h-[1px] bg-[#FFB000]/10",
-                            style: { transform: "rotate(-35deg)", transformOrigin: "bottom left" }
-                          }
-                        ),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-[2px] left-[2px] w-[5px] h-[5px] border-l-[1.5px] border-t-[1.5px] border-[#FFB000]/25 rounded-tl-[1px]" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-[2px] right-[2px] w-[5px] h-[5px] border-r-[1.5px] border-t-[1.5px] border-[#FFB000]/25 rounded-tr-[1px]" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute bottom-[2px] left-[2px] w-[5px] h-[5px] border-l-[1.5px] border-b-[1.5px] border-[#FFB000]/25 rounded-bl-[1px]" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute bottom-[2px] right-[2px] w-[5px] h-[5px] border-r-[1.5px] border-b-[1.5px] border-[#FFB000]/25 rounded-br-[1px]" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-b from-[#FFB000]/10 to-transparent" }),
-                        isOnTarget && /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "div",
-                          {
-                            className: "absolute inset-0",
-                            style: {
-                              background: "radial-gradient(circle at 50% 50%, rgba(255,176,0,0.08), transparent 70%)",
-                              animation: "targetPulse 2s ease-in-out infinite"
-                            }
-                          }
-                        ),
-                        isDeadlocked && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-[#FF4444]/10 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                          "span",
-                          {
-                            className: "text-[#FF4444] font-bold leading-none select-none",
-                            style: {
-                              fontSize: "clamp(4px, 30%, 10px)",
-                              textShadow: "0 0 4px rgba(255,68,68,0.5)"
-                            },
-                            children: "✗"
-                          }
-                        ) })
-                      ]
-                    }
-                  )
-                }
-              )
-            },
-            box.id
-          );
-        }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
+        boxes.map((box) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+          BoxTile,
           {
-            className: "absolute z-20",
-            style: {
-              left: `${player.x * tileWidthPercent}%`,
-              top: `${player.y * tileHeightPercent}%`,
-              width: `${tileWidthPercent}%`,
-              height: `${tileHeightPercent}%`,
-              transition: "left 80ms ease-out, top 80ms ease-out"
-            },
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              PetSprite,
-              {
-                size: Math.min(tileWidthPercent * cols / 100 * 16, 16),
-                status: isMoving ? "moving" : "idle",
-                direction: lastDirection,
-                animationFrame: animFrame,
-                className: "drop-shadow-[0_0_4px_rgba(255,176,0,0.3)]"
-              }
-            ) })
+            box,
+            board,
+            isDeadlocked: deadlockedBoxIds.has(box.id),
+            tileWidthPercent: tw,
+            tileHeightPercent: th
+          },
+          box.id
+        )),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          PlayerLayer$1,
+          {
+            x: player.x,
+            y: player.y,
+            tileWidthPercent: tw,
+            tileHeightPercent: th,
+            status: isMoving ? "moving" : "idle",
+            direction: lastDirection
           }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("style", { children: `
-        @keyframes targetPulse {
-          0%, 100% { opacity: 0.4; transform: scale(1); }
-          50% { opacity: 0.7; transform: scale(1.08); }
-        }
-      ` })
+        )
       ]
     }
   );

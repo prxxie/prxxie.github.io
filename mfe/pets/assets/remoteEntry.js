@@ -2,7 +2,7 @@ const currentImports = {};
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
 "./PetsApp":()=>{
-      dynamicLoadingCss(["style-DbKfaAtb.css"], false, './PetsApp');
+      dynamicLoadingCss(["style-BsFaRVr3.css"], false, './PetsApp');
       return __federation_import('/mfe/pets/assets/__federation_expose_PetsApp-BKAQGciT.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {

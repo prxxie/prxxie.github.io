@@ -15,7 +15,8 @@
     --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: "Geist Mono", ui-monospace, monospace;
-    --color-black: #000;
+    --color-red-500: oklch(63.7% .237 25.331);
+    --color-white: #fff;
     --spacing: .25rem;
     --text-xs: .75rem;
     --text-xs--line-height: calc(1 / .75);
@@ -23,8 +24,6 @@
     --text-sm--line-height: calc(1.25 / .875);
     --font-weight-bold: 700;
     --leading-relaxed: 1.625;
-    --default-transition-duration: .15s;
-    --default-transition-timing-function: cubic-bezier(.4, 0, .2, 1);
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
     --font-pixel: "Geist Mono", ui-monospace, monospace;
@@ -293,16 +292,16 @@
     margin-right: calc(var(--spacing) * 1);
   }
 
-  .mr-2 {
-    margin-right: calc(var(--spacing) * 2);
-  }
-
-  .mb-1 {
-    margin-bottom: calc(var(--spacing) * 1);
-  }
-
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
+  }
+
+  .mb-4 {
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+
+  .ml-4 {
+    margin-left: calc(var(--spacing) * 4);
   }
 
   .flex {
@@ -327,6 +326,10 @@
 
   .h-full {
     height: 100%;
+  }
+
+  .min-h-\[300px\] {
+    min-height: 300px;
   }
 
   .w-3 {
@@ -361,10 +364,6 @@
     justify-content: space-between;
   }
 
-  .gap-1 {
-    gap: calc(var(--spacing) * 1);
-  }
-
   .gap-2 {
     gap: calc(var(--spacing) * 2);
   }
@@ -383,37 +382,20 @@
     border-bottom-width: 1px;
   }
 
-  .border-dashed {
-    --tw-border-style: dashed;
-    border-style: dashed;
-  }
-
   .border-cozy-border {
     border-color: var(--color-cozy-border);
   }
 
-  .bg-\[\#201500\] {
-    background-color: #201500;
-  }
-
-  .bg-black {
-    background-color: var(--color-black);
-  }
-
-  .bg-cozy-accent {
-    background-color: var(--color-cozy-accent);
-  }
-
-  .p-2 {
-    padding: calc(var(--spacing) * 2);
-  }
-
-  .p-3 {
-    padding: calc(var(--spacing) * 3);
+  .bg-\[\#050505\] {
+    background-color: #050505;
   }
 
   .p-4 {
     padding: calc(var(--spacing) * 4);
+  }
+
+  .p-6 {
+    padding: calc(var(--spacing) * 6);
   }
 
   .px-2 {
@@ -428,8 +410,20 @@
     padding-top: calc(var(--spacing) * 2);
   }
 
-  .pb-1 {
-    padding-bottom: calc(var(--spacing) * 1);
+  .pt-4 {
+    padding-top: calc(var(--spacing) * 4);
+  }
+
+  .pb-2 {
+    padding-bottom: calc(var(--spacing) * 2);
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
   }
 
   .font-press {
@@ -450,8 +444,8 @@
     font-size: 8px;
   }
 
-  .text-\[12px\] {
-    font-size: 12px;
+  .text-\[10px\] {
+    font-size: 10px;
   }
 
   .leading-relaxed {
@@ -464,27 +458,25 @@
     font-weight: var(--font-weight-bold);
   }
 
-  .text-cozy-accent {
-    color: var(--color-cozy-accent);
+  .text-cozy-muted {
+    color: var(--color-cozy-muted);
   }
 
   .text-cozy-text {
     color: var(--color-cozy-text);
   }
 
-  .transition-colors {
-    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
-    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
-    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  .text-red-500 {
+    color: var(--color-red-500);
+  }
+
+  .uppercase {
+    text-transform: uppercase;
   }
 
   @media (hover: hover) {
-    .hover\:bg-cozy-accent:hover {
-      background-color: var(--color-cozy-accent);
-    }
-
-    .hover\:text-black:hover {
-      color: var(--color-black);
+    .hover\:text-white:hover {
+      color: var(--color-white);
     }
   }
 }
@@ -697,6 +689,17 @@ button:focus-visible, [role="button"]:focus-visible, .pixel-btn:focus-visible {
     transition: none !important;
     animation: none !important;
     transform: none !important;
+  }
+}
+@keyframes targetPulse {
+  0%, 100% {
+    opacity: .4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: .7;
+    transform: scale(1.08);
   }
 }
 @property --tw-border-style {

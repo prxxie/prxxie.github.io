@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import PetSprite from "./PetSprite";
 import { useProgressService } from "../hooks/useProgressService";
 import type { PetStatus } from "../types";
@@ -6,11 +6,21 @@ import type { PetStatus } from "../types";
 export default function PetWidget(): React.ReactElement {
   const { state, isHungry, foodAvailable, feedPet } = useProgressService();
   const [spriteStatus, setSpriteStatus] = useState<PetStatus>("idle");
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current !== null) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleFeed = useCallback(async () => {
     await feedPet();
     setSpriteStatus("eating");
-    setTimeout(() => setSpriteStatus("idle"), 2000);
+    if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
   }, [feedPet]);
 
   const canFeed = isHungry && foodAvailable > 0;

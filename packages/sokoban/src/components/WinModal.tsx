@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ProgressService, LocalProgressRepository } from "shared";
 import { useSokobanStore } from "../store/useSokobanStore";
 import { synth } from "../engine/synth";
+import { SOKOBAN_LEVELS } from "../levels";
 
 const progressService = new ProgressService(new LocalProgressRepository());
 
@@ -28,7 +29,7 @@ export default function WinModal({ onBack }: WinModalProps): React.ReactElement 
       return;
     }
     void progressService
-      .completeLevel("sokoban", `level-${currentLevelIdx}`)
+      .completeLevel("sokoban", SOKOBAN_LEVELS[currentLevelIdx]?.id ?? `level-${currentLevelIdx}`)
       .then((firstTime) => {
         setRewardMsg(firstTime ? "+1 FOOD" : "ALREADY COMPLETE");
       });

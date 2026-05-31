@@ -23,11 +23,11 @@ export default function ShikakuApp(): React.ReactElement {
   }, [isWon]);
 
   useEffect(() => {
-    if (!isWon || !puzzle) return;
+    if (!isWon || !puzzle || selectedIdx === null) return;
     void progressService.completeLevel("shikaku", puzzle.id).then((firstTime) => {
       setRewardMsg(firstTime ? "+1 FOOD" : "ALREADY COMPLETE");
     });
-  }, [isWon, puzzle]);
+  }, [isWon, puzzle, selectedIdx]);
 
   const handleSelectLevel = (idx: number): void => {
     setSelectedIdx(idx);

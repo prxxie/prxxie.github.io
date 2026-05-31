@@ -39,5 +39,3 @@ export function useProgressService() {
 
   return { state, isHungry, foodAvailable, feedPet };
 }
-
-export { progressService };

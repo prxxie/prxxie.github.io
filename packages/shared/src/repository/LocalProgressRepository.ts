@@ -2,7 +2,7 @@ import { getEvolutionStage } from "../pet/evolution";
 import type { ProgressRepository } from "./ProgressRepository";
 import type { ProgressState } from "../progress/types";
 
-const STORAGE_KEY = "cozyos.progress.v1";
+export const STORAGE_KEY = "cozyos.progress.v1";
 
 interface StoredData {
   version: 1;
@@ -34,7 +34,11 @@ export class LocalProgressRepository implements ProgressRepository {
   async saveState(state: ProgressState): Promise<void> {
     await Promise.resolve();
     const data: StoredData = { version: 1, state };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (err) {
+      throw new Error(`Failed to save progress: ${String(err)}`);
+    }
   }
 
   async completeLevel(module: string, levelId: string): Promise<boolean> {

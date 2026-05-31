@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { LocalProgressRepository } from "./LocalProgressRepository";
-
-const STORAGE_KEY = "cozyos.progress.v1";
+import { LocalProgressRepository, STORAGE_KEY } from "./LocalProgressRepository";
 
 describe("LocalProgressRepository", () => {
   let repo: LocalProgressRepository;
@@ -29,6 +27,12 @@ describe("LocalProgressRepository", () => {
 
     it("returns initial state when version field is missing", async () => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ state: {} }));
+      const state = await repo.getState();
+      expect(state.completedLevels).toEqual([]);
+    });
+
+    it("returns initial state when version is wrong", async () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, state: {} }));
       const state = await repo.getState();
       expect(state.completedLevels).toEqual([]);
     });

@@ -15,6 +15,21 @@ vi.mock("./engine/synth", () => ({
   },
 }));
 
+vi.mock("shared", () => ({
+  ProgressService: vi.fn().mockImplementation(() => ({
+    completeLevel: vi.fn().mockResolvedValue(true),
+    feedPet: vi.fn().mockResolvedValue(undefined),
+    getFoodAvailable: vi.fn().mockResolvedValue(0),
+    isPetHungry: vi.fn().mockResolvedValue(false),
+    getState: vi.fn().mockResolvedValue({
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 0, stage: 1, lastFedAt: 0 },
+    }),
+  })),
+  LocalProgressRepository: vi.fn().mockImplementation(() => ({})),
+}));
+
 import { synth } from "./engine/synth";
 
 describe("ShikakuApp Component", () => {

@@ -29,6 +29,7 @@ describe("getEvolutionStage", () => {
 
   it("EVOLUTION_THRESHOLDS has 5 entries", () => {
     expect(EVOLUTION_THRESHOLDS).toHaveLength(5);
+    expect(EVOLUTION_THRESHOLDS).toEqual([0, 10, 30, 60, 100]);
   });
 
   it("first threshold is 0", () => {

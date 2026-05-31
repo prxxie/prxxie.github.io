@@ -1,4 +1,4 @@
-export const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
+export const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100] as const;
 
 export function getEvolutionStage(xp: number): number {
   let stage = 1;

@@ -71,6 +71,25 @@ describe("ProgressService", () => {
       expect(result).toBe(true);
       expect(repo.completeLevel).toHaveBeenCalledWith("shikaku", "easy-1");
     });
+
+    it("dispatches cozyos:progress-updated when first completion", async () => {
+      const spy = vi.spyOn(window, "dispatchEvent");
+      const repo = makeMockRepo(makeState());
+      const service = new ProgressService(repo);
+      await service.completeLevel("shikaku", "easy-1");
+      expect(spy).toHaveBeenCalledOnce();
+      spy.mockRestore();
+    });
+
+    it("does NOT dispatch event when level already completed (repo returns false)", async () => {
+      const repo = makeMockRepo(makeState());
+      (repo.completeLevel as ReturnType<typeof vi.fn>).mockResolvedValue(false);
+      const spy = vi.spyOn(window, "dispatchEvent");
+      const service = new ProgressService(repo);
+      await service.completeLevel("shikaku", "easy-1");
+      expect(spy).not.toHaveBeenCalled();
+      spy.mockRestore();
+    });
   });
 
   describe("feedPet", () => {
@@ -108,6 +127,20 @@ describe("ProgressService", () => {
       const service = new ProgressService(repo);
       await service.feedPet();
       expect(repo.feedPet).not.toHaveBeenCalled();
+    });
+
+    it("dispatches cozyos:progress-updated when feed succeeds", async () => {
+      const state = makeState({
+        completedLevels: [{ module: "s", levelId: "1", completedAt: 1 }],
+        foodConsumed: 0,
+        pet: { xp: 0, stage: 1, lastFedAt: 0 },
+      });
+      const repo = makeMockRepo(state);
+      const spy = vi.spyOn(window, "dispatchEvent");
+      const service = new ProgressService(repo);
+      await service.feedPet();
+      expect(spy).toHaveBeenCalledOnce();
+      spy.mockRestore();
     });
   });
 

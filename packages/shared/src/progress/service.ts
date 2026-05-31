@@ -12,23 +12,26 @@ export class ProgressService {
 
   async completeLevel(module: string, levelId: string): Promise<boolean> {
     const result = await this.repo.completeLevel(module, levelId);
-    window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    if (result && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
     return result;
   }
 
   async feedPet(): Promise<void> {
-    const [hungry, food] = await Promise.all([
-      this.isPetHungry(),
-      this.getFoodAvailable(),
-    ]);
-    if (!hungry || food <= 0) return;
+    const state = await this.repo.getState();
+    const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+    const foodAvailable = Math.max(0, state.completedLevels.length - state.foodConsumed);
+    if (!isHungry || foodAvailable <= 0) return;
     await this.repo.feedPet();
-    window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
   }
 
   async getFoodAvailable(): Promise<number> {
     const state = await this.repo.getState();
-    return state.completedLevels.length - state.foodConsumed;
+    return Math.max(0, state.completedLevels.length - state.foodConsumed);
   }
 
   async isPetHungry(): Promise<boolean> {

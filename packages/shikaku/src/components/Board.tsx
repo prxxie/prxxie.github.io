@@ -156,7 +156,7 @@ export default function Board(): React.ReactElement | null {
           const nextPalette = DEFAULT_COLORS[regions.length % DEFAULT_COLORS.length];
           return (
           <div
-            className="absolute border-2 border-dashed pointer-events-none"
+            className="absolute border border-dashed pointer-events-none"
             style={{
               left: `calc((${dragRect.x} / ${puzzle.width}) * 100%)`,
               top: `calc((${dragRect.y} / ${puzzle.height}) * 100%)`,

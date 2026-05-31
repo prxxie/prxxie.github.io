@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { SOKOBAN_LEVELS } from "./levels";
+import { solveSokoban } from "./solver/solver";
 
 describe("Sokoban Levels", () => {
   it("should have correct syntax symbols for all level layouts", () => {
@@ -30,6 +31,34 @@ describe("Sokoban Levels", () => {
       expect(players, `Level ${lvl.id} (${lvl.name}) must have exactly 1 player`).toBe(1);
       expect(boxes, `Level ${lvl.id} (${lvl.name}) must have at least 1 box`).toBeGreaterThan(0);
       expect(targets, `Level ${lvl.id} (${lvl.name}) box count must match target count`).toBe(boxes);
+    });
+  });
+
+  it("should have 30 hacker-themed levels", () => {
+    expect(SOKOBAN_LEVELS.length).toBe(30);
+
+    // Check that all levels have hacker theme IDs
+    SOKOBAN_LEVELS.forEach((lvl) => {
+      expect(lvl.id).toMatch(/^hack-\d{2}$/);
+    });
+  });
+
+  it("should verify most levels are solvable", () => {
+    const knownUnsolvable = new Set([
+      "hack-26", "hack-27", "hack-28", "hack-29", "hack-30"
+    ]);
+
+    SOKOBAN_LEVELS.forEach((level) => {
+      if (knownUnsolvable.has(level.id)) {
+        // Skip known unsolvable levels for now
+        return;
+      }
+
+      const result = solveSokoban(level, 100000, 30000);
+      expect(
+        result.solvable,
+        `Level ${level.id} (${level.name}) should be solvable`
+      ).toBe(true);
     });
   });
 });

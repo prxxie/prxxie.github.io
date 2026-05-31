@@ -32,22 +32,10 @@ var TileType = /* @__PURE__ */ ((TileType2) => {
 })(TileType || {});
 
 const SOKOBAN_LEVELS = [
-  // ── Easy: 1–5 (1–2 boxes, small grids) ───────────────────────────
+  // ── Easy: 1–5 (1–2 boxes, tutorial basics) ──────────────────────
   {
-    id: "soko-01",
-    name: "First Steps",
-    grid: [
-      "  ####  ",
-      "###  ###",
-      "#      #",
-      "# .$$# #",
-      "#  @.  #",
-      "########"
-    ]
-  },
-  {
-    id: "soko-02",
-    name: "Tiny Trial",
+    id: "hack-01",
+    name: "Hello World",
     grid: [
       "#####",
       "#@  #",
@@ -57,8 +45,19 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "soko-03",
-    name: "Side by Side",
+    id: "hack-02",
+    name: "Null Pointer",
+    grid: [
+      "######",
+      "#@   #",
+      "# $  #",
+      "#  . #",
+      "######"
+    ]
+  },
+  {
+    id: "hack-03",
+    name: "Syntax Error",
     grid: [
       "######",
       "#@  .#",
@@ -68,20 +67,19 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "soko-04",
-    name: "Cross Paths",
+    id: "hack-04",
+    name: "First Commit",
     grid: [
-      "######",
-      "#  . #",
-      "# $  #",
-      "#.$  #",
-      "#@   #",
-      "######"
+      "#######",
+      "#@    #",
+      "#  $  #",
+      "#  .  #",
+      "#######"
     ]
   },
   {
-    id: "soko-05",
-    name: "Box Duo",
+    id: "hack-05",
+    name: "Console Log",
     grid: [
       "######",
       "#@   #",
@@ -90,48 +88,46 @@ const SOKOBAN_LEVELS = [
       "######"
     ]
   },
-  // ── Medium: 6–10 (2–3 boxes) ─────────────────────────────────────
+  // ── Medium: 6–10 (2–3 boxes, sequencing) ────────────────────────
   {
-    id: "soko-06",
-    name: "L-Shaped",
-    grid: [
-      " #####",
-      "## . #",
-      "# $  #",
-      "#  $ #",
-      "# .  #",
-      "#@   #",
-      "######"
-    ]
-  },
-  {
-    id: "soko-07",
-    name: "Zigzag",
+    id: "hack-06",
+    name: "Stack Overflow",
     grid: [
       " ######",
-      "##  . #",
-      "#  .  #",
-      "# $   #",
+      "##    #",
       "#  $  #",
-      "#   @ #",
+      "# $.  #",
+      "#  . @#",
       "#######"
     ]
   },
   {
-    id: "soko-08",
-    name: "Two Corners",
+    id: "hack-07",
+    name: "Infinite Loop",
     grid: [
-      "#########",
-      "#  . .  #",
-      "#  $ $  #",
-      "#       #",
-      "#   @   #",
-      "#########"
+      " #######",
+      "##     #",
+      "#  $ . #",
+      "# .  $ #",
+      "#    @ #",
+      "########"
     ]
   },
   {
-    id: "soko-09",
-    name: "The Alley",
+    id: "hack-08",
+    name: "Race Condition",
+    grid: [
+      "########",
+      "#  . . #",
+      "#  $ $ #",
+      "#      #",
+      "#   @  #",
+      "########"
+    ]
+  },
+  {
+    id: "hack-09",
+    name: "Memory Leak",
     grid: [
       " #######",
       "##     #",
@@ -142,34 +138,34 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "soko-10",
-    name: "Trio",
+    id: "hack-10",
+    name: "Buffer Overflow",
     grid: [
-      "#######",
-      "#  $ .#",
-      "#$  . #",
-      "#  $  #",
-      "# . @ #",
-      "#######"
+      " #######",
+      "##     #",
+      "#  $ . #",
+      "# $.   #",
+      "#    @ #",
+      "########"
     ]
   },
-  // ── Hard: 11–15 (3–4 boxes) ──────────────────────────────────────
+  // ── Hard: 11–15 (3–4 boxes, deadlock awareness) ─────────────────
   {
-    id: "soko-11",
-    name: "Crossing",
+    id: "hack-11",
+    name: "Segmentation Fault",
     grid: [
       " #######",
       "##     #",
       "# $  . #",
       "# .  $ #",
       "#  $   #",
-      "#   . @#",
+      "#   .@ #",
       "########"
     ]
   },
   {
-    id: "soko-12",
-    name: "Staircase",
+    id: "hack-12",
+    name: "Heap Fragmentation",
     grid: [
       "########",
       "#   .  #",
@@ -182,63 +178,63 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "soko-13",
-    name: "Deadlock Danger",
+    id: "hack-13",
+    name: "Deadlock",
     grid: [
       "#########",
-      "#  . $. #",
-      "# $  .  #",
+      "#  .  . #",
+      "# $   $ #",
       "#       #",
       "#  $    #",
-      "#  @    #",
+      "#  . @  #",
       "#########"
     ]
   },
   {
-    id: "soko-14",
-    name: "The Wall",
+    id: "hack-14",
+    name: "Thread Starvation",
     grid: [
-      " #######",
-      "##     #",
-      "#  $.  #",
-      "#  . $ #",
-      "#   $  #",
-      "#  .  @#",
-      "########"
+      " ########",
+      "##      #",
+      "#  $ .  #",
+      "#  . $  #",
+      "#   $   #",
+      "#  .   @#",
+      "#########"
     ]
   },
   {
-    id: "soko-15",
-    name: "Four Corners",
+    id: "hack-15",
+    name: "Cache Miss",
     grid: [
       "#########",
-      "# .  .  #",
+      "# .   . #",
+      "#  $  $ #",
       "#       #",
-      "# $  $  #",
+      "#  .  . #",
+      "#  $  $ #",
       "#       #",
-      "# .  .  #",
-      "# $  $  #",
       "#    @  #",
       "#########"
     ]
   },
-  // ── Expert: 16–20 (4–5 boxes) ────────────────────────────────────
+  // ── Expert: 16–20 (4–5 boxes, spatial reasoning) ────────────────
   {
-    id: "soko-16",
-    name: "The Knot",
+    id: "hack-16",
+    name: "SQL Injection",
     grid: [
       "########",
       "#  .   #",
       "#      #",
-      "# .$$  #",
+      "# . $$ #",
       "#  $   #",
       "#  . @ #",
       "########"
     ]
   },
   {
-    id: "soko-17",
-    name: "Traverse",
+    id: "hack-17",
+    name: "XSS Attack",
     grid: [
       "########",
       "#   .  #",
@@ -251,8 +247,8 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "soko-18",
-    name: "Spiral",
+    id: "hack-18",
+    name: "CSRF Token",
     grid: [
       " #######",
       "##     #",
@@ -265,8 +261,8 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "soko-19",
-    name: "Gauntlet",
+    id: "hack-19",
+    name: "Man in the Middle",
     grid: [
       "########",
       "# .  . #",
@@ -279,17 +275,168 @@ const SOKOBAN_LEVELS = [
     ]
   },
   {
-    id: "soko-20",
-    name: "The Grand",
+    id: "hack-20",
+    name: "Zero Day",
     grid: [
       "##########",
       "#  .  .  #",
-      "# $  $   #",
-      "#   .    #",
       "#  $  $  #",
-      "# .      #",
+      "#    .   #",
+      "#   $  $ #",
+      "#  .     #",
       "#    @   #",
       "##########"
+    ]
+  },
+  // ── Advanced: 21–25 (5–6 boxes, advanced tactics) ───────────────
+  {
+    id: "hack-21",
+    name: "Kernel Panic",
+    grid: [
+      "##########",
+      "#   .  . #",
+      "#   $  $ #",
+      "#     .  #",
+      "#    $   #",
+      "#   . $  #",
+      "#        #",
+      "#   @    #",
+      "##########"
+    ]
+  },
+  {
+    id: "hack-22",
+    name: "Privilege Escalation",
+    grid: [
+      " #########",
+      "##       #",
+      "#  $ . $ #",
+      "#  .   . #",
+      "#  $   $ #",
+      "#    .   #",
+      "#     @  #",
+      "##########"
+    ]
+  },
+  {
+    id: "hack-23",
+    name: "Side Channel",
+    grid: [
+      "##########",
+      "#     .  #",
+      "#    $   #",
+      "#   .    #",
+      "#    $ . #",
+      "#     $  #",
+      "#        #",
+      "#    @   #",
+      "##########"
+    ]
+  },
+  {
+    id: "hack-24",
+    name: "Timing Attack",
+    grid: [
+      " ##########",
+      "##        #",
+      "#    $ .  #",
+      "#    .  $ #",
+      "#    $  . #",
+      "#      .  #",
+      "#      $  #",
+      "#      @  #",
+      "###########"
+    ]
+  },
+  {
+    id: "hack-25",
+    name: "Spectre",
+    grid: [
+      "###########",
+      "#   .   . #",
+      "#   $   $ #",
+      "#     .   #",
+      "#    $    #",
+      "#   .  $  #",
+      "#         #",
+      "#     @   #",
+      "###########"
+    ]
+  },
+  // ── Master: 26–30 (6–7 boxes, expert mastery) ───────────────────
+  {
+    id: "hack-26",
+    name: "Ransomware",
+    grid: [
+      "###########",
+      "#  .    . #",
+      "#  $    $ #",
+      "#    .  . #",
+      "#   $   $ #",
+      "#  .      #",
+      "#   $     #",
+      "#     @   #",
+      "###########"
+    ]
+  },
+  {
+    id: "hack-27",
+    name: "Rootkit",
+    grid: [
+      "############",
+      "#  .     . #",
+      "#  $     $ #",
+      "#    .   . #",
+      "#   $    $ #",
+      "#  .       #",
+      "#   $      #",
+      "#      @   #",
+      "############"
+    ]
+  },
+  {
+    id: "hack-28",
+    name: "Cryptanalysis",
+    grid: [
+      "############",
+      "#  .     . #",
+      "#  $     $ #",
+      "#    .   . #",
+      "#   $    $ #",
+      "#  .     . #",
+      "#   $  $   #",
+      "#      @   #",
+      "############"
+    ]
+  },
+  {
+    id: "hack-29",
+    name: "Quantum Entanglement",
+    grid: [
+      "#############",
+      "#  .      . #",
+      "#  $      $ #",
+      "#    .    . #",
+      "#   $     $ #",
+      "#  .      . #",
+      "#   $   $   #",
+      "#       @   #",
+      "#############"
+    ]
+  },
+  {
+    id: "hack-30",
+    name: "Singularity",
+    grid: [
+      "#############",
+      "#  .      . #",
+      "#  $      $ #",
+      "#    .    . #",
+      "#   $     $ #",
+      "#  .      . #",
+      "#   $ $     #",
+      "#       @   #",
+      "#############"
     ]
   }
 ];

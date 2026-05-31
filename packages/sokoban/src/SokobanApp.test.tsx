@@ -16,6 +16,21 @@ vi.mock("./engine/synth", () => ({
   },
 }));
 
+vi.mock("shared", () => ({
+  ProgressService: vi.fn().mockImplementation(() => ({
+    completeLevel: vi.fn().mockResolvedValue(true),
+    feedPet: vi.fn().mockResolvedValue(undefined),
+    getFoodAvailable: vi.fn().mockResolvedValue(0),
+    isPetHungry: vi.fn().mockResolvedValue(false),
+    getState: vi.fn().mockResolvedValue({
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 0, stage: 1, lastFedAt: 0 },
+    }),
+  })),
+  LocalProgressRepository: vi.fn().mockImplementation(() => ({})),
+}));
+
 describe("SokobanApp Component", () => {
   beforeEach(() => {
     useSokobanStore.setState({
@@ -47,7 +62,7 @@ describe("SokobanApp Component", () => {
 
     // HUD element
     expect(screen.getByText("< MENU")).toBeInTheDocument();
-    expect(screen.getByText("FIRST STEPS")).toBeInTheDocument();
+    expect(screen.getByText("HELLO WORLD")).toBeInTheDocument();
     
     // Controls elements (virtual keys)
     expect(screen.getByLabelText("Move Up")).toBeInTheDocument();

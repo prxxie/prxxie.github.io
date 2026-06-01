@@ -1,6 +1,23 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useSokobanStore } from "./useSokobanStore";
 import { TileType } from "../types";
+
+vi.mock("../levels", () => ({
+  SOKOBAN_LEVELS: [
+    {
+      id: "test-0",
+      name: "Test 0",
+      grid: ["#####", "#@  #", "# $ #", "# . #", "#####"],
+      targets: { threeStars: 10, twoStars: 20 },
+    },
+    {
+      id: "test-1",
+      name: "Test 1",
+      grid: ["#####", "#@  #", "# $ #", "# . #", "#####"],
+      targets: { threeStars: 10, twoStars: 20 },
+    },
+  ],
+}));
 
 describe("Sokoban Game Store", () => {
   beforeEach(() => {

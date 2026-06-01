@@ -23,6 +23,114 @@ function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&
 
 var jsxRuntimeExports = jsxRuntime.exports;
 
+const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
+function getEvolutionStage(xp) {
+  let stage = 1;
+  for (let i = 1; i < EVOLUTION_THRESHOLDS.length; i++) {
+    if (xp >= EVOLUTION_THRESHOLDS[i]) stage = i + 1;
+  }
+  return stage;
+}
+
+const STORAGE_KEY = "cozyos.progress.v1";
+function initialState() {
+  return {
+    completedLevels: [],
+    foodConsumed: 0,
+    pet: { xp: 0, stage: 1, lastFedAt: 0 }
+  };
+}
+class LocalProgressRepository {
+  async getState() {
+    await Promise.resolve();
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return initialState();
+      const data = JSON.parse(raw);
+      if (data.version !== 1) return initialState();
+      return data.state;
+    } catch {
+      return initialState();
+    }
+  }
+  async saveState(state) {
+    await Promise.resolve();
+    const data = { version: 1, state };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (err) {
+      throw new Error(`Failed to save progress: ${String(err)}`);
+    }
+  }
+  async completeLevel(module, levelId) {
+    const state = await this.getState();
+    const alreadyDone = state.completedLevels.some(
+      (l) => l.module === module && l.levelId === levelId
+    );
+    if (alreadyDone) return false;
+    await this.saveState({
+      ...state,
+      completedLevels: [
+        ...state.completedLevels,
+        { module, levelId, completedAt: Date.now() }
+      ]
+    });
+    return true;
+  }
+  async feedPet() {
+    const state = await this.getState();
+    const newXp = state.pet.xp + 1;
+    await this.saveState({
+      ...state,
+      foodConsumed: state.foodConsumed + 1,
+      pet: {
+        xp: newXp,
+        stage: getEvolutionStage(newXp),
+        lastFedAt: Date.now()
+      }
+    });
+  }
+}
+
+const HUNGER_COOLDOWN = 4 * 60 * 60 * 1e3;
+class ProgressService {
+  constructor(repo) {
+    this.repo = repo;
+  }
+  async getState() {
+    return this.repo.getState();
+  }
+  async completeLevel(module, levelId) {
+    const result = await this.repo.completeLevel(module, levelId);
+    if (result && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+    return result;
+  }
+  async feedPet() {
+    const state = await this.repo.getState();
+    const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+    const foodAvailable = Math.max(0, state.completedLevels.length - state.foodConsumed);
+    if (!isHungry || foodAvailable <= 0) return;
+    await this.repo.feedPet();
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+  async getFoodAvailable() {
+    const state = await this.repo.getState();
+    return Math.max(0, state.completedLevels.length - state.foodConsumed);
+  }
+  async isPetHungry() {
+    const state = await this.repo.getState();
+    return Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+  }
+  async getPetStage() {
+    const state = await this.repo.getState();
+    return state.pet.stage;
+  }
+}
+
 var TileType = /* @__PURE__ */ ((TileType2) => {
   TileType2[TileType2["EMPTY"] = 0] = "EMPTY";
   TileType2[TileType2["WALL"] = 1] = "WALL";
@@ -2004,7 +2112,7 @@ function Box({ box, board, isDeadlocked, tileWidthPercent, tileHeightPercent }) 
 const BoxTile = React$3.memo(Box);
 
 const React$2 = await importShared('react');
-const {useEffect: useEffect$2,useState: useState$2} = React$2;
+const {useEffect: useEffect$3,useState: useState$2} = React$2;
 
 function getBodyColor(status, isSleeping) {
   if (isSleeping) return "#779988";
@@ -2025,7 +2133,7 @@ function PetSprite({
   className = ""
 }) {
   const [animFrame, setAnimFrame] = useState$2(0);
-  useEffect$2(() => {
+  useEffect$3(() => {
     if (status === "moving" || status === "playing") {
       const timer = setInterval(() => setAnimFrame((f) => (f + 1) % 2), 400);
       return () => clearInterval(timer);
@@ -2158,28 +2266,32 @@ function Board() {
   );
 }
 
-function LevelSelect({ onSelect }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4 text-cozy-text font-mono", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[12px] text-center my-2", children: "SELECT LEVEL" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-5 gap-3 max-h-[300px] overflow-y-auto p-2", children: SOKOBAN_LEVELS.map((level, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "button",
-      {
-        onClick: () => onSelect(idx),
-        className: "w-10 h-10 border border-cozy-border flex items-center justify-center font-press text-[11px] bg-black text-cozy-text cursor-pointer hover:bg-cozy-text hover:text-black hover:scale-105 active:translate-y-0.5 transition-colors",
-        "aria-label": `Select level ${idx + 1}`,
-        children: idx + 1
-      },
-      level.id
-    )) })
+function LevelSelect({ onSelect, completedLevelIds, currentLevelIdx }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-2 text-cozy-text font-mono w-full min-h-0 flex-1", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[12px] text-center my-2 shrink-0", children: "SELECT LEVEL" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-5 gap-3 p-2 overflow-y-auto flex-1 min-h-0", children: SOKOBAN_LEVELS.map((level, idx) => {
+      const completed = completedLevelIds.has(level.id);
+      const active = currentLevelIdx === idx;
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          onClick: () => onSelect(idx),
+          className: `w-10 h-10 border flex items-center justify-center font-press text-[11px] cursor-pointer transition-colors active:translate-y-0.5 ${active ? "border-[#FFB000] bg-[#FFB000]/10 text-[#FFB000]" : completed ? "border-cozy-border bg-black text-[#FFB000] hover:bg-cozy-text hover:text-black hover:scale-105" : "border-cozy-border bg-black text-cozy-text hover:bg-cozy-text hover:text-black hover:scale-105"}`,
+          "aria-label": `Select level ${idx + 1}${completed ? " (completed)" : ""}`,
+          children: completed ? "★" : idx + 1
+        },
+        level.id
+      );
+    }) })
   ] });
 }
 
-const {useEffect: useEffect$1,useRef} = await importShared('react');
+const {useEffect: useEffect$2,useRef} = await importShared('react');
 function Controls() {
   const move = useSokobanStore((state) => state.move);
   const isWon = useSokobanStore((state) => state.isWon);
   const touchStart = useRef(null);
-  useEffect$1(() => {
+  useEffect$2(() => {
     const handleKeyDown = (e) => {
       if (isWon) return;
       switch (e.key) {
@@ -2212,7 +2324,7 @@ function Controls() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [move, isWon]);
-  useEffect$1(() => {
+  useEffect$2(() => {
     const handleTouchStart = (e) => {
       if (e.touches.length === 1) {
         touchStart.current = {
@@ -2291,134 +2403,26 @@ function Controls() {
   ] });
 }
 
-const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
-function getEvolutionStage(xp) {
-  let stage = 1;
-  for (let i = 1; i < EVOLUTION_THRESHOLDS.length; i++) {
-    if (xp >= EVOLUTION_THRESHOLDS[i]) stage = i + 1;
-  }
-  return stage;
-}
-
-const STORAGE_KEY = "cozyos.progress.v1";
-function initialState() {
-  return {
-    completedLevels: [],
-    foodConsumed: 0,
-    pet: { xp: 0, stage: 1, lastFedAt: 0 }
-  };
-}
-class LocalProgressRepository {
-  async getState() {
-    await Promise.resolve();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return initialState();
-      const data = JSON.parse(raw);
-      if (data.version !== 1) return initialState();
-      return data.state;
-    } catch {
-      return initialState();
-    }
-  }
-  async saveState(state) {
-    await Promise.resolve();
-    const data = { version: 1, state };
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch (err) {
-      throw new Error(`Failed to save progress: ${String(err)}`);
-    }
-  }
-  async completeLevel(module, levelId) {
-    const state = await this.getState();
-    const alreadyDone = state.completedLevels.some(
-      (l) => l.module === module && l.levelId === levelId
-    );
-    if (alreadyDone) return false;
-    await this.saveState({
-      ...state,
-      completedLevels: [
-        ...state.completedLevels,
-        { module, levelId, completedAt: Date.now() }
-      ]
-    });
-    return true;
-  }
-  async feedPet() {
-    const state = await this.getState();
-    const newXp = state.pet.xp + 1;
-    await this.saveState({
-      ...state,
-      foodConsumed: state.foodConsumed + 1,
-      pet: {
-        xp: newXp,
-        stage: getEvolutionStage(newXp),
-        lastFedAt: Date.now()
-      }
-    });
-  }
-}
-
-const HUNGER_COOLDOWN = 4 * 60 * 60 * 1e3;
-class ProgressService {
-  constructor(repo) {
-    this.repo = repo;
-  }
-  async getState() {
-    return this.repo.getState();
-  }
-  async completeLevel(module, levelId) {
-    const result = await this.repo.completeLevel(module, levelId);
-    if (result && typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
-    }
-    return result;
-  }
-  async feedPet() {
-    const state = await this.repo.getState();
-    const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
-    const foodAvailable = Math.max(0, state.completedLevels.length - state.foodConsumed);
-    if (!isHungry || foodAvailable <= 0) return;
-    await this.repo.feedPet();
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
-    }
-  }
-  async getFoodAvailable() {
-    const state = await this.repo.getState();
-    return Math.max(0, state.completedLevels.length - state.foodConsumed);
-  }
-  async isPetHungry() {
-    const state = await this.repo.getState();
-    return Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
-  }
-  async getPetStage() {
-    const state = await this.repo.getState();
-    return state.pet.stage;
-  }
-}
-
 const React = await importShared('react');
-const {useEffect,useState: useState$1} = React;
-const progressService = new ProgressService(new LocalProgressRepository());
+const {useEffect: useEffect$1,useState: useState$1} = React;
+const progressService$1 = new ProgressService(new LocalProgressRepository());
 function WinModal({ onBack }) {
   const isWon = useSokobanStore((state) => state.isWon);
   const nextLevel = useSokobanStore((state) => state.nextLevel);
   const moves = useSokobanStore((state) => state.moves);
   const currentLevelIdx = useSokobanStore((state) => state.currentLevelIdx);
   const [rewardMsg, setRewardMsg] = useState$1(null);
-  useEffect(() => {
+  useEffect$1(() => {
     if (isWon) {
       synth.playWin();
     }
   }, [isWon]);
-  useEffect(() => {
+  useEffect$1(() => {
     if (!isWon) {
       setRewardMsg(null);
       return;
     }
-    void progressService.completeLevel("sokoban", SOKOBAN_LEVELS[currentLevelIdx]?.id ?? `level-${currentLevelIdx}`).then((firstTime) => {
+    void progressService$1.completeLevel("sokoban", SOKOBAN_LEVELS[currentLevelIdx]?.id ?? `level-${currentLevelIdx}`).then((firstTime) => {
       setRewardMsg(firstTime ? "+1 FOOD" : "ALREADY COMPLETE");
     });
   }, [isWon, currentLevelIdx]);
@@ -2456,15 +2460,40 @@ function WinModal({ onBack }) {
   ] }) });
 }
 
-const {useState} = await importShared('react');
+const {useState,useEffect,useCallback} = await importShared('react');
+const progressService = new ProgressService(new LocalProgressRepository());
 function SokobanApp() {
   const [view, setView] = useState("menu");
+  const [completedLevelIds, setCompletedLevelIds] = useState(/* @__PURE__ */ new Set());
   const loadLevel = useSokobanStore((state) => state.loadLevel);
+  const currentLevelIdx = useSokobanStore((state) => state.currentLevelIdx);
+  const refreshCompleted = useCallback(async () => {
+    const state = await progressService.getState();
+    const ids = new Set(
+      state.completedLevels.filter((c) => c.module === "sokoban").map((c) => c.levelId)
+    );
+    setCompletedLevelIds(ids);
+  }, []);
+  useEffect(() => {
+    void refreshCompleted();
+    const handler = () => {
+      void refreshCompleted();
+    };
+    window.addEventListener("cozyos:progress-updated", handler);
+    return () => window.removeEventListener("cozyos:progress-updated", handler);
+  }, [refreshCompleted]);
   const handleSelectLevel = (idx) => {
     loadLevel(idx);
     setView("game");
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border border-cozy-border bg-black p-4 select-none relative flex flex-col items-center text-cozy-text", children: view === "menu" ? /* @__PURE__ */ jsxRuntimeExports.jsx(LevelSelect, { onSelect: handleSelectLevel }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 items-center w-full relative", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border border-cozy-border bg-black p-4 select-none relative flex flex-col items-center text-cozy-text max-h-[calc(100vh-120px)]", children: view === "menu" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+    LevelSelect,
+    {
+      onSelect: handleSelectLevel,
+      completedLevelIds,
+      currentLevelIdx
+    }
+  ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 items-center w-full relative", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(HUD, { onBack: () => setView("menu") }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Board, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Controls, {}),

@@ -10,12 +10,12 @@ import type {
 } from "../types";
 
 export const DEFAULT_COLORS = [
-  { bg: "rgba(245, 158, 11, 0.25)", border: "rgba(245, 158, 11, 0.7)" },
-  { bg: "rgba(16, 185, 129, 0.25)", border: "rgba(16, 185, 129, 0.7)" },
-  { bg: "rgba(59, 130, 246, 0.25)", border: "rgba(59, 130, 246, 0.7)" },
-  { bg: "rgba(236, 72, 153, 0.25)", border: "rgba(236, 72, 153, 0.7)" },
-  { bg: "rgba(139, 92, 246, 0.25)", border: "rgba(139, 92, 246, 0.7)" },
-  { bg: "rgba(20, 184, 166, 0.25)", border: "rgba(20, 184, 166, 0.7)" },
+  { bg: "rgba(245, 158, 11, 0.45)", border: "rgba(245, 158, 11, 1)" },
+  { bg: "rgba(16, 185, 129, 0.45)", border: "rgba(16, 185, 129, 1)" },
+  { bg: "rgba(59, 130, 246, 0.45)", border: "rgba(59, 130, 246, 1)" },
+  { bg: "rgba(236, 72, 153, 0.45)", border: "rgba(236, 72, 153, 1)" },
+  { bg: "rgba(139, 92, 246, 0.45)", border: "rgba(139, 92, 246, 1)" },
+  { bg: "rgba(20, 184, 166, 0.45)", border: "rgba(20, 184, 166, 1)" },
 ];
 
 interface CommitResult {

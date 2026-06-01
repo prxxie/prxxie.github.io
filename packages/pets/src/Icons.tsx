@@ -2,10 +2,21 @@ import React from "react";
 
 export const PixelChickenIcon = ({ className = "w-4 h-4 inline-block" }): React.ReactElement => (
   <svg className={className} viewBox="0 0 16 16" fill="currentColor">
-    <rect x="5" y="4" width="6" height="6" />
-    <rect x="4" y="5" width="8" height="4" />
-    <rect x="8" y="10" width="2" height="3" />
-    <rect x="7" y="12" width="4" height="2" />
+    {/* Top point */}
+    <rect x="7" y="1" width="2" height="3" />
+    {/* Upper-left arm */}
+    <rect x="2" y="4" width="3" height="2" />
+    {/* Upper-right arm */}
+    <rect x="11" y="4" width="3" height="2" />
+    {/* Center body */}
+    <rect x="5" y="5" width="6" height="6" />
+    <rect x="4" y="6" width="8" height="4" />
+    {/* Lower-left arm */}
+    <rect x="2" y="9" width="3" height="2" />
+    {/* Lower-right arm */}
+    <rect x="11" y="9" width="3" height="2" />
+    {/* Bottom point */}
+    <rect x="7" y="12" width="2" height="3" />
   </svg>
 );
 

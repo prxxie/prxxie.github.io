@@ -38,6 +38,8 @@ export class LocalProgressRepository implements ProgressRepository {
       if (state.pet.happiness === undefined) state.pet.happiness = 50;
       if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = Date.now();
       if (state.pet.isSleeping === undefined) state.pet.isSleeping = false;
+      // Always recompute stage from XP — guards against stale stored stage
+      state.pet.stage = getEvolutionStage(state.pet.xp);
       
       return state;
     } catch {

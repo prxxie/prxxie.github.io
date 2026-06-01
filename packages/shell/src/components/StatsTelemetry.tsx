@@ -4,6 +4,20 @@ interface ShikakuSaveData {
   completed?: Record<string, { stars: number; bestTime: number }>;
 }
 
+interface CompletedLevel {
+  module: string;
+  levelId: string;
+  stars: number;
+  completedAt: number;
+}
+
+interface CozyProgress {
+  version: number;
+  state: { completedLevels: CompletedLevel[] };
+}
+
+const PROGRESS_KEY = "cozyos.progress.v1";
+
 const STATIC_POSTS = [
   { date: "2026-05-30", title: "Monochrome Amber CRT theme conversion completed" },
   { date: "2026-05-29", title: "Building Sokoban micro-frontend puzzle game" },
@@ -11,7 +25,8 @@ const STATIC_POSTS = [
 
 export default function StatsTelemetry(): React.ReactElement {
   const [shikakuSolved, setShikakuSolved] = useState(0);
-  const [sokobanLevel, setSokobanLevel] = useState(0);
+  const [sokobanSolved, setSokobanSolved] = useState(0);
+  const [sokobanMaxLevel, setSokobanMaxLevel] = useState(-1);
 
   useEffect(() => {
     try {
@@ -27,11 +42,20 @@ export default function StatsTelemetry(): React.ReactElement {
     }
 
     try {
-      const savedSokoban = localStorage.getItem("cozy_os_sokoban_level");
-      if (savedSokoban) {
-        const parsed = parseInt(savedSokoban, 10);
-        if (!Number.isNaN(parsed)) {
-          setSokobanLevel(parsed);
+      const savedProgress = localStorage.getItem(PROGRESS_KEY);
+      if (savedProgress) {
+        const parsed = JSON.parse(savedProgress) as CozyProgress;
+        if (parsed?.version === 1 && Array.isArray(parsed.state?.completedLevels)) {
+          const sokobanLevels = parsed.state.completedLevels.filter(
+            (l) => l.module === "sokoban"
+          );
+          setSokobanSolved(sokobanLevels.length);
+          // levelId is a 0-based index stored as string (e.g. "0", "4")
+          const maxIdx = sokobanLevels.reduce((max, l) => {
+            const idx = parseInt(l.levelId, 10);
+            return Number.isNaN(idx) ? max : Math.max(max, idx);
+          }, -1);
+          setSokobanMaxLevel(maxIdx);
         }
       }
     } catch {
@@ -55,7 +79,7 @@ export default function StatsTelemetry(): React.ReactElement {
           <span className="text-cozy-accent font-bold">● SOKOBAN CARGO</span>
           <br />
           <span>
-            LEVEL REACHED: {sokobanLevel + 1} | SOLVED: {sokobanLevel}
+            SOLVED: {sokobanSolved} | BEST LEVEL: {sokobanMaxLevel >= 0 ? sokobanMaxLevel + 1 : 0}
           </span>
         </div>
         <div className="border-t border-dashed border-cozy-border pt-1.5 mt-1">

@@ -7,7 +7,6 @@ import { useHashRouter } from "./hooks/useHashRouter";
 import MatrixMenu from "./components/MatrixMenu";
 import StatsTelemetry from "./components/StatsTelemetry";
 import HomeDashboard from "./components/HomeDashboard";
-import PetWidget from "./components/PetWidget";
 import MfeLoader from "./components/MfeLoader";
 
 const queryClient = new QueryClient();
@@ -60,7 +59,7 @@ export default function App(): React.ReactElement {
   const { currentTab, navigate } = useHashRouter();
   const windowRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isPetHudOpen, setIsPetHudOpen] = useState(false);
+  const [isMobileHudOpen, setIsMobileHudOpen] = useState(false);
   const progressService = useProgressService();
 
   useEffect(() => {
@@ -93,8 +92,6 @@ export default function App(): React.ReactElement {
         return <AboutApp />;
       case "posts":
         return <PostsApp />;
-      case "pets":
-        return <PetsApp progressState={progressService} />;
       case "shikaku":
         return <ShikakuApp />;
       case "sokoban":
@@ -110,14 +107,12 @@ export default function App(): React.ReactElement {
         <ConsoleFrame
           currentTab={currentTab}
           setTab={navigate}
-          onMobileHud={currentTab !== "pets" ? () => setIsPetHudOpen(true) : undefined}
+          onMobileHud={() => setIsMobileHudOpen(true)}
         >
           <div className="grid grid-cols-1 md:grid-cols-20 gap-6 items-start">
             <div
               ref={windowRef}
-              className={`col-span-1 ${
-                currentTab === "pets" ? "md:col-span-20" : "md:col-span-13"
-              } retro-window`}
+              className="col-span-1 md:col-span-13 retro-window"
             >
               <div className="window-header">
                 <span className="flex items-center gap-1">
@@ -150,38 +145,38 @@ export default function App(): React.ReactElement {
               </div>
             </div>
 
-            {currentTab !== "pets" && (
-              <div className="hidden md:flex md:col-span-7 flex-col gap-4">
-                <MatrixMenu currentTab={currentTab} navigate={navigate} />
+            <div className="hidden md:flex md:col-span-7 flex-col gap-4">
+              <MatrixMenu currentTab={currentTab} navigate={navigate} />
 
-                <div className="retro-window">
-                  <div className="window-header">
-                    <span className="flex items-center gap-1">
-                      <PixelPawIcon className="w-3.5 h-3.5" />
-                      <span className="window-header-accent">PET_HUD</span>
-                    </span>
-                    <span className="text-cozy-accent font-bold cursor-pointer">
-                      [-]
-                    </span>
-                  </div>
-                  <div className="window-body min-h-[160px] p-2">
-                    <PetWidget />
-                  </div>
+              <div className="retro-window">
+                <div className="window-header">
+                  <span className="flex items-center gap-1">
+                    <PixelPawIcon className="w-3.5 h-3.5" />
+                    <span className="window-header-accent">PET_HUD</span>
+                  </span>
+                  <span className="text-cozy-accent font-bold cursor-pointer">
+                    [-]
+                  </span>
                 </div>
-
-                <StatsTelemetry />
+                <div className="window-body p-0">
+                  <Suspense fallback={<MfeLoader petStage={progressService.state.pet.stage} />}>
+                    <PetsApp progressState={progressService} />
+                  </Suspense>
+                </div>
               </div>
-            )}
+
+              <StatsTelemetry />
+            </div>
           </div>
-          {isPetHudOpen && (
+          {isMobileHudOpen && (
             <div
               className="fixed inset-0 bg-black/75 z-45 md:hidden"
-              onClick={() => setIsPetHudOpen(false)}
+              onClick={() => setIsMobileHudOpen(false)}
             />
           )}
           <div
             className={`fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${
-              isPetHudOpen ? "translate-x-0" : "translate-x-full"
+              isMobileHudOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
             <div className="flex justify-between items-center border-b border-dashed border-cozy-border pb-2">
@@ -189,7 +184,7 @@ export default function App(): React.ReactElement {
                 <PixelPawIcon className="w-3.5 h-3.5" /> MOBILE_HUD
               </span>
               <button
-                onClick={() => setIsPetHudOpen(false)}
+                onClick={() => setIsMobileHudOpen(false)}
                 className="text-cozy-text font-bold cursor-pointer font-press text-[9px] bg-transparent border-none"
               >
                 [X]
@@ -200,13 +195,15 @@ export default function App(): React.ReactElement {
               currentTab={currentTab}
               navigate={(tab) => {
                 navigate(tab);
-                setIsPetHudOpen(false);
+                setIsMobileHudOpen(false);
               }}
             />
 
             <div className="flex-1 overflow-y-auto flex flex-col gap-4">
-              <div className="border border-cozy-border p-2">
-                <PetWidget />
+              <div className="border border-cozy-border">
+                <Suspense fallback={<MfeLoader petStage={progressService.state.pet.stage} />}>
+                  <PetsApp progressState={progressService} />
+                </Suspense>
               </div>
 
               <StatsTelemetry />

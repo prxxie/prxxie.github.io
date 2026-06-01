@@ -11,7 +11,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $.$ #",
       "#  @  #",
       "#######"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-02",
@@ -25,7 +26,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   @  #",
       "#      #",
       "########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-03",
@@ -38,7 +40,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #.  #",
       "##  @ ##",
       " ######"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-04",
@@ -52,7 +55,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   $  #",
       "#  .@ ##",
       "########"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-05",
@@ -66,7 +70,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   . $ #",
       "#    @  #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-06",
@@ -80,7 +85,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "## ##  ##",
       "#    @  #",
       "########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-07",
@@ -94,7 +100,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $.#   #",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-08",
@@ -108,7 +115,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "##  .  $ #",
       " #   @  ##",
       " ########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-09",
@@ -122,7 +130,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  . $   #",
       "#   @   ##",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-10",
@@ -136,7 +145,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "## # .  ###",
       " #   @  #",
       " ########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-11",
@@ -151,7 +161,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# ##  #  ##",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-12",
@@ -166,7 +177,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   $  # ##",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-13",
@@ -180,7 +192,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  ##.##  #",
       "#   $@    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-14",
@@ -195,7 +208,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $  .   #",
       "##   @   ##",
       " #########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-15",
@@ -210,7 +224,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $  $  #  #",
       "#    @     #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-16",
@@ -226,7 +241,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #   ##",
       "#    @     #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-17",
@@ -241,7 +257,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $  . $ ###",
       "#  #  #  @#",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-18",
@@ -256,7 +273,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $  $  ##  #",
       "#  #  #  @ ##",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-19",
@@ -271,7 +289,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $  $  ##$  #",
       "#  #  #   @ ##",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-20",
@@ -287,7 +306,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  #  ##",
       "#     @      #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-21",
@@ -303,7 +323,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  # # ##",
       "#     @       #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-22",
@@ -319,7 +340,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  #  ###",
       "#     @      #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-23",
@@ -335,7 +357,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  # #   #",
       "#     @       ##",
       "################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-24",
@@ -351,7 +374,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  #  # ##",
       "#     @        #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-25",
@@ -367,7 +391,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  # #  ###",
       "#     @         #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-26",
@@ -383,7 +408,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  #  ##  #",
       "#     @        ##",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-27",
@@ -399,7 +425,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  # # #  ##",
       "#     @          #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-28",
@@ -415,7 +442,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  #  # # ##",
       "#     @          #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-29",
@@ -431,7 +459,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  # # #   ##",
       "#     @           #",
       "###################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-30",
@@ -447,7 +476,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  #  #  #  # # # #",
       "#     @          ##",
       "###################"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-31",
@@ -461,7 +491,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  #",
       "#  @   #",
       "########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-32",
@@ -474,7 +505,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "##$  $  #",
       "#  .  @ #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-33",
@@ -488,7 +520,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $  .  #",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-34",
@@ -502,7 +535,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  .  .  #",
       "#   @   ##",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-35",
@@ -515,7 +549,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $# ##  #",
       "#  .  $ @ #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-36",
@@ -529,7 +564,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  . $ .  #",
       "#   @     #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-37",
@@ -543,7 +579,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $  . $  #",
       "#   @   #  #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-38",
@@ -557,7 +594,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  .  . $  #",
       "#  #  #  @ #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-39",
@@ -571,7 +609,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  . $  . $ #",
       "#   @    #  #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-40",
@@ -586,7 +625,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $.    $ # #",
       "#  #  #   @ #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-41",
@@ -600,7 +640,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  . $  . $  #",
       "#   @    #  ##",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-42",
@@ -615,7 +656,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $.    $ ## #",
       "#  #  #   @  #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-43",
@@ -629,7 +671,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  . $  . $ $ #",
       "#   @    #   ##",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-44",
@@ -644,7 +687,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $.    $ ##  #",
       "#  #  #    @  #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-45",
@@ -658,7 +702,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  . $  . $ $  #",
       "#   @    #  #  #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-46",
@@ -673,7 +718,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $.    $ ##   #",
       "#  #  #    @  ##",
       "################"
-    ]
+    ],
+    targets: { threeStars: 64, twoStars: 112 }
   },
   {
     "id": "hack-47",
@@ -687,7 +733,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  . $  . $ $   #",
       "#   @    #  #  ##",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-48",
@@ -702,7 +749,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $.    $ ## #  #",
       "#  #  #     @  ##",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 72, twoStars: 126 }
   },
   {
     "id": "hack-49",
@@ -716,7 +764,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  . $  . $ $  $  #",
       "#   @    #  # #  ##",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-50",
@@ -731,7 +780,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "# $.    $ ## ##   #",
       "#  #  #      @  ###",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 88, twoStars: 154 }
   },
   {
     "id": "hack-51",
@@ -744,7 +794,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "## ##  #",
       "#  .@$ #",
       "########"
-    ]
+    ],
+    targets: { threeStars: 30, twoStars: 54 }
   },
   {
     "id": "hack-52",
@@ -758,7 +809,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  # $  #",
       "#    @  #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 30, twoStars: 54 }
   },
   {
     "id": "hack-53",
@@ -772,7 +824,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $ $   #",
       "#    @   #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-54",
@@ -786,7 +839,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  #",
       "#    @   #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-55",
@@ -800,7 +854,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $#$    #",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-56",
@@ -814,7 +869,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $#$#   #",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-57",
@@ -828,7 +884,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  .  . $  #",
       "#   @   #  #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-58",
@@ -842,7 +899,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$ $  #",
       "#    @  #  #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-59",
@@ -856,7 +914,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $  #",
       "#    @   #  #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-60",
@@ -870,7 +929,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $  #",
       "#  #  #  @  #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-61",
@@ -884,7 +944,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $ #",
       "#    @   ##  #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-62",
@@ -898,7 +959,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $ #",
       "#  #  #   @  #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-63",
@@ -912,7 +974,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $  #",
       "#    @   ##   #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-64",
@@ -926,7 +989,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $  #",
       "#  #  #    @  #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-65",
@@ -940,7 +1004,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $ $ #",
       "#    @   ##    #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-66",
@@ -954,7 +1019,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $   #",
       "#  #  #     @  #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-67",
@@ -968,7 +1034,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $ $  #",
       "#    @   ##   # #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-68",
@@ -982,7 +1049,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $    #",
       "#  #  #      @  #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 90, twoStars: 162 }
   },
   {
     "id": "hack-69",
@@ -996,7 +1064,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $ $ $  #",
       "#    @   ##    #  #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-70",
@@ -1010,7 +1079,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$  $ $   $  #",
       "#  #  #       @  ##",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 110, twoStars: 198 }
   },
   {
     "id": "hack-71",
@@ -1024,7 +1094,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  .  . #",
       "#  @ #  #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-72",
@@ -1038,7 +1109,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  .  .  #",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-73",
@@ -1052,7 +1124,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  .  .   #",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-74",
@@ -1066,7 +1139,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  .  .   #",
       "#   @     #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-75",
@@ -1080,7 +1154,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .   .  #",
       "#   @    $ #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-76",
@@ -1094,7 +1169,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .   .  #",
       "#  @     $ #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-77",
@@ -1108,7 +1184,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .   . $ #",
       "#   @        #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-78",
@@ -1122,7 +1199,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .   . $ #",
       "#  @      $ #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-79",
@@ -1136,7 +1214,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .   . $ $#",
       "#   @      $ #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-80",
@@ -1150,7 +1229,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .   . $  #",
       "#  @     $ $ #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-81",
@@ -1164,7 +1244,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $ .  #",
       "#   @   #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 30, twoStars: 54 }
   },
   {
     "id": "hack-82",
@@ -1178,7 +1259,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  .  .  #",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-83",
@@ -1192,7 +1274,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$   #",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-84",
@@ -1206,7 +1289,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#  $##$   #",
       "#   @     #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-85",
@@ -1221,7 +1305,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .   #",
       "#    @     #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-86",
@@ -1236,7 +1321,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .   #",
       "#   @      #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-87",
@@ -1251,7 +1337,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  . $  #",
       "#    @      #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-88",
@@ -1266,7 +1353,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  . $  #",
       "#   @       #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-89",
@@ -1281,7 +1369,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  . $   #",
       "#    @       #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-90",
@@ -1296,7 +1385,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $  #",
       "#   @      $ #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-91",
@@ -1311,7 +1401,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $ #",
       "#    @      $ #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-92",
@@ -1326,7 +1417,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $ #",
       "#   @       $ #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 90, twoStars: 162 }
   },
   {
     "id": "hack-93",
@@ -1341,7 +1433,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $  #",
       "#    @       $ #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 90, twoStars: 162 }
   },
   {
     "id": "hack-94",
@@ -1356,7 +1449,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $   #",
       "#   @        $  #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 100, twoStars: 180 }
   },
   {
     "id": "hack-95",
@@ -1371,7 +1465,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $ $ #",
       "#    @        $ #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 110, twoStars: 198 }
   },
   {
     "id": "hack-96",
@@ -1386,7 +1481,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $   #",
       "#   @         $ #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 100, twoStars: 180 }
   },
   {
     "id": "hack-97",
@@ -1401,7 +1497,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $ $   #",
       "#    @         $  #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 120, twoStars: 216 }
   },
   {
     "id": "hack-98",
@@ -1416,7 +1513,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $  $ #",
       "#   @          $ #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 110, twoStars: 198 }
   },
   {
     "id": "hack-99",
@@ -1431,7 +1529,8 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#   .  .  $ $  $ $ #",
       "#    @           $ #",
       "###################"
-    ]
+    ],
+    targets: { threeStars: 130, twoStars: 234 }
   },
   {
     "id": "hack-100",
@@ -1448,6 +1547,7 @@ export const SOKOBAN_LEVELS: LevelData[] = [
       "#    .   .   $ .   #",
       "#    @          $  #",
       "####################"
-    ]
+    ],
+    targets: { threeStars: 160, twoStars: 288 }
   }
 ];

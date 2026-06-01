@@ -21,8 +21,14 @@ export interface MoveSnapshot {
   boxes: Box[];
 }
 
+export interface StarTargets {
+  threeStars: number;
+  twoStars: number;
+}
+
 export interface LevelData {
   id: string;
   name: string;
   grid: string[];
+  targets: StarTargets;
 }

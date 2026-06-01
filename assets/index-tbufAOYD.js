@@ -167,9 +167,9 @@ const PixelPawIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */
   /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "4", width: "2", height: "2" })
 ] });
 
-const {create: create$1} = await importShared('zustand');
+const {create} = await importShared('zustand');
 
-const useUiStore = create$1()((set) => ({
+const useUiStore = create()((set) => ({
   isMenuOpen: false,
   setMenuOpen: (isOpen) => set({ isMenuOpen: isOpen }),
   toggleMenu: () => set((state) => ({ isMenuOpen: !state.isMenuOpen }))
@@ -391,60 +391,283 @@ function ConsoleFrame({
   ] });
 }
 
-const {create} = await importShared('zustand');
+const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
+function getEvolutionStage(xp) {
+  let stage = 1;
+  for (let i = 1; i < EVOLUTION_THRESHOLDS.length; i++) {
+    if (xp >= EVOLUTION_THRESHOLDS[i]) stage = i + 1;
+  }
+  return stage;
+}
 
-const usePetStore = create()((set) => ({
-  hunger: 50,
-  happiness: 50,
-  status: "idle",
-  isSleeping: false,
-  feed: () => set((state) => {
-    if (state.isSleeping) return state;
-    return {
-      ...state,
-      hunger: Math.max(0, state.hunger - 20),
-      status: "eating"
-    };
-  }),
-  play: () => set((state) => {
-    if (state.isSleeping) return state;
-    return {
-      ...state,
-      happiness: Math.min(100, state.happiness + 20),
-      status: "playing"
-    };
-  }),
-  toggleSleep: () => set((state) => ({
-    isSleeping: !state.isSleeping,
-    status: !state.isSleeping ? "sleeping" : "idle"
-  })),
-  setStatus: (status) => set({ status }),
-  tick: () => set((state) => {
-    const nextHunger = Math.min(
-      100,
-      state.hunger + (state.isSleeping ? 2 : 5)
-    );
-    const nextHappiness = Math.max(
-      0,
-      state.happiness - (state.isSleeping ? 1 : 5)
-    );
-    let nextStatus = state.status;
-    if (state.status === "eating" || state.status === "playing") {
-      nextStatus = "idle";
+const STORAGE_KEY = "cozyos.progress.v1";
+function initialState() {
+  return {
+    completedLevels: [],
+    foodConsumed: 0,
+    pet: {
+      xp: 0,
+      stage: 1,
+      lastFedAt: 0,
+      happiness: 50,
+      lastPlayedAt: Date.now(),
+      isSleeping: false
     }
-    if (state.isSleeping) {
-      nextStatus = "sleeping";
+  };
+}
+class LocalProgressRepository {
+  async getState() {
+    await Promise.resolve();
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return initialState();
+      const data = JSON.parse(raw);
+      if (data.version !== 1) return initialState();
+      const state = data.state;
+      if (state.pet.happiness === void 0) state.pet.happiness = 50;
+      if (state.pet.lastPlayedAt === void 0) state.pet.lastPlayedAt = Date.now();
+      if (state.pet.isSleeping === void 0) state.pet.isSleeping = false;
+      return state;
+    } catch {
+      return initialState();
     }
-    return {
+  }
+  async saveState(state) {
+    await Promise.resolve();
+    const data = { version: 1, state };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (err) {
+      throw new Error(`Failed to save progress: ${String(err)}`);
+    }
+  }
+  async completeLevel(module, levelId) {
+    return this.completeLevelWithStars(module, levelId, 1);
+  }
+  async completeLevelWithStars(module, levelId, stars) {
+    const state = await this.getState();
+    const existing = state.completedLevels.find(
+      (l) => l.module === module && l.levelId === levelId
+    );
+    if (existing) {
+      if (stars <= existing.stars) return false;
+      await this.saveState({
+        ...state,
+        completedLevels: state.completedLevels.map(
+          (l) => l.module === module && l.levelId === levelId ? { ...l, stars, completedAt: Date.now() } : l
+        )
+      });
+      return true;
+    }
+    await this.saveState({
       ...state,
-      hunger: nextHunger,
-      happiness: nextHappiness,
-      status: nextStatus
-    };
-  })
-}));
+      completedLevels: [
+        ...state.completedLevels,
+        { module, levelId, stars, completedAt: Date.now() }
+      ]
+    });
+    return true;
+  }
+  async feedPet(lastPlayedAt) {
+    const state = await this.getState();
+    const newXp = state.pet.xp + 1;
+    await this.saveState({
+      ...state,
+      foodConsumed: state.foodConsumed + 1,
+      pet: {
+        ...state.pet,
+        xp: newXp,
+        stage: getEvolutionStage(newXp),
+        lastFedAt: Date.now(),
+        isSleeping: false,
+        // Auto-wakes up when fed
+        lastPlayedAt: lastPlayedAt !== void 0 ? lastPlayedAt : state.pet.lastPlayedAt
+      }
+    });
+  }
+  async playWithPet(happiness) {
+    const state = await this.getState();
+    await this.saveState({
+      ...state,
+      pet: {
+        ...state.pet,
+        happiness,
+        lastPlayedAt: Date.now()
+      }
+    });
+  }
+  async toggleSleep(lastFedAt, lastPlayedAt) {
+    const state = await this.getState();
+    await this.saveState({
+      ...state,
+      pet: {
+        ...state.pet,
+        isSleeping: !state.pet.isSleeping,
+        lastFedAt: lastFedAt !== void 0 ? lastFedAt : state.pet.lastFedAt,
+        lastPlayedAt: lastPlayedAt !== void 0 ? lastPlayedAt : state.pet.lastPlayedAt
+      }
+    });
+  }
+}
+
+const HUNGER_COOLDOWN = 10 * 60 * 1e3;
+const HAPPINESS_COOLDOWN = 10 * 60 * 1e3;
+class ProgressService {
+  constructor(repo) {
+    this.repo = repo;
+  }
+  async getState() {
+    return this.repo.getState();
+  }
+  async completeLevel(module, levelId) {
+    const result = await this.repo.completeLevel(module, levelId);
+    if (result && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+    return result;
+  }
+  async completeLevelWithStars(module, levelId, stars) {
+    const result = await this.repo.completeLevelWithStars(module, levelId, stars);
+    if (result && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+    return result;
+  }
+  async feedPet() {
+    const state = await this.repo.getState();
+    const isHungry = await this.isPetHungry();
+    const foodAvailable = await this.getFoodAvailable();
+    if (!isHungry || foodAvailable <= 0) return;
+    let nextLastPlayedAt;
+    if (state.pet.isSleeping && state.pet.lastPlayedAt !== 0) {
+      const elapsed = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+      const oldHappinessDivisor = HAPPINESS_COOLDOWN * 4;
+      const newElapsed = elapsed * (HAPPINESS_COOLDOWN / oldHappinessDivisor);
+      nextLastPlayedAt = Date.now() - newElapsed;
+    }
+    await this.repo.feedPet(nextLastPlayedAt);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+  async playWithPet() {
+    const state = await this.repo.getState();
+    if (state.pet.isSleeping) return;
+    const currentHappiness = await this.getHappiness();
+    const newHappiness = Math.min(100, currentHappiness + 20);
+    await this.repo.playWithPet(newHappiness);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+  async toggleSleep() {
+    const state = await this.repo.getState();
+    const oldHungerDivisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    const newHungerDivisor = !state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    const elapsedHunger = Math.max(0, Date.now() - state.pet.lastFedAt);
+    const newElapsedHunger = elapsedHunger * (newHungerDivisor / oldHungerDivisor);
+    const lastFedAt = state.pet.lastFedAt !== 0 ? Date.now() - newElapsedHunger : 0;
+    const oldHappinessDivisor = state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const newHappinessDivisor = !state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const elapsedHappiness = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+    const newElapsedHappiness = elapsedHappiness * (newHappinessDivisor / oldHappinessDivisor);
+    const lastPlayedAt = state.pet.lastPlayedAt !== 0 ? Date.now() - newElapsedHappiness : 0;
+    await this.repo.toggleSleep(lastFedAt, lastPlayedAt);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+  async getFoodAvailable() {
+    const state = await this.repo.getState();
+    const totalStars = state.completedLevels.reduce(
+      (sum, l) => sum + (l.stars ?? 1),
+      0
+    );
+    return Math.max(0, totalStars - state.foodConsumed);
+  }
+  async isPetHungry() {
+    const level = await this.getHungryLevel();
+    return level >= 1;
+  }
+  async getHungryLevel() {
+    const state = await this.repo.getState();
+    if (state.pet.lastFedAt === 0) return 6;
+    const elapsed = Math.max(0, Date.now() - state.pet.lastFedAt);
+    const divisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    return Math.min(6, Math.floor(elapsed / divisor));
+  }
+  async getHappiness() {
+    const state = await this.repo.getState();
+    if (state.pet.lastPlayedAt === 0) return state.pet.happiness;
+    const elapsed = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+    const divisor = state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const decay = Math.floor(elapsed / divisor) * 5;
+    return Math.max(0, state.pet.happiness - decay);
+  }
+  async getPetStage() {
+    const state = await this.repo.getState();
+    return state.pet.stage;
+  }
+}
 
 const {useState: useState$4,useEffect: useEffect$5,useCallback: useCallback$2} = await importShared('react');
+const progressService = new ProgressService(new LocalProgressRepository());
+const EMPTY_STATE = {
+  completedLevels: [],
+  foodConsumed: 0,
+  pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false }
+};
+function useProgressService() {
+  const [state, setState] = useState$4(EMPTY_STATE);
+  const [isHungry, setIsHungry] = useState$4(false);
+  const [foodAvailable, setFoodAvailable] = useState$4(0);
+  const [hungryLevel, setHungryLevel] = useState$4(0);
+  const [happiness, setHappiness] = useState$4(50);
+  const refresh = useCallback$2(async () => {
+    const [s, hungry, food, level, happy] = await Promise.all([
+      progressService.getState(),
+      progressService.isPetHungry(),
+      progressService.getFoodAvailable(),
+      progressService.getHungryLevel(),
+      progressService.getHappiness()
+    ]);
+    setState(s);
+    setIsHungry(hungry);
+    setFoodAvailable(food);
+    setHungryLevel(level);
+    setHappiness(happy);
+  }, []);
+  useEffect$5(() => {
+    void refresh();
+    const handler = () => {
+      void refresh();
+    };
+    window.addEventListener("cozyos:progress-updated", handler);
+    return () => window.removeEventListener("cozyos:progress-updated", handler);
+  }, [refresh]);
+  const feedPet = useCallback$2(async () => {
+    await progressService.feedPet();
+  }, []);
+  const playWithPet = useCallback$2(async () => {
+    await progressService.playWithPet();
+  }, []);
+  const toggleSleep = useCallback$2(async () => {
+    await progressService.toggleSleep();
+  }, []);
+  return {
+    state,
+    isHungry,
+    foodAvailable,
+    hungryLevel,
+    happiness,
+    isSleeping: state.pet.isSleeping,
+    feedPet,
+    playWithPet,
+    toggleSleep
+  };
+}
+
+const {useState: useState$3,useEffect: useEffect$4,useCallback: useCallback$1} = await importShared('react');
 
 const VALID_TABS = ["home", "about", "posts", "pets", "shikaku", "sokoban"];
 function getTabFromHash() {
@@ -456,31 +679,31 @@ function getTabFromHash() {
   return "home";
 }
 function useHashRouter() {
-  const [currentTab, setCurrentTab] = useState$4(getTabFromHash);
-  useEffect$5(() => {
+  const [currentTab, setCurrentTab] = useState$3(getTabFromHash);
+  useEffect$4(() => {
     const handleHashChange = () => {
       setCurrentTab(getTabFromHash());
     };
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
-  const navigate = useCallback$2((tab) => {
+  const navigate = useCallback$1((tab) => {
     window.location.hash = tab === "home" ? "" : `#/${tab}`;
     setCurrentTab(tab);
   }, []);
   return { currentTab, navigate };
 }
 
-const {useEffect: useEffect$4,useState: useState$3} = await importShared('react');
+const {useEffect: useEffect$3,useState: useState$2} = await importShared('react');
 
 const STATIC_POSTS = [
   { date: "2026-05-30", title: "Monochrome Amber CRT theme conversion completed" },
   { date: "2026-05-29", title: "Building Sokoban micro-frontend puzzle game" }
 ];
 function StatsTelemetry() {
-  const [shikakuSolved, setShikakuSolved] = useState$3(0);
-  const [sokobanLevel, setSokobanLevel] = useState$3(0);
-  useEffect$4(() => {
+  const [shikakuSolved, setShikakuSolved] = useState$2(0);
+  const [sokobanLevel, setSokobanLevel] = useState$2(0);
+  useEffect$3(() => {
     try {
       const savedShikaku = localStorage.getItem("cozy_os_shikaku_save");
       if (savedShikaku) {
@@ -538,13 +761,13 @@ function StatsTelemetry() {
   ] });
 }
 
-const {useEffect: useEffect$3,useRef: useRef$2} = await importShared('react');
+const {useEffect: useEffect$2,useRef: useRef$2} = await importShared('react');
 
 function HomeDashboard() {
   const planetCanvasRef = useRef$2(null);
   const waterfallRef = useRef$2(null);
   const oscilloscopeRef = useRef$2(null);
-  useEffect$3(() => {
+  useEffect$2(() => {
     const canvas = planetCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -595,7 +818,7 @@ function HomeDashboard() {
     draw();
     return () => cancelAnimationFrame(animId);
   }, []);
-  useEffect$3(() => {
+  useEffect$2(() => {
     const osc = oscilloscopeRef.current;
     const wf = waterfallRef.current;
     if (!osc || !wf) return;
@@ -730,254 +953,153 @@ function HomeDashboard() {
   ] });
 }
 
-function getBodyColor(status, isSleeping) {
-  if (isSleeping) return "#779988";
-  if (status === "eating") return "#CC6666";
-  if (status === "playing") return "#CC6666";
-  if (status === "moving") return "#CC9966";
-  return "#A0785A";
-}
-function getEyeOffset(direction) {
-  const baseX = direction === "left" ? -0.5 : direction === "right" ? 0.5 : 0;
-  const baseY = direction === "up" ? -0.5 : direction === "down" ? 0.5 : 0;
-  return { ex: baseX, ey: baseY };
-}
 function PetSprite({
   size = 16,
+  stage = 1,
   status = "idle",
   isSleeping = false,
-  direction = "down",
+  isHungry = false,
+  // direction is kept in props signature for API compatibility but unused in SVG render rules
   animationFrame = 0,
   className = ""
 }) {
-  const bodyColor = getBodyColor(status, isSleeping);
-  const { ex, ey } = getEyeOffset(direction);
-  const bounceClass = status === "playing" || status === "moving" ? "animate-bounce" : "";
-  const legOffset = status === "moving" ? animationFrame === 0 ? 0 : 1 : 0;
+  const isEating = status === "eating";
+  const isPlaying = status === "playing";
+  const isMoving = status === "moving";
+  const bounceClass = isPlaying || isMoving ? "animate-bounce" : "";
+  const wiggleStyle = isMoving || status === "idle" && animationFrame === 1 ? { transform: "rotate(3deg)", transformOrigin: "bottom center" } : {};
+  const renderStageSprite = () => {
+    switch (stage) {
+      case 1:
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "3", width: "6", height: "10", rx: "3", fill: "#eeeecc" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "5", width: "8", height: "7", rx: "2", fill: "#eeeecc" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isEating && animationFrame === 0 ? "7" : "6", y: "5", width: "2", height: "2", fill: "#44aa44" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isEating && animationFrame === 0 ? "8" : "9", y: "8", width: "2", height: "2", fill: "#44aa44" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "10", width: "2", height: "1", fill: "#44aa44" })
+        ] });
+      case 2: {
+        const leafColor = isHungry ? "#cccc33" : "#33aa33";
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "rect",
+            {
+              x: "3",
+              y: animationFrame === 0 ? "10" : "9",
+              width: "2",
+              height: "2",
+              fill: "#88cc88"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "7", height: "6", rx: "2", fill: "#88cc88" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "9", width: "9", height: "3", fill: "#88cc88" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isMoving && animationFrame === 0 ? "4" : "5", y: "13", width: "2", height: "1", fill: "#448844" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isMoving && animationFrame === 1 ? "11" : "10", y: "13", width: "2", height: "1", fill: "#448844" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: animationFrame === 0 ? "5" : "6", width: "2", height: "2", fill: leafColor }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: animationFrame === 0 ? "4" : "5", width: "2", height: "2", fill: leafColor }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "7", width: "1", height: "1", fill: "#448844" }),
+          " ",
+          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "8", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6.5", y: "8.5", width: "1", height: "1", fill: "#ff4444" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "8", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10.5", y: "8.5", width: "1", height: "1", fill: "#ff4444" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "11", width: "2", height: "1", fill: "#448844" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "9", width: "2", height: "1", fill: "#448844" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "9", width: "2", height: "1", fill: "#448844" })
+          ] })
+        ] });
+      }
+      case 3:
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: isEating && animationFrame === 0 ? "2" : "3", width: "3", height: "3", rx: "1", fill: "#ff66aa" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "5", width: "5", height: "1", fill: "#338833" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "6", width: "9", height: "7", rx: "2", fill: "#55aaaa" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "8", width: "11", height: "4", fill: "#55aaaa" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isMoving && animationFrame === 0 ? "3" : "4", y: "13", width: "2", height: "1", fill: "#227777" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isMoving && animationFrame === 1 ? "12" : "11", y: "13", width: "2", height: "1", fill: "#227777" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "1", y: "9", width: "3", height: "2", fill: "#55aaaa" }),
+          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "7", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7.5", width: "1", height: "1", fill: "#ff2222" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7.5", width: "1", height: "1", fill: "#ff2222" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "10", width: "3", height: "1", fill: "#227777" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "8", width: "2", height: "1", fill: "#227777" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "8", width: "2", height: "1", fill: "#227777" })
+          ] })
+        ] });
+      case 4:
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "5", width: "9", height: "1", fill: "#226622" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: animationFrame === 0 ? "2" : "3", width: "7", height: "3", fill: "#ff4488" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: animationFrame === 0 ? "1" : "2", width: "3", height: "1", fill: "#ffcc00" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "6", width: "11", height: "7", rx: "2", fill: "#2d6a6a" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "13", y: "8", width: "2", height: "2", fill: "#2d6a6a" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "14", y: isPlaying && animationFrame === 0 ? "5" : "6", width: "2", height: "2", fill: "#226622" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "13", width: "2", height: "1", fill: "#124a4a" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "13", width: "2", height: "1", fill: "#124a4a" }),
+          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "8", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "8", width: "1", height: "1", fill: "#ff0000" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "8", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "8", width: "1", height: "1", fill: "#ff0000" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "11", width: "3", height: "1", fill: "#124a4a" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "9", width: "2", height: "1", fill: "#124a4a" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "9", width: "2", height: "1", fill: "#124a4a" })
+          ] })
+        ] });
+      case 5: {
+        const floatOffset = animationFrame === 0 ? -1 : 1;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { style: { transform: `translateY(${floatOffset}px)` }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "2", y: "11", width: "1", height: "1", fill: "#ffff99", opacity: animationFrame === 0 ? 0.3 : 0.8 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "14", y: "4", width: "1", height: "1", fill: "#ffff99", opacity: animationFrame === 0 ? 0.8 : 0.3 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "13", y: "11", width: "1", height: "1", fill: "#ffff99", opacity: animationFrame === 0 ? 0.4 : 0.9 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: animationFrame === 0 ? "M 3,6 L 0,2 L 1,7 Z" : "M 3,6 L 0,4 L 1,8 Z", fill: "#33aa33" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: animationFrame === 0 ? "M 13,6 L 16,2 L 15,7 Z" : "M 13,6 L 16,4 L 15,8 Z", fill: "#33aa33" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "0", width: "5", height: "2", fill: "#ffff33" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "9", height: "1", fill: "#226622" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "2", width: "7", height: "2", fill: "#ff0066" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "1", width: "3", height: "1", fill: "#ffff33" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "5", width: "11", height: "7", rx: "2", fill: "#2d6a6a" }),
+          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "1", height: "1", fill: "#ff0000" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "7", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "7", width: "1", height: "1", fill: "#ff0000" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "8", width: "2", height: "1", fill: "#124a4a" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "8", width: "2", height: "1", fill: "#124a4a" })
+          ] })
+        ] });
+      }
+      default:
+        return null;
+    }
+  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "svg",
     {
       viewBox: "0 0 16 16",
       className: `${bounceClass} ${className}`,
-      style: { width: size, height: size },
+      style: { width: size, height: size, ...wiggleStyle },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "3", width: "10", height: "10", rx: "2", ry: "2", fill: bodyColor }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "8", height: "8", fill: bodyColor }),
-        status === "moving" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: 11 + legOffset, width: "2", height: "2", fill: "var(--color-cozy-border)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: 11 + (1 - legOffset), width: "2", height: "2", fill: "var(--color-cozy-border)" })
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "11", width: "8", height: "2", fill: "var(--color-cozy-border)" }),
-        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "rect",
-          {
-            x: "13",
-            y: animationFrame === 0 ? "4" : "6",
-            width: "2",
-            height: "2",
-            fill: bodyColor
-          }
-        ),
-        isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "1", width: "2", height: "2", fill: "var(--color-cozy-border)", opacity: "0.6" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "12", y: "3", width: "2", height: "1", fill: "var(--color-cozy-border)", opacity: "0.4" })
-        ] }),
-        !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 5 + ex, y: 6 + ey, width: "2", height: "2", fill: "#FFFFFF", rx: "0.5" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 5.5 + ex, y: 6.5 + ey, width: "1", height: "1", fill: "#000000" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 9 + ex, y: 6 + ey, width: "2", height: "2", fill: "#FFFFFF", rx: "0.5" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 9.5 + ex, y: 6.5 + ey, width: "1", height: "1", fill: "#000000" })
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "3", height: "1", fill: "var(--color-cozy-border)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7", width: "3", height: "1", fill: "var(--color-cozy-border)" })
-        ] }),
-        !isSleeping && status !== "eating" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "9", width: "4", height: "1", fill: "var(--color-cozy-border)" }),
-        !isSleeping && status === "eating" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "9", width: "2", height: "2", fill: "var(--color-cozy-border)" }),
-        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "8", width: "1.5", height: "1", fill: "#FF8888", opacity: "0.5", rx: "0.5" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11.5", y: "8", width: "1.5", height: "1", fill: "#FF8888", opacity: "0.5", rx: "0.5" })
+        renderStageSprite(),
+        isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { className: "animate-pulse", style: { fill: "var(--color-cozy-border)", opacity: 0.8 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: "11", y: "4", style: { fontSize: "4px", fontFamily: "monospace" }, children: "Z" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: "13", y: "2", style: { fontSize: "3px", fontFamily: "monospace" }, children: "z" })
         ] })
       ]
     }
   );
 }
 
-const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
-function getEvolutionStage(xp) {
-  let stage = 1;
-  for (let i = 1; i < EVOLUTION_THRESHOLDS.length; i++) {
-    if (xp >= EVOLUTION_THRESHOLDS[i]) stage = i + 1;
-  }
-  return stage;
-}
-
-const STORAGE_KEY = "cozyos.progress.v1";
-function initialState() {
-  return {
-    completedLevels: [],
-    foodConsumed: 0,
-    pet: { xp: 0, stage: 1, lastFedAt: 0 }
-  };
-}
-class LocalProgressRepository {
-  async getState() {
-    await Promise.resolve();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return initialState();
-      const data = JSON.parse(raw);
-      if (data.version !== 1) return initialState();
-      return data.state;
-    } catch {
-      return initialState();
-    }
-  }
-  async saveState(state) {
-    await Promise.resolve();
-    const data = { version: 1, state };
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch (err) {
-      throw new Error(`Failed to save progress: ${String(err)}`);
-    }
-  }
-  async completeLevel(module, levelId) {
-    return this.completeLevelWithStars(module, levelId, 1);
-  }
-  async completeLevelWithStars(module, levelId, stars) {
-    const state = await this.getState();
-    const existing = state.completedLevels.find(
-      (l) => l.module === module && l.levelId === levelId
-    );
-    if (existing) {
-      if (stars <= existing.stars) return false;
-      await this.saveState({
-        ...state,
-        completedLevels: state.completedLevels.map(
-          (l) => l.module === module && l.levelId === levelId ? { ...l, stars, completedAt: Date.now() } : l
-        )
-      });
-      return true;
-    }
-    await this.saveState({
-      ...state,
-      completedLevels: [
-        ...state.completedLevels,
-        { module, levelId, stars, completedAt: Date.now() }
-      ]
-    });
-    return true;
-  }
-  async feedPet() {
-    const state = await this.getState();
-    const newXp = state.pet.xp + 1;
-    await this.saveState({
-      ...state,
-      foodConsumed: state.foodConsumed + 1,
-      pet: {
-        xp: newXp,
-        stage: getEvolutionStage(newXp),
-        lastFedAt: Date.now()
-      }
-    });
-  }
-}
-
-const HUNGER_COOLDOWN = 10 * 60 * 1e3;
-class ProgressService {
-  constructor(repo) {
-    this.repo = repo;
-  }
-  async getState() {
-    return this.repo.getState();
-  }
-  async completeLevel(module, levelId) {
-    const result = await this.repo.completeLevel(module, levelId);
-    if (result && typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
-    }
-    return result;
-  }
-  async completeLevelWithStars(module, levelId, stars) {
-    const result = await this.repo.completeLevelWithStars(module, levelId, stars);
-    if (result && typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
-    }
-    return result;
-  }
-  async feedPet() {
-    const state = await this.repo.getState();
-    const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
-    const foodAvailable = await this.getFoodAvailable();
-    if (!isHungry || foodAvailable <= 0) return;
-    await this.repo.feedPet();
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
-    }
-  }
-  async getFoodAvailable() {
-    const state = await this.repo.getState();
-    const totalStars = state.completedLevels.reduce(
-      (sum, l) => sum + (l.stars ?? 1),
-      0
-    );
-    return Math.max(0, totalStars - state.foodConsumed);
-  }
-  async isPetHungry() {
-    const state = await this.repo.getState();
-    return Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
-  }
-  async getHungryLevel() {
-    const state = await this.repo.getState();
-    const elapsed = Date.now() - state.pet.lastFedAt;
-    return Math.min(6, Math.floor(elapsed / HUNGER_COOLDOWN));
-  }
-  async getPetStage() {
-    const state = await this.repo.getState();
-    return state.pet.stage;
-  }
-}
-
-const {useState: useState$2,useEffect: useEffect$2,useCallback: useCallback$1} = await importShared('react');
-const progressService = new ProgressService(new LocalProgressRepository());
-const EMPTY_STATE = {
-  completedLevels: [],
-  foodConsumed: 0,
-  pet: { xp: 0, stage: 1, lastFedAt: 0 }
-};
-function useProgressService() {
-  const [state, setState] = useState$2(EMPTY_STATE);
-  const [isHungry, setIsHungry] = useState$2(false);
-  const [foodAvailable, setFoodAvailable] = useState$2(0);
-  const [hungryLevel, setHungryLevel] = useState$2(0);
-  const refresh = useCallback$1(async () => {
-    const [s, hungry, food, level] = await Promise.all([
-      progressService.getState(),
-      progressService.isPetHungry(),
-      progressService.getFoodAvailable(),
-      progressService.getHungryLevel()
-    ]);
-    setState(s);
-    setIsHungry(hungry);
-    setFoodAvailable(food);
-    setHungryLevel(level);
-  }, []);
-  useEffect$2(() => {
-    void refresh();
-    const handler = () => {
-      void refresh();
-    };
-    window.addEventListener("cozyos:progress-updated", handler);
-    return () => window.removeEventListener("cozyos:progress-updated", handler);
-  }, [refresh]);
-  const feedPet = useCallback$1(async () => {
-    await progressService.feedPet();
-  }, []);
-  return { state, isHungry, foodAvailable, hungryLevel, feedPet };
-}
-
 const {useState: useState$1,useCallback,useEffect: useEffect$1,useRef: useRef$1} = await importShared('react');
 function PetWidget() {
-  const { state, isHungry, foodAvailable, feedPet } = useProgressService();
+  const { state, isHungry, foodAvailable, feedPet, isSleeping } = useProgressService();
   const [spriteStatus, setSpriteStatus] = useState$1("idle");
   const resetTimerRef = useRef$1(null);
   useEffect$1(() => {
@@ -993,13 +1115,38 @@ function PetWidget() {
     if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
     resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2e3);
   }, [feedPet]);
-  const canFeed = isHungry && foodAvailable > 0;
+  const canFeed = isHungry && foodAvailable > 0 && !isSleeping;
+  const getStageName = (stage) => {
+    switch (stage) {
+      case 1:
+        return "EGG";
+      case 2:
+        return "LEAFY SPROUT";
+      case 3:
+        return "BUDREPTILE";
+      case 4:
+        return "FLORASAUR";
+      case 5:
+        return "MEGA FLORASAUR";
+      default:
+        return "UNKNOWN";
+    }
+  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-2 p-2 text-cozy-text", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border p-2 bg-black flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetSprite, { size: 64, status: spriteStatus }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border p-2 bg-black flex items-center justify-center relative w-20 h-20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PetSprite,
+      {
+        size: 64,
+        stage: state.pet.stage,
+        status: isSleeping ? "sleeping" : spriteStatus,
+        isSleeping,
+        isHungry
+      }
+    ) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-1 font-mono text-[9px]", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press", children: "STAGE:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: state.pet.stage })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: getStageName(state.pet.stage) })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press", children: "XP:" }),
@@ -1007,11 +1154,14 @@ function PetWidget() {
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press", children: "FOOD:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: foodAvailable })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+          "★ ",
+          foodAvailable
+        ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press", children: "STATUS:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: isHungry ? "HUNGRY" : "FULL" })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: isSleeping ? "SLEEPING" : isHungry ? "HUNGRY" : "FULL" })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -1022,7 +1172,7 @@ function PetWidget() {
         },
         disabled: !canFeed,
         className: "w-full pixel-btn text-[8px] disabled:opacity-40 disabled:pointer-events-none",
-        children: canFeed ? "FEED PET" : isHungry ? "NO FOOD" : "NOT HUNGRY"
+        children: isSleeping ? "AWAKE TO FEED" : canFeed ? "FEED PET" : isHungry ? "NO FOOD" : "NOT HUNGRY"
       }
     )
   ] });
@@ -1071,6 +1221,7 @@ function App() {
   const windowRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPetHudOpen, setIsPetHudOpen] = useState(false);
+  const progressService = useProgressService();
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -1100,7 +1251,7 @@ function App() {
       case "posts":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(PostsApp, {});
       case "pets":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { usePetStore });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { progressState: progressService });
       case "shikaku":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(ShikakuApp, {});
       case "sokoban":

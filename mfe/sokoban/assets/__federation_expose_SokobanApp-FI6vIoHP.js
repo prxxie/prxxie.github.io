@@ -37,7 +37,14 @@ function initialState() {
   return {
     completedLevels: [],
     foodConsumed: 0,
-    pet: { xp: 0, stage: 1, lastFedAt: 0 }
+    pet: {
+      xp: 0,
+      stage: 1,
+      lastFedAt: 0,
+      happiness: 50,
+      lastPlayedAt: Date.now(),
+      isSleeping: false
+    }
   };
 }
 class LocalProgressRepository {
@@ -48,7 +55,11 @@ class LocalProgressRepository {
       if (!raw) return initialState();
       const data = JSON.parse(raw);
       if (data.version !== 1) return initialState();
-      return data.state;
+      const state = data.state;
+      if (state.pet.happiness === void 0) state.pet.happiness = 50;
+      if (state.pet.lastPlayedAt === void 0) state.pet.lastPlayedAt = Date.now();
+      if (state.pet.isSleeping === void 0) state.pet.isSleeping = false;
+      return state;
     } catch {
       return initialState();
     }
@@ -89,22 +100,50 @@ class LocalProgressRepository {
     });
     return true;
   }
-  async feedPet() {
+  async feedPet(lastPlayedAt) {
     const state = await this.getState();
     const newXp = state.pet.xp + 1;
     await this.saveState({
       ...state,
       foodConsumed: state.foodConsumed + 1,
       pet: {
+        ...state.pet,
         xp: newXp,
         stage: getEvolutionStage(newXp),
-        lastFedAt: Date.now()
+        lastFedAt: Date.now(),
+        isSleeping: false,
+        // Auto-wakes up when fed
+        lastPlayedAt: lastPlayedAt !== void 0 ? lastPlayedAt : state.pet.lastPlayedAt
+      }
+    });
+  }
+  async playWithPet(happiness) {
+    const state = await this.getState();
+    await this.saveState({
+      ...state,
+      pet: {
+        ...state.pet,
+        happiness,
+        lastPlayedAt: Date.now()
+      }
+    });
+  }
+  async toggleSleep(lastFedAt, lastPlayedAt) {
+    const state = await this.getState();
+    await this.saveState({
+      ...state,
+      pet: {
+        ...state.pet,
+        isSleeping: !state.pet.isSleeping,
+        lastFedAt: lastFedAt !== void 0 ? lastFedAt : state.pet.lastFedAt,
+        lastPlayedAt: lastPlayedAt !== void 0 ? lastPlayedAt : state.pet.lastPlayedAt
       }
     });
   }
 }
 
 const HUNGER_COOLDOWN = 10 * 60 * 1e3;
+const HAPPINESS_COOLDOWN = 10 * 60 * 1e3;
 class ProgressService {
   constructor(repo) {
     this.repo = repo;
@@ -128,10 +167,44 @@ class ProgressService {
   }
   async feedPet() {
     const state = await this.repo.getState();
-    const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+    const isHungry = await this.isPetHungry();
     const foodAvailable = await this.getFoodAvailable();
     if (!isHungry || foodAvailable <= 0) return;
-    await this.repo.feedPet();
+    let nextLastPlayedAt;
+    if (state.pet.isSleeping && state.pet.lastPlayedAt !== 0) {
+      const elapsed = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+      const oldHappinessDivisor = HAPPINESS_COOLDOWN * 4;
+      const newElapsed = elapsed * (HAPPINESS_COOLDOWN / oldHappinessDivisor);
+      nextLastPlayedAt = Date.now() - newElapsed;
+    }
+    await this.repo.feedPet(nextLastPlayedAt);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+  async playWithPet() {
+    const state = await this.repo.getState();
+    if (state.pet.isSleeping) return;
+    const currentHappiness = await this.getHappiness();
+    const newHappiness = Math.min(100, currentHappiness + 20);
+    await this.repo.playWithPet(newHappiness);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+  async toggleSleep() {
+    const state = await this.repo.getState();
+    const oldHungerDivisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    const newHungerDivisor = !state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    const elapsedHunger = Math.max(0, Date.now() - state.pet.lastFedAt);
+    const newElapsedHunger = elapsedHunger * (newHungerDivisor / oldHungerDivisor);
+    const lastFedAt = state.pet.lastFedAt !== 0 ? Date.now() - newElapsedHunger : 0;
+    const oldHappinessDivisor = state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const newHappinessDivisor = !state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const elapsedHappiness = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+    const newElapsedHappiness = elapsedHappiness * (newHappinessDivisor / oldHappinessDivisor);
+    const lastPlayedAt = state.pet.lastPlayedAt !== 0 ? Date.now() - newElapsedHappiness : 0;
+    await this.repo.toggleSleep(lastFedAt, lastPlayedAt);
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
     }
@@ -145,13 +218,23 @@ class ProgressService {
     return Math.max(0, totalStars - state.foodConsumed);
   }
   async isPetHungry() {
-    const state = await this.repo.getState();
-    return Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+    const level = await this.getHungryLevel();
+    return level >= 1;
   }
   async getHungryLevel() {
     const state = await this.repo.getState();
-    const elapsed = Date.now() - state.pet.lastFedAt;
-    return Math.min(6, Math.floor(elapsed / HUNGER_COOLDOWN));
+    if (state.pet.lastFedAt === 0) return 6;
+    const elapsed = Math.max(0, Date.now() - state.pet.lastFedAt);
+    const divisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    return Math.min(6, Math.floor(elapsed / divisor));
+  }
+  async getHappiness() {
+    const state = await this.repo.getState();
+    if (state.pet.lastPlayedAt === 0) return state.pet.happiness;
+    const elapsed = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+    const divisor = state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const decay = Math.floor(elapsed / divisor) * 5;
+    return Math.max(0, state.pet.happiness - decay);
   }
   async getPetStage() {
     const state = await this.repo.getState();

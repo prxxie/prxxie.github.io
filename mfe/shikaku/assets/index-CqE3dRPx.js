@@ -1,5 +1,5 @@
 import { importShared } from './__federation_fn_import-D-nfbenS.js';
-import PetsApp, { j as jsxRuntimeExports } from './__federation_expose_PetsApp-BKAQGciT.js';
+import ShikakuApp, { j as jsxRuntimeExports } from './__federation_expose_ShikakuApp-BH620BNf.js';
 import { r as reactDomExports } from './index-D9Af7wOI.js';
 
 true&&(function polyfill() {
@@ -54,5 +54,5 @@ if (!rootElement) {
   throw new Error("Root element not found");
 }
 client.createRoot(rootElement).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 w-[500px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, {}) }) })
+  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 flex justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ShikakuApp, {}) }) })
 );

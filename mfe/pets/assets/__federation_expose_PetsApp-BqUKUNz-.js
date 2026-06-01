@@ -24,10 +24,14 @@ function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&
 var jsxRuntimeExports = jsxRuntime.exports;
 
 const PixelChickenIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "4", width: "6", height: "6" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "5", width: "8", height: "4" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "10", width: "2", height: "3" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "12", width: "4", height: "2" })
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "1", width: "2", height: "3" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "2", y: "4", width: "3", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "4", width: "3", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "5", width: "6", height: "6" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "6", width: "8", height: "4" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "2", y: "9", width: "3", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "9", width: "3", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "12", width: "2", height: "3" })
 ] });
 const PixelBearIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
   /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "3", width: "3", height: "3" }),

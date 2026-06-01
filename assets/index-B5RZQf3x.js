@@ -200,7 +200,8 @@ function playBeepSound(frequency = 440, duration = 0.08) {
 
 const {useState: useState$6} = await importShared('react');
 function ConsoleFrame({
-  children
+  children,
+  onMobileHud
 }) {
   const [muted, setMuted] = useState$6(getAudioMuted);
   const handleAudioToggle = () => {
@@ -233,18 +234,29 @@ function ConsoleFrame({
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-xs font-bold text-cozy-accent uppercase", children: "PRXXIE_OS v4.7" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "button",
-        {
-          onClick: handleAudioToggle,
-          className: `pixel-btn text-[9px] px-3 py-1 ${!muted ? "bg-cozy-accent text-black border-cozy-border" : ""}`,
-          "aria-label": "Toggle Audio Beeps",
-          children: [
-            "SOUND: ",
-            !muted ? "ON" : "OFF"
-          ]
-        }
-      ) })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            onClick: handleAudioToggle,
+            className: `pixel-btn text-[9px] px-3 py-1 ${!muted ? "bg-cozy-accent text-black border-cozy-border" : ""}`,
+            "aria-label": "Toggle Audio Beeps",
+            children: [
+              "SOUND: ",
+              !muted ? "ON" : "OFF"
+            ]
+          }
+        ),
+        onMobileHud && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: onMobileHud,
+            className: "md:hidden pixel-btn text-[9px] px-3 py-1",
+            "aria-label": "Open mobile HUD",
+            children: "[ HUD ]"
+          }
+        )
+      ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "w-full max-w-5xl mx-auto flex-1 px-4 py-6 box-border", children })
   ] });
@@ -258,11 +270,17 @@ const PixelBookIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ *
   /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "8", x2: "13", y2: "8" })
 ] });
 const PixelPawIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "7", width: "2", height: "3" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "9", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "9", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "4", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "4", width: "2", height: "2" })
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "2", height: "1" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7", width: "2", height: "1" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "8", width: "8", height: "1" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "9", width: "8", height: "1" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "10", width: "6", height: "1" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "11", width: "4", height: "1" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "12", width: "2", height: "1" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "2", y: "5", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "3", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "3", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "12", y: "5", width: "2", height: "2" })
 ] });
 
 const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
@@ -1269,112 +1287,112 @@ function App() {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(HomeDashboard, {});
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full flex justify-center min-h-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(ConsoleFrame, { currentTab, setTab: navigate, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-20 gap-6 items-start", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "div",
-        {
-          ref: windowRef,
-          className: `col-span-1 ${currentTab === "pets" ? "md:col-span-20" : "md:col-span-13"} retro-window`,
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBookIcon, { className: "w-3.5 h-3.5" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "window-header-accent", children: [
-                  currentTab.toUpperCase(),
-                  "_VIEW"
-                ] })
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full flex justify-center min-h-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    ConsoleFrame,
+    {
+      currentTab,
+      setTab: navigate,
+      onMobileHud: currentTab !== "pets" ? () => setIsPetHudOpen(true) : void 0,
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-20 gap-6 items-start", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
+            {
+              ref: windowRef,
+              className: `col-span-1 ${currentTab === "pets" ? "md:col-span-20" : "md:col-span-13"} retro-window`,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBookIcon, { className: "w-3.5 h-3.5" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "window-header-accent", children: [
+                      currentTab.toUpperCase(),
+                      "_VIEW"
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 items-center", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "button",
+                      {
+                        onClick: toggleFullscreen,
+                        className: "text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]",
+                        "aria-label": "Toggle Fullscreen",
+                        children: isFullscreen ? "[🗗]" : "[⛶]"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Suspense,
+                  {
+                    fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }),
+                    children: renderMainContent()
+                  }
+                ) })
+              ]
+            }
+          ),
+          currentTab !== "pets" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden md:flex md:col-span-7 flex-col gap-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(MatrixMenu, { currentTab, navigate }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "retro-window", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "window-header-accent", children: "PET_HUD" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[-]" })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 items-center", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[160px] p-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetWidget, {}) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
+          ] })
+        ] }),
+        isPetHudOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "div",
+          {
+            className: "fixed inset-0 bg-black/75 z-45 md:hidden",
+            onClick: () => setIsPetHudOpen(false)
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "div",
+          {
+            className: `fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${isPetHudOpen ? "translate-x-0" : "translate-x-full"}`,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b border-dashed border-cozy-border pb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[9px] text-cozy-text flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
+                  " MOBILE_HUD"
+                ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "button",
                   {
-                    onClick: toggleFullscreen,
-                    className: "text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]",
-                    "aria-label": "Toggle Fullscreen",
-                    children: isFullscreen ? "[🗗]" : "[⛶]"
+                    onClick: () => setIsPetHudOpen(false),
+                    className: "text-cozy-text font-bold cursor-pointer font-press text-[9px] bg-transparent border-none",
+                    children: "[X]"
                   }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                MatrixMenu,
+                {
+                  currentTab,
+                  navigate: (tab) => {
+                    navigate(tab);
+                    setIsPetHudOpen(false);
+                  }
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 overflow-y-auto flex flex-col gap-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border p-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetWidget, {}) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
               ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Suspense,
-              {
-                fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }),
-                children: renderMainContent()
-              }
-            ) })
-          ]
-        }
-      ),
-      currentTab !== "pets" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden md:flex md:col-span-7 flex-col gap-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(MatrixMenu, { currentTab, navigate }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "retro-window", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "window-header-accent", children: "PET_HUD" })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[-]" })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[160px] p-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetWidget, {}) })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
-      ] })
-    ] }),
-    currentTab !== "pets" && /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "button",
-      {
-        onClick: () => setIsPetHudOpen(true),
-        className: "md:hidden fixed bottom-6 right-6 z-40 pixel-btn text-[9px]",
-        children: "[ MOBILE HUD ]"
-      }
-    ),
-    isPetHudOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "div",
-      {
-        className: "fixed inset-0 bg-black/75 z-45 md:hidden",
-        onClick: () => setIsPetHudOpen(false)
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      "div",
-      {
-        className: `fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${isPetHudOpen ? "translate-x-0" : "translate-x-full"}`,
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b border-dashed border-cozy-border pb-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[9px] text-cozy-text flex items-center gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
-              " MOBILE_HUD"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                onClick: () => setIsPetHudOpen(false),
-                className: "text-cozy-text font-bold cursor-pointer font-press text-[9px] bg-transparent border-none",
-                children: "[X]"
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            MatrixMenu,
-            {
-              currentTab,
-              navigate: (tab) => {
-                navigate(tab);
-                setIsPetHudOpen(false);
-              }
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 overflow-y-auto flex flex-col gap-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border p-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetWidget, {}) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
-          ] })
-        ]
-      }
-    )
-  ] }) }) });
+            ]
+          }
+        )
+      ]
+    }
+  ) }) });
 }
 
 const React = await importShared('react');

@@ -357,16 +357,8 @@
     right: calc(var(--spacing) * 0);
   }
 
-  .right-6 {
-    right: calc(var(--spacing) * 6);
-  }
-
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
-  }
-
-  .bottom-6 {
-    bottom: calc(var(--spacing) * 6);
   }
 
   .left-1\/2 {
@@ -375,10 +367,6 @@
 
   .z-30 {
     z-index: 30;
-  }
-
-  .z-40 {
-    z-index: 40;
   }
 
   .z-45 {
@@ -391,6 +379,40 @@
 
   .col-span-1 {
     grid-column: span 1 / span 1;
+  }
+
+  .container {
+    width: 100%;
+  }
+
+  @media (min-width: 40rem) {
+    .container {
+      max-width: 40rem;
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .container {
+      max-width: 48rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .container {
+      max-width: 64rem;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .container {
+      max-width: 80rem;
+    }
+  }
+
+  @media (min-width: 96rem) {
+    .container {
+      max-width: 96rem;
+    }
   }
 
   .m-0 {

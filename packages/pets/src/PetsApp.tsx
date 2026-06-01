@@ -139,16 +139,14 @@ export default function PetsApp({
             <span className="absolute bottom-1 left-2 text-[10px] text-cozy-text font-mono select-none">+</span>
             <span className="absolute bottom-1 right-2 text-[10px] text-cozy-text font-mono select-none">+</span>
 
-            <div style={{ filter: "sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2)" }}>
-              <PetSprite
-                size={120}
-                stage={petState.stage}
-                status={isSleeping ? "sleeping" : spriteStatus}
-                isSleeping={isSleeping}
-                isHungry={isHungry}
-                animationFrame={animationFrame}
-              />
-            </div>
+            <PetSprite
+              size={120}
+              stage={petState.stage}
+              status={isSleeping ? "sleeping" : spriteStatus}
+              isSleeping={isSleeping}
+              isHungry={isHungry}
+              animationFrame={animationFrame}
+            />
 
             {isSleeping && (
               <span className="absolute top-2 right-2 text-cozy-text font-press text-[8px] animate-pulse">

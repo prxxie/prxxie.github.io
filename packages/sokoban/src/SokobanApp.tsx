@@ -12,6 +12,7 @@ const progressService = new ProgressService(new LocalProgressRepository());
 export default function SokobanApp(): React.ReactElement {
   const [view, setView] = useState<"menu" | "game">("menu");
   const [bestStars, setBestStars] = useState<Record<string, number>>({});
+  const [petStage, setPetStage] = useState(1);
   const loadLevel = useSokobanStore((state) => state.loadLevel);
   const currentLevelIdx = useSokobanStore((state) => state.currentLevelIdx);
 
@@ -24,6 +25,7 @@ export default function SokobanApp(): React.ReactElement {
       }
     }
     setBestStars(map);
+    setPetStage(state.pet.stage);
   }, []);
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function SokobanApp(): React.ReactElement {
       ) : (
         <div className="flex flex-col gap-4 items-center w-full relative">
           <HUD onBack={() => setView("menu")} />
-          <Board />
+          <Board petStage={petStage} />
           <Controls />
           <WinModal onBack={() => setView("menu")} />
         </div>

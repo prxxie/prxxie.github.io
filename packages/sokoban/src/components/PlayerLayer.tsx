@@ -8,9 +8,10 @@ interface PlayerLayerProps {
   tileHeightPercent: number;
   status: PetStatus;
   direction: PetDirection;
+  petStage?: number;
 }
 
-function PlayerLayer({ x, y, tileWidthPercent, tileHeightPercent, status, direction }: PlayerLayerProps) {
+function PlayerLayer({ x, y, tileWidthPercent, tileHeightPercent, status, direction, petStage = 1 }: PlayerLayerProps) {
   return (
     <div
       className="absolute z-20"
@@ -24,6 +25,7 @@ function PlayerLayer({ x, y, tileWidthPercent, tileHeightPercent, status, direct
     >
       <div className="w-full h-full flex items-center justify-center">
         <PetSprite
+          stage={petStage}
           status={status}
           direction={direction}
           className="drop-shadow-[0_0_4px_rgba(255,176,0,0.3)]"

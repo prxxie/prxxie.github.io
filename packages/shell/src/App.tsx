@@ -8,6 +8,7 @@ import MatrixMenu from "./components/MatrixMenu";
 import StatsTelemetry from "./components/StatsTelemetry";
 import HomeDashboard from "./components/HomeDashboard";
 import PetWidget from "./components/PetWidget";
+import MfeLoader from "./components/MfeLoader";
 
 const queryClient = new QueryClient();
 
@@ -137,9 +138,7 @@ export default function App(): React.ReactElement {
               <div className="window-body min-h-[350px]">
                 <Suspense
                   fallback={
-                    <div className="font-press text-center pt-10 text-[8px]">
-                      LOADING MFE...
-                    </div>
+                    <MfeLoader petStage={progressService.state.pet.stage} />
                   }
                 >
                   {renderMainContent()}

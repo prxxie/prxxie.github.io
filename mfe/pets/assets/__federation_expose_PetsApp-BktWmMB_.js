@@ -292,7 +292,7 @@ function PetsApp({
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-1 right-2 text-[10px] text-cozy-text font-mono select-none", children: "+" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute bottom-1 left-2 text-[10px] text-cozy-text font-mono select-none", children: "+" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute bottom-1 right-2 text-[10px] text-cozy-text font-mono select-none", children: "+" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { filter: "sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2)" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
             PetSprite,
             {
               size: 120,
@@ -302,7 +302,7 @@ function PetsApp({
               isHungry,
               animationFrame
             }
-          ) }),
+          ),
           isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-2 right-2 text-cozy-text font-press text-[8px] animate-pulse", children: "ZZZ..." })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [

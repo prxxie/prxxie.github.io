@@ -699,6 +699,17 @@ button:focus-visible, [role="button"]:focus-visible, .pixel-btn:focus-visible {
     transform: none !important;
   }
 }
+@keyframes mfe-progress-slide {
+  from {
+    width: 15%;
+    margin-left: 0%;
+  }
+
+  to {
+    width: 40%;
+    margin-left: 60%;
+  }
+}
 @keyframes targetPulse {
   0%, 100% {
     opacity: .4;

@@ -2325,22 +2325,12 @@ const BoxTile = React$3.memo(Box);
 const React$2 = await importShared('react');
 const {useEffect: useEffect$3,useState: useState$2} = React$2;
 
-function getBodyColor(status, isSleeping) {
-  if (isSleeping) return "#779988";
-  if (status === "eating" || status === "playing") return "#CC6666";
-  if (status === "moving") return "#CC9966";
-  return "#A0785A";
-}
-function getEyeOffset(direction) {
-  const baseX = direction === "left" ? -0.5 : direction === "right" ? 0.5 : 0;
-  const baseY = direction === "up" ? -0.5 : direction === "down" ? 0.5 : 0;
-  return { ex: baseX, ey: baseY };
-}
 function PetSprite({
   size = "100%",
+  stage = 1,
   status = "idle",
   isSleeping = false,
-  direction = "down",
+  isHungry = false,
   className = ""
 }) {
   const [animFrame, setAnimFrame] = useState$2(0);
@@ -2351,42 +2341,124 @@ function PetSprite({
     }
     setAnimFrame(0);
   }, [status]);
-  const bodyColor = getBodyColor(status, isSleeping);
-  const { ex, ey } = getEyeOffset(direction);
-  const bounceClass = status === "playing" || status === "moving" ? "animate-bounce" : "";
-  const legOffset = status === "moving" ? animFrame === 0 ? 0 : 1 : 0;
+  const isEating = status === "eating";
+  const isPlaying = status === "playing";
+  const isMoving = status === "moving";
+  const bounceClass = isPlaying || isMoving ? "animate-bounce" : "";
+  const wiggleStyle = isMoving || status === "idle" && animFrame === 1 ? { transform: "rotate(3deg)", transformOrigin: "bottom center" } : {};
+  const renderStageSprite = () => {
+    switch (stage) {
+      case 1:
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "3", width: "6", height: "10", rx: "3", fill: "#eeeecc" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "5", width: "8", height: "7", rx: "2", fill: "#eeeecc" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isEating && animFrame === 0 ? "7" : "6", y: "5", width: "2", height: "2", fill: "#44aa44" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isEating && animFrame === 0 ? "8" : "9", y: "8", width: "2", height: "2", fill: "#44aa44" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "10", width: "2", height: "1", fill: "#44aa44" })
+        ] });
+      case 2: {
+        const leafColor = isHungry ? "#cccc33" : "#33aa33";
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: animFrame === 0 ? "10" : "9", width: "2", height: "2", fill: "#88cc88" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "7", height: "6", rx: "2", fill: "#88cc88" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "9", width: "9", height: "3", fill: "#88cc88" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isMoving && animFrame === 0 ? "4" : "5", y: "13", width: "2", height: "1", fill: "#448844" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isMoving && animFrame === 1 ? "11" : "10", y: "13", width: "2", height: "1", fill: "#448844" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: animFrame === 0 ? "5" : "6", width: "2", height: "2", fill: leafColor }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: animFrame === 0 ? "4" : "5", width: "2", height: "2", fill: leafColor }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "7", width: "1", height: "1", fill: "#448844" }),
+          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "8", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6.5", y: "8.5", width: "1", height: "1", fill: "#ff4444" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "8", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10.5", y: "8.5", width: "1", height: "1", fill: "#ff4444" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "11", width: "2", height: "1", fill: "#448844" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "9", width: "2", height: "1", fill: "#448844" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "9", width: "2", height: "1", fill: "#448844" })
+          ] })
+        ] });
+      }
+      case 3:
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: isEating && animFrame === 0 ? "2" : "3", width: "3", height: "3", rx: "1", fill: "#ff66aa" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "5", width: "5", height: "1", fill: "#338833" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "6", width: "9", height: "7", rx: "2", fill: "#55aaaa" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "8", width: "11", height: "4", fill: "#55aaaa" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isMoving && animFrame === 0 ? "3" : "4", y: "13", width: "2", height: "1", fill: "#227777" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: isMoving && animFrame === 1 ? "12" : "11", y: "13", width: "2", height: "1", fill: "#227777" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "1", y: "9", width: "3", height: "2", fill: "#55aaaa" }),
+          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "8", y: "7", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7.5", width: "1", height: "1", fill: "#ff2222" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7.5", width: "1", height: "1", fill: "#ff2222" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "10", width: "3", height: "1", fill: "#227777" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "8", width: "2", height: "1", fill: "#227777" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "8", width: "2", height: "1", fill: "#227777" })
+          ] })
+        ] });
+      case 4:
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "5", width: "9", height: "1", fill: "#226622" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: animFrame === 0 ? "2" : "3", width: "7", height: "3", fill: "#ff4488" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: animFrame === 0 ? "1" : "2", width: "3", height: "1", fill: "#ffcc00" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "6", width: "11", height: "7", rx: "2", fill: "#2d6a6a" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "13", y: "8", width: "2", height: "2", fill: "#2d6a6a" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "14", y: isPlaying && animFrame === 0 ? "5" : "6", width: "2", height: "2", fill: "#226622" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "13", width: "2", height: "1", fill: "#124a4a" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "13", width: "2", height: "1", fill: "#124a4a" }),
+          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "8", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "8", width: "1", height: "1", fill: "#ff0000" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "8", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "8", width: "1", height: "1", fill: "#ff0000" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "11", width: "3", height: "1", fill: "#124a4a" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "9", width: "2", height: "1", fill: "#124a4a" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "9", width: "2", height: "1", fill: "#124a4a" })
+          ] })
+        ] });
+      case 5: {
+        const floatOffset = animFrame === 0 ? -1 : 1;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { style: { transform: `translateY(${floatOffset}px)` }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "2", y: "11", width: "1", height: "1", fill: "#ffff99", opacity: animFrame === 0 ? 0.3 : 0.8 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "14", y: "4", width: "1", height: "1", fill: "#ffff99", opacity: animFrame === 0 ? 0.8 : 0.3 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "13", y: "11", width: "1", height: "1", fill: "#ffff99", opacity: animFrame === 0 ? 0.4 : 0.9 }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: animFrame === 0 ? "M 3,6 L 0,2 L 1,7 Z" : "M 3,6 L 0,4 L 1,8 Z", fill: "#33aa33" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: animFrame === 0 ? "M 13,6 L 16,2 L 15,7 Z" : "M 13,6 L 16,4 L 15,8 Z", fill: "#33aa33" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "0", width: "5", height: "2", fill: "#ffff33" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "9", height: "1", fill: "#226622" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "2", width: "7", height: "2", fill: "#ff0066" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "1", width: "3", height: "1", fill: "#ffff33" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "5", width: "11", height: "7", rx: "2", fill: "#2d6a6a" }),
+          !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "1", height: "1", fill: "#ff0000" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "7", width: "2", height: "2", fill: "#ffffff" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "7", width: "1", height: "1", fill: "#ff0000" })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "8", width: "2", height: "1", fill: "#124a4a" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "8", width: "2", height: "1", fill: "#124a4a" })
+          ] })
+        ] });
+      }
+      default:
+        return null;
+    }
+  };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(
     "svg",
     {
       viewBox: "0 0 16 16",
       className: `${bounceClass} ${className}`,
-      style: { width: size, height: size },
+      style: { width: size, height: size, ...wiggleStyle },
       children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "3", width: "10", height: "10", rx: "2", ry: "2", fill: bodyColor }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "8", height: "8", fill: bodyColor }),
-        status === "moving" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: 11 + legOffset, width: "2", height: "2", fill: "var(--color-cozy-border)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: 11 + (1 - legOffset), width: "2", height: "2", fill: "var(--color-cozy-border)" })
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "11", width: "8", height: "2", fill: "var(--color-cozy-border)" }),
-        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "13", y: animFrame === 0 ? "4" : "6", width: "2", height: "2", fill: bodyColor }),
-        isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "1", width: "2", height: "2", fill: "var(--color-cozy-border)", opacity: "0.6" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "12", y: "3", width: "2", height: "1", fill: "var(--color-cozy-border)", opacity: "0.4" })
-        ] }),
-        !isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 5 + ex, y: 6 + ey, width: "2", height: "2", fill: "#FFFFFF", rx: "0.5" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 5.5 + ex, y: 6.5 + ey, width: "1", height: "1", fill: "#000000" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 9 + ex, y: 6 + ey, width: "2", height: "2", fill: "#FFFFFF", rx: "0.5" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: 9.5 + ex, y: 6.5 + ey, width: "1", height: "1", fill: "#000000" })
-        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "7", width: "3", height: "1", fill: "var(--color-cozy-border)" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "7", width: "3", height: "1", fill: "var(--color-cozy-border)" })
-        ] }),
-        !isSleeping && status !== "eating" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "9", width: "4", height: "1", fill: "var(--color-cozy-border)" }),
-        !isSleeping && status === "eating" && /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "9", width: "2", height: "2", fill: "var(--color-cozy-border)" }),
-        status === "playing" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "8", width: "1.5", height: "1", fill: "#FF8888", opacity: "0.5", rx: "0.5" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11.5", y: "8", width: "1.5", height: "1", fill: "#FF8888", opacity: "0.5", rx: "0.5" })
+        renderStageSprite(),
+        isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { className: "animate-pulse", style: { fill: "var(--color-cozy-border)", opacity: 0.8 }, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: "11", y: "4", style: { fontSize: "4px", fontFamily: "monospace" }, children: "Z" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: "13", y: "2", style: { fontSize: "3px", fontFamily: "monospace" }, children: "z" })
         ] })
       ]
     }
@@ -2395,7 +2467,7 @@ function PetSprite({
 const PetSprite$1 = React$2.memo(PetSprite);
 
 const React$1 = await importShared('react');
-function PlayerLayer({ x, y, tileWidthPercent, tileHeightPercent, status, direction }) {
+function PlayerLayer({ x, y, tileWidthPercent, tileHeightPercent, status, direction, petStage = 1 }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(
     "div",
     {
@@ -2410,6 +2482,7 @@ function PlayerLayer({ x, y, tileWidthPercent, tileHeightPercent, status, direct
       children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         PetSprite$1,
         {
+          stage: petStage,
           status,
           direction,
           className: "drop-shadow-[0_0_4px_rgba(255,176,0,0.3)]"
@@ -2420,7 +2493,7 @@ function PlayerLayer({ x, y, tileWidthPercent, tileHeightPercent, status, direct
 }
 const PlayerLayer$1 = React$1.memo(PlayerLayer);
 
-function Board() {
+function Board({ petStage = 1 }) {
   const { board, player, boxes, deadlockedBoxIds, lastDirection, isMoving } = useSokobanStore(
     (s) => ({
       board: s.board,
@@ -2469,7 +2542,8 @@ function Board() {
             tileWidthPercent: tw,
             tileHeightPercent: th,
             status: isMoving ? "moving" : "idle",
-            direction: lastDirection
+            direction: lastDirection,
+            petStage
           }
         )
       ]
@@ -2696,6 +2770,7 @@ const progressService = new ProgressService(new LocalProgressRepository());
 function SokobanApp() {
   const [view, setView] = useState("menu");
   const [bestStars, setBestStars] = useState({});
+  const [petStage, setPetStage] = useState(1);
   const loadLevel = useSokobanStore((state) => state.loadLevel);
   const currentLevelIdx = useSokobanStore((state) => state.currentLevelIdx);
   const refreshProgress = useCallback(async () => {
@@ -2707,6 +2782,7 @@ function SokobanApp() {
       }
     }
     setBestStars(map);
+    setPetStage(state.pet.stage);
   }, []);
   useEffect(() => {
     void refreshProgress();
@@ -2729,7 +2805,7 @@ function SokobanApp() {
     }
   ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 items-center w-full relative", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(HUD, { onBack: () => setView("menu") }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Board, {}),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Board, { petStage }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Controls, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsx(WinModal, { onBack: () => setView("menu") })
   ] }) });

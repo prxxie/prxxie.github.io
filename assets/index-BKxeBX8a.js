@@ -148,33 +148,6 @@ const remotesMap = {
                     return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
                 }
 
-const PixelFolderIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M1 3h4l2 2h8v8H1V3z" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "1", y1: "5", x2: "15", y2: "5" })
-] });
-const PixelBookIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M1 2h6v11H1V2z M9 2h6v11H9V2z" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "5", x2: "5", y2: "5" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "8", x2: "5", y2: "8" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "5", x2: "13", y2: "5" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "8", x2: "13", y2: "8" })
-] });
-const PixelPawIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "7", width: "2", height: "3" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "9", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "9", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "4", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "4", width: "2", height: "2" })
-] });
-
-const {create} = await importShared('zustand');
-
-const useUiStore = create()((set) => ({
-  isMenuOpen: false,
-  setMenuOpen: (isOpen) => set({ isMenuOpen: isOpen }),
-  toggleMenu: () => set((state) => ({ isMenuOpen: !state.isMenuOpen }))
-}));
-
 let audioCtx = null;
 let isAudioMuted = true;
 const STORAGE_KEY$1 = "prxxie_audio_muted";
@@ -225,69 +198,11 @@ function playBeepSound(frequency = 440, duration = 0.08) {
   }
 }
 
-const GRID_ITEMS = [
-  { tab: "home", key: "HM" },
-  { tab: "about", key: "AB" },
-  { tab: "posts", key: "PO" },
-  { tab: "pets", key: "PE" },
-  { tab: "shikaku", key: "SH" },
-  { tab: "sokoban", key: "SO" }
-];
-function MatrixMenu({
-  currentTab,
-  navigate
-}) {
-  const handleButtonClick = (tabName) => {
-    playBeepSound(440, 0.06);
-    navigate(tabName);
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-cozy-border p-2 bg-black", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[10px] font-press text-cozy-accent mb-2 text-center bg-cozy-muted/20 py-1", children: "COMMAND_MATRIX" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-2", children: GRID_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      "button",
-      {
-        onClick: () => handleButtonClick(item.tab),
-        className: `pixel-btn text-[9px] py-2 px-1 text-center font-press capitalize ${currentTab === item.tab ? "bg-cozy-accent text-black border-cozy-border" : "bg-transparent text-cozy-text hover:bg-cozy-muted/20"}`,
-        children: [
-          "[",
-          item.key,
-          "] ",
-          item.tab
-        ]
-      },
-      item.tab
-    )) })
-  ] });
-}
-
-const {useEffect: useEffect$6,useState: useState$5} = await importShared('react');
+const {useState: useState$6} = await importShared('react');
 function ConsoleFrame({
-  children,
-  currentTab,
-  setTab
+  children
 }) {
-  const isMenuOpen = useUiStore((state) => state.isMenuOpen);
-  const setMenuOpen = useUiStore((state) => state.setMenuOpen);
-  const toggleMenu = useUiStore((state) => state.toggleMenu);
-  const [muted, setMuted] = useState$5(getAudioMuted);
-  useEffect$6(() => {
-    if (isMenuOpen) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-    return () => {
-      document.body.classList.remove("overflow-hidden");
-    };
-  }, [isMenuOpen]);
-  useEffect$6(() => {
-    if (!isMenuOpen) return;
-    const handleKeyDown = (e) => {
-      if (e.key === "Escape") setMenuOpen(false);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isMenuOpen, setMenuOpen]);
+  const [muted, setMuted] = useState$6(getAudioMuted);
   const handleAudioToggle = () => {
     const nextMuted = !muted;
     setAudioMuted(nextMuted);
@@ -295,10 +210,6 @@ function ConsoleFrame({
     if (!nextMuted) {
       playBeepSound(520, 0.08);
     }
-  };
-  const handleNavigate = (tab) => {
-    setTab(tab);
-    setMenuOpen(false);
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full min-h-screen flex flex-col bg-cozy-bg box-border", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "bg-black border-b border-cozy-border p-3 box-border w-full relative z-30", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border", children: [
@@ -322,74 +233,37 @@ function ConsoleFrame({
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-xs font-bold text-cozy-accent uppercase", children: "PRXXIE_OS v4.7" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "button",
-          {
-            onClick: handleAudioToggle,
-            className: `pixel-btn text-[9px] px-3 py-1 ${!muted ? "bg-cozy-accent text-black border-cozy-border" : ""}`,
-            "aria-label": "Toggle Audio Beeps",
-            children: [
-              "SOUND: ",
-              !muted ? "ON" : "OFF"
-            ]
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: () => {
-              playBeepSound(440, 0.05);
-              toggleMenu();
-            },
-            className: "md:hidden pixel-btn text-[9px] px-3 py-1",
-            "aria-expanded": isMenuOpen,
-            "aria-controls": "mobile-menu-drawer",
-            "aria-label": "Toggle navigation menu",
-            children: "[MENU]"
-          }
-        )
-      ] })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "button",
+        {
+          onClick: handleAudioToggle,
+          className: `pixel-btn text-[9px] px-3 py-1 ${!muted ? "bg-cozy-accent text-black border-cozy-border" : ""}`,
+          "aria-label": "Toggle Audio Beeps",
+          children: [
+            "SOUND: ",
+            !muted ? "ON" : "OFF"
+          ]
+        }
+      ) })
     ] }) }),
-    isMenuOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "div",
-      {
-        className: "fixed inset-0 bg-black/45 z-40 md:hidden animate-[fade-in_0.2s_ease-out]",
-        onClick: () => setMenuOpen(false),
-        "aria-hidden": "true"
-      }
-    ),
-    isMenuOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      "div",
-      {
-        id: "mobile-menu-drawer",
-        role: "dialog",
-        "aria-modal": "true",
-        "aria-label": "Navigation menu",
-        className: "fixed top-0 right-0 bottom-0 w-64 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 animate-[slideIn_0.2s_ease-out] md:hidden",
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b border-dashed border-cozy-border pb-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[10px] text-cozy-accent flex items-center gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-3.5 h-3.5" }),
-              " MOBILE_CTRL"
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                onClick: () => setMenuOpen(false),
-                className: "text-cozy-accent font-bold cursor-pointer font-press text-[10px] bg-transparent border-none",
-                "aria-label": "Close navigation menu",
-                children: "[X]"
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(MatrixMenu, { currentTab, navigate: handleNavigate })
-        ]
-      }
-    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: "w-full max-w-5xl mx-auto flex-1 px-4 py-6 box-border", children })
   ] });
 }
+
+const PixelBookIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "none", stroke: "currentColor", strokeWidth: "1.5", strokeLinecap: "square", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M1 2h6v11H1V2z M9 2h6v11H9V2z" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "5", x2: "5", y2: "5" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "3", y1: "8", x2: "5", y2: "8" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "5", x2: "13", y2: "5" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "11", y1: "8", x2: "13", y2: "8" })
+] });
+const PixelPawIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "7", width: "2", height: "3" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "9", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "9", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "5", y: "4", width: "2", height: "2" }),
+  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "4", width: "2", height: "2" })
+] });
 
 const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
 function getEvolutionStage(xp) {
@@ -610,7 +484,7 @@ class ProgressService {
   }
 }
 
-const {useState: useState$4,useEffect: useEffect$5,useCallback: useCallback$2} = await importShared('react');
+const {useState: useState$5,useEffect: useEffect$6,useCallback: useCallback$2} = await importShared('react');
 const progressService = new ProgressService(new LocalProgressRepository());
 const EMPTY_STATE = {
   completedLevels: [],
@@ -618,11 +492,11 @@ const EMPTY_STATE = {
   pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false }
 };
 function useProgressService() {
-  const [state, setState] = useState$4(EMPTY_STATE);
-  const [isHungry, setIsHungry] = useState$4(false);
-  const [foodAvailable, setFoodAvailable] = useState$4(0);
-  const [hungryLevel, setHungryLevel] = useState$4(0);
-  const [happiness, setHappiness] = useState$4(50);
+  const [state, setState] = useState$5(EMPTY_STATE);
+  const [isHungry, setIsHungry] = useState$5(false);
+  const [foodAvailable, setFoodAvailable] = useState$5(0);
+  const [hungryLevel, setHungryLevel] = useState$5(0);
+  const [happiness, setHappiness] = useState$5(50);
   const refresh = useCallback$2(async () => {
     const [s, hungry, food, level, happy] = await Promise.all([
       progressService.getState(),
@@ -637,7 +511,7 @@ function useProgressService() {
     setHungryLevel(level);
     setHappiness(happy);
   }, []);
-  useEffect$5(() => {
+  useEffect$6(() => {
     void refresh();
     const handler = () => {
       void refresh();
@@ -667,7 +541,7 @@ function useProgressService() {
   };
 }
 
-const {useState: useState$3,useEffect: useEffect$4,useCallback: useCallback$1} = await importShared('react');
+const {useState: useState$4,useEffect: useEffect$5,useCallback: useCallback$1} = await importShared('react');
 
 const VALID_TABS = ["home", "about", "posts", "pets", "shikaku", "sokoban"];
 function getTabFromHash() {
@@ -679,8 +553,8 @@ function getTabFromHash() {
   return "home";
 }
 function useHashRouter() {
-  const [currentTab, setCurrentTab] = useState$3(getTabFromHash);
-  useEffect$4(() => {
+  const [currentTab, setCurrentTab] = useState$4(getTabFromHash);
+  useEffect$5(() => {
     const handleHashChange = () => {
       setCurrentTab(getTabFromHash());
     };
@@ -694,16 +568,51 @@ function useHashRouter() {
   return { currentTab, navigate };
 }
 
-const {useEffect: useEffect$3,useState: useState$2} = await importShared('react');
+const GRID_ITEMS = [
+  { tab: "home", key: "HM" },
+  { tab: "about", key: "AB" },
+  { tab: "posts", key: "PO" },
+  { tab: "pets", key: "PE" },
+  { tab: "shikaku", key: "SH" },
+  { tab: "sokoban", key: "SO" }
+];
+function MatrixMenu({
+  currentTab,
+  navigate
+}) {
+  const handleButtonClick = (tabName) => {
+    playBeepSound(440, 0.06);
+    navigate(tabName);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-cozy-border p-2 bg-black", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[10px] font-press text-cozy-accent mb-2 text-center bg-cozy-muted/20 py-1", children: "COMMAND_MATRIX" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-2", children: GRID_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      "button",
+      {
+        onClick: () => handleButtonClick(item.tab),
+        className: `pixel-btn text-[9px] py-2 px-1 text-center font-press capitalize ${currentTab === item.tab ? "bg-cozy-accent text-black border-cozy-border" : "bg-transparent text-cozy-text hover:bg-cozy-muted/20"}`,
+        children: [
+          "[",
+          item.key,
+          "] ",
+          item.tab
+        ]
+      },
+      item.tab
+    )) })
+  ] });
+}
+
+const {useEffect: useEffect$4,useState: useState$3} = await importShared('react');
 
 const STATIC_POSTS = [
   { date: "2026-05-30", title: "Monochrome Amber CRT theme conversion completed" },
   { date: "2026-05-29", title: "Building Sokoban micro-frontend puzzle game" }
 ];
 function StatsTelemetry() {
-  const [shikakuSolved, setShikakuSolved] = useState$2(0);
-  const [sokobanLevel, setSokobanLevel] = useState$2(0);
-  useEffect$3(() => {
+  const [shikakuSolved, setShikakuSolved] = useState$3(0);
+  const [sokobanLevel, setSokobanLevel] = useState$3(0);
+  useEffect$4(() => {
     try {
       const savedShikaku = localStorage.getItem("cozy_os_shikaku_save");
       if (savedShikaku) {
@@ -761,13 +670,13 @@ function StatsTelemetry() {
   ] });
 }
 
-const {useEffect: useEffect$2,useRef: useRef$2} = await importShared('react');
+const {useEffect: useEffect$3,useRef: useRef$2} = await importShared('react');
 
 function HomeDashboard() {
   const planetCanvasRef = useRef$2(null);
   const waterfallRef = useRef$2(null);
   const oscilloscopeRef = useRef$2(null);
-  useEffect$2(() => {
+  useEffect$3(() => {
     const canvas = planetCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -818,7 +727,7 @@ function HomeDashboard() {
     draw();
     return () => cancelAnimationFrame(animId);
   }, []);
-  useEffect$2(() => {
+  useEffect$3(() => {
     const osc = oscilloscopeRef.current;
     const wf = waterfallRef.current;
     if (!osc || !wf) return;
@@ -1097,12 +1006,12 @@ function PetSprite({
   );
 }
 
-const {useState: useState$1,useCallback,useEffect: useEffect$1,useRef: useRef$1} = await importShared('react');
+const {useState: useState$2,useCallback,useEffect: useEffect$2,useRef: useRef$1} = await importShared('react');
 function PetWidget() {
   const { state, isHungry, foodAvailable, feedPet, isSleeping } = useProgressService();
-  const [spriteStatus, setSpriteStatus] = useState$1("idle");
+  const [spriteStatus, setSpriteStatus] = useState$2("idle");
   const resetTimerRef = useRef$1(null);
-  useEffect$1(() => {
+  useEffect$2(() => {
     return () => {
       if (resetTimerRef.current !== null) {
         clearTimeout(resetTimerRef.current);
@@ -1175,6 +1084,106 @@ function PetWidget() {
         children: isSleeping ? "AWAKE TO FEED" : canFeed ? "FEED PET" : isHungry ? "NO FOOD" : "NOT HUNGRY"
       }
     )
+  ] });
+}
+
+const {useEffect: useEffect$1,useState: useState$1} = await importShared('react');
+const MESSAGES = [
+  "LOADING...",
+  "PET IS WARMING UP...",
+  "FETCHING MODULES...",
+  "ALMOST THERE...",
+  "BOOTING SYSTEM...",
+  "PET IS EXCITED!"
+];
+function MfeLoader({ petStage = 1 }) {
+  const [msgIdx, setMsgIdx] = useState$1(0);
+  const [dots, setDots] = useState$1("");
+  const [frame, setFrame] = useState$1(0);
+  useEffect$1(() => {
+    const t = setInterval(() => {
+      setMsgIdx((i) => (i + 1) % MESSAGES.length);
+    }, 1200);
+    return () => clearInterval(t);
+  }, []);
+  useEffect$1(() => {
+    const t = setInterval(() => {
+      setDots((d) => d.length >= 3 ? "" : d + ".");
+    }, 400);
+    return () => clearInterval(t);
+  }, []);
+  useEffect$1(() => {
+    const t = setInterval(() => {
+      setFrame((f) => (f + 1) % 2);
+    }, 500);
+    return () => clearInterval(t);
+  }, []);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center min-h-[350px] gap-6 select-none", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-center justify-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
+        {
+          className: "absolute rounded-full animate-ping",
+          style: {
+            width: 80,
+            height: 80,
+            background: "radial-gradient(circle, rgba(255,176,0,0.15) 0%, transparent 70%)",
+            animationDuration: "1.5s"
+          }
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
+        {
+          className: "absolute bottom-0 left-1/2 -translate-x-1/2 rounded-full animate-pulse",
+          style: {
+            width: 40,
+            height: 6,
+            background: "rgba(255,176,0,0.2)",
+            filter: "blur(4px)",
+            bottom: -8
+          }
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-bounce", style: { animationDuration: "0.8s" }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PetSprite,
+        {
+          size: 72,
+          stage: petStage,
+          status: "playing",
+          animationFrame: frame
+        }
+      ) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "span",
+        {
+          className: "font-press text-[9px] text-cozy-accent",
+          style: { minWidth: "16ch", textAlign: "center", letterSpacing: "0.05em" },
+          children: [
+            MESSAGES[msgIdx].replace(/\.\.\.$/, ""),
+            dots
+          ]
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
+        {
+          className: "border border-cozy-border bg-black overflow-hidden",
+          style: { width: 120, height: 6 },
+          children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "h-full bg-cozy-accent",
+              style: {
+                animation: "mfe-progress-slide 1.2s ease-in-out infinite alternate"
+              }
+            }
+          )
+        }
+      )
+    ] })
   ] });
 }
 
@@ -1292,7 +1301,7 @@ function App() {
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
               Suspense,
               {
-                fallback: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-center pt-10 text-[8px]", children: "LOADING MFE..." }),
+                fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }),
                 children: renderMainContent()
               }
             ) })

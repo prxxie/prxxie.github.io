@@ -34,16 +34,28 @@ describe("StatsTelemetry", () => {
     expect(screen.getByText(/SOLVED: 2 PUZZLE/)).toBeInTheDocument();
   });
 
-  it("loads Sokoban level from localStorage", () => {
-    localStorage.setItem("cozy_os_sokoban_level", "5");
+  it("loads Sokoban progress from cozyos.progress.v1", () => {
+    const mockProgress = {
+      version: 1,
+      state: {
+        completedLevels: [
+          { module: "sokoban", levelId: "0", stars: 3, completedAt: 1 },
+          { module: "sokoban", levelId: "4", stars: 2, completedAt: 2 },
+          { module: "sokoban", levelId: "9", stars: 1, completedAt: 3 },
+          { module: "shikaku", levelId: "0", stars: 2, completedAt: 4 },
+        ],
+      },
+    };
+    localStorage.setItem("cozyos.progress.v1", JSON.stringify(mockProgress));
 
     render(<StatsTelemetry />);
-    expect(screen.getByText(/LEVEL REACHED: 6/)).toBeInTheDocument();
+    expect(screen.getByText(/SOLVED: 3/)).toBeInTheDocument();
+    expect(screen.getByText(/BEST LEVEL: 10/)).toBeInTheDocument();
   });
 
   it("falls back to zero counts when localStorage is empty", () => {
     render(<StatsTelemetry />);
     expect(screen.getByText(/SOLVED: 0 PUZZLE/)).toBeInTheDocument();
-    expect(screen.getByText(/LEVEL REACHED: 1/)).toBeInTheDocument();
+    expect(screen.getByText(/SOLVED: 0 \| BEST LEVEL: 0/)).toBeInTheDocument();
   });
 });

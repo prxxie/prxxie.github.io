@@ -41,7 +41,7 @@ describe("LocalProgressRepository", () => {
   describe("saveState / getState round-trip", () => {
     it("persists and restores state", async () => {
       const saved = {
-        completedLevels: [{ module: "shikaku", levelId: "easy-1", completedAt: 1000 }],
+        completedLevels: [{ module: "shikaku", levelId: "easy-1", completedAt: 1000, stars: 1 }],
         foodConsumed: 1,
         pet: { xp: 1, stage: 1, lastFedAt: 9000 },
       };

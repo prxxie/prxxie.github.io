@@ -13,7 +13,14 @@ function initialState(): ProgressState {
   return {
     completedLevels: [],
     foodConsumed: 0,
-    pet: { xp: 0, stage: 1, lastFedAt: 0 },
+    pet: {
+      xp: 0,
+      stage: 1,
+      lastFedAt: 0,
+      happiness: 50,
+      lastPlayedAt: 0,
+      isSleeping: false,
+    },
   };
 }
 
@@ -25,7 +32,14 @@ export class LocalProgressRepository implements ProgressRepository {
       if (!raw) return initialState();
       const data = JSON.parse(raw) as StoredData;
       if (data.version !== 1) return initialState();
-      return data.state;
+      
+      // Fill defaults for backward compatibility
+      const state = data.state;
+      if (state.pet.happiness === undefined) state.pet.happiness = 50;
+      if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = 0;
+      if (state.pet.isSleeping === undefined) state.pet.isSleeping = false;
+      
+      return state;
     } catch {
       return initialState();
     }
@@ -79,9 +93,34 @@ export class LocalProgressRepository implements ProgressRepository {
       ...state,
       foodConsumed: state.foodConsumed + 1,
       pet: {
+        ...state.pet,
         xp: newXp,
         stage: getEvolutionStage(newXp),
         lastFedAt: Date.now(),
+        isSleeping: false, // Auto-wakes up when fed
+      },
+    });
+  }
+
+  async playWithPet(happiness: number): Promise<void> {
+    const state = await this.getState();
+    await this.saveState({
+      ...state,
+      pet: {
+        ...state.pet,
+        happiness,
+        lastPlayedAt: Date.now(),
+      },
+    });
+  }
+
+  async toggleSleep(): Promise<void> {
+    const state = await this.getState();
+    await this.saveState({
+      ...state,
+      pet: {
+        ...state.pet,
+        isSleeping: !state.pet.isSleeping,
       },
     });
   }

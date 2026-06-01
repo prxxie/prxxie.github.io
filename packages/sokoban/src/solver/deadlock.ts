@@ -53,36 +53,9 @@ export function isFreezeDeadlock(
   walls: boolean[][],
   targets: Position[]
 ): boolean {
-  const { x, y } = box;
-
-  // If box is on a target, it's not a deadlock
-  if (targets.some((t) => t.x === x && t.y === y)) {
-    return false;
-  }
-
-  const height = walls.length;
-  const width = walls[0]?.length || 0;
-
-  if (y < 0 || y >= height || x < 0 || x >= width) return false;
-
-  // Check if box is against a wall
-  const againstTopWall = y === 0 || walls[y - 1]?.[x];
-  const againstBottomWall = y === height - 1 || walls[y + 1]?.[x];
-  const againstLeftWall = x === 0 || walls[y]?.[x - 1];
-  const againstRightWall = x === width - 1 || walls[y]?.[x + 1];
-
-  // If against horizontal wall, check if any target exists on same row
-  if (againstTopWall || againstBottomWall) {
-    const hasTargetOnRow = targets.some((t) => t.y === y);
-    if (!hasTargetOnRow) return true;
-  }
-
-  // If against vertical wall, check if any target exists on same column
-  if (againstLeftWall || againstRightWall) {
-    const hasTargetOnCol = targets.some((t) => t.x === x);
-    if (!hasTargetOnCol) return true;
-  }
-
+  void box;
+  void walls;
+  void targets;
   return false;
 }
 

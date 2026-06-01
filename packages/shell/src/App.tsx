@@ -7,6 +7,7 @@ import { useHashRouter } from "./hooks/useHashRouter";
 import MatrixMenu from "./components/MatrixMenu";
 import StatsTelemetry from "./components/StatsTelemetry";
 import HomeDashboard from "./components/HomeDashboard";
+import PetWidget from "./components/PetWidget";
 
 const queryClient = new QueryClient();
 
@@ -56,7 +57,6 @@ function Fallback({ name }: { name: string }): React.ReactElement {
 
 export default function App(): React.ReactElement {
   const { currentTab, navigate } = useHashRouter();
-  const tick = usePetStore((state) => state.tick);
   const windowRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPetHudOpen, setIsPetHudOpen] = useState(false);
@@ -84,13 +84,6 @@ export default function App(): React.ReactElement {
       });
     }
   };
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      tick();
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [tick]);
 
   const renderMainContent = (): React.ReactNode => {
     switch (currentTab) {
@@ -168,15 +161,7 @@ export default function App(): React.ReactElement {
                     </span>
                   </div>
                   <div className="window-body min-h-[160px] p-2">
-                    <Suspense
-                      fallback={
-                        <div className="font-press text-center pt-4 text-[8px]">
-                          LOADING PET...
-                        </div>
-                      }
-                    >
-                      <PetsApp usePetStore={usePetStore} />
-                    </Suspense>
+                    <PetWidget />
                   </div>
                 </div>
 
@@ -227,15 +212,7 @@ export default function App(): React.ReactElement {
 
             <div className="flex-1 overflow-y-auto flex flex-col gap-4">
               <div className="border border-cozy-border p-2">
-                <Suspense
-                  fallback={
-                    <div className="font-press text-center pt-4 text-[8px]">
-                      LOADING PET...
-                    </div>
-                  }
-                >
-                  <PetsApp usePetStore={usePetStore} />
-                </Suspense>
+                <PetWidget />
               </div>
 
               <StatsTelemetry />

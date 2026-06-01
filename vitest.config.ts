@@ -28,6 +28,10 @@ export default defineConfig({
         __dirname,
         "./packages/shell/src/components/MockMfe.tsx"
       ),
+      "shared": path.resolve(
+        __dirname,
+        "./packages/shared/src/index.ts"
+      ),
     },
   },
 });

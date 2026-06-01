@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { PixelChickenIcon, PixelBearIcon, PixelMoonIcon, PixelSunIcon } from "./Icons";
 import PetSprite from "../../shell/src/components/PetSprite";
 import type { PetStatus } from "../../shell/src/types";
+import { EVOLUTION_THRESHOLDS } from "../../shared/src/pet/evolution";
 
 // --- Type matching useProgressService return shape ---
 interface ProgressState {
@@ -61,9 +62,10 @@ const getStageLore = (stage: number): string => {
 };
 
 const getXpToNextStage = (stage: number): number => {
-  // XP thresholds from evolution.ts: stages at 5, 15, 30, 50, 80
-  const thresholds = [0, 5, 15, 30, 50, 80];
-  return thresholds[stage] ?? 80;
+  // EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100]
+  // threshold[stage] is the XP required to reach `stage` (1-indexed)
+  // so the XP needed to reach the NEXT stage is threshold[stage]
+  return EVOLUTION_THRESHOLDS[stage] ?? EVOLUTION_THRESHOLDS[EVOLUTION_THRESHOLDS.length - 1];
 };
 
 export default function PetsApp({
@@ -113,7 +115,9 @@ export default function PetsApp({
   const hungerPct = Math.max(0, 100 - Math.round((hungryLevel / 6) * 100));
 
   // XP progress within current stage
-  const currentStageXpFloor = [0, 0, 5, 15, 30, 50][petState.stage] ?? 0;
+  // EVOLUTION_THRESHOLDS[stage-1] = XP floor for current stage
+  // EVOLUTION_THRESHOLDS[stage]   = XP needed for next stage
+  const currentStageXpFloor = EVOLUTION_THRESHOLDS[petState.stage - 1] ?? 0;
   const nextStageXp = getXpToNextStage(petState.stage);
   const xpRange = nextStageXp - currentStageXpFloor;
   const xpProgress = xpRange > 0

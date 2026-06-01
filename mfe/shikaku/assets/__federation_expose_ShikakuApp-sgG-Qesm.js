@@ -23,6 +23,114 @@ function q(c,a,g){var b,d={},e=null,h=null;void 0!==g&&(e=""+g);void 0!==a.key&&
 
 var jsxRuntimeExports = jsxRuntime.exports;
 
+const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
+function getEvolutionStage(xp) {
+  let stage = 1;
+  for (let i = 1; i < EVOLUTION_THRESHOLDS.length; i++) {
+    if (xp >= EVOLUTION_THRESHOLDS[i]) stage = i + 1;
+  }
+  return stage;
+}
+
+const STORAGE_KEY = "cozyos.progress.v1";
+function initialState() {
+  return {
+    completedLevels: [],
+    foodConsumed: 0,
+    pet: { xp: 0, stage: 1, lastFedAt: 0 }
+  };
+}
+class LocalProgressRepository {
+  async getState() {
+    await Promise.resolve();
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return initialState();
+      const data = JSON.parse(raw);
+      if (data.version !== 1) return initialState();
+      return data.state;
+    } catch {
+      return initialState();
+    }
+  }
+  async saveState(state) {
+    await Promise.resolve();
+    const data = { version: 1, state };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (err) {
+      throw new Error(`Failed to save progress: ${String(err)}`);
+    }
+  }
+  async completeLevel(module, levelId) {
+    const state = await this.getState();
+    const alreadyDone = state.completedLevels.some(
+      (l) => l.module === module && l.levelId === levelId
+    );
+    if (alreadyDone) return false;
+    await this.saveState({
+      ...state,
+      completedLevels: [
+        ...state.completedLevels,
+        { module, levelId, completedAt: Date.now() }
+      ]
+    });
+    return true;
+  }
+  async feedPet() {
+    const state = await this.getState();
+    const newXp = state.pet.xp + 1;
+    await this.saveState({
+      ...state,
+      foodConsumed: state.foodConsumed + 1,
+      pet: {
+        xp: newXp,
+        stage: getEvolutionStage(newXp),
+        lastFedAt: Date.now()
+      }
+    });
+  }
+}
+
+const HUNGER_COOLDOWN = 4 * 60 * 60 * 1e3;
+class ProgressService {
+  constructor(repo) {
+    this.repo = repo;
+  }
+  async getState() {
+    return this.repo.getState();
+  }
+  async completeLevel(module, levelId) {
+    const result = await this.repo.completeLevel(module, levelId);
+    if (result && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+    return result;
+  }
+  async feedPet() {
+    const state = await this.repo.getState();
+    const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+    const foodAvailable = Math.max(0, state.completedLevels.length - state.foodConsumed);
+    if (!isHungry || foodAvailable <= 0) return;
+    await this.repo.feedPet();
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+  async getFoodAvailable() {
+    const state = await this.repo.getState();
+    return Math.max(0, state.completedLevels.length - state.foodConsumed);
+  }
+  async isPetHungry() {
+    const state = await this.repo.getState();
+    return Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+  }
+  async getPetStage() {
+    const state = await this.repo.getState();
+    return state.pet.stage;
+  }
+}
+
 function validateRegion(region, puzzle, existingRegions) {
   if (region.width <= 0 || region.height <= 0 || region.x < 0 || region.y < 0 || region.x + region.width > puzzle.width || region.y + region.height > puzzle.height) {
     return { valid: false, reason: "OUT_OF_BOUNDS" };
@@ -10924,22 +11032,33 @@ function LevelSelect({
 }
 
 const {useState,useEffect} = await importShared('react');
+const progressService = new ProgressService(new LocalProgressRepository());
 function ShikakuApp() {
   const [selectedIdx, setSelectedIdx] = useState(null);
+  const [rewardMsg, setRewardMsg] = useState(null);
   const isWon = useShikakuStore((state) => state.isWon);
+  const puzzle = useShikakuStore((state) => state.puzzle);
   const loadLevel = useShikakuStore((state) => state.loadLevel);
   useEffect(() => {
     if (isWon) {
       synth.playWin();
     }
   }, [isWon]);
+  useEffect(() => {
+    if (!isWon || !puzzle || selectedIdx === null) return;
+    void progressService.completeLevel("shikaku", puzzle.id).then((firstTime) => {
+      setRewardMsg(firstTime ? "+1 FOOD" : "ALREADY COMPLETE");
+    });
+  }, [isWon, puzzle, selectedIdx]);
   const handleSelectLevel = (idx) => {
     setSelectedIdx(idx);
+    setRewardMsg(null);
     loadLevel(SHIKAKU_LEVELS, idx);
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full max-w-[450px] border border-cozy-border bg-black p-6 select-none text-cozy-text", children: selectedIdx === null ? /* @__PURE__ */ jsxRuntimeExports.jsx(LevelSelect, { onSelect: handleSelectLevel }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-6 items-center", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(HUD, { onBack: () => setSelectedIdx(null) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Board, {})
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Board, {}),
+    isWon && rewardMsg && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-[9px] border border-cozy-border px-3 py-1 text-cozy-text", children: rewardMsg })
   ] }) });
 }
 

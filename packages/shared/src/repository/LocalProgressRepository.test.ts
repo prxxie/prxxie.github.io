@@ -78,6 +78,44 @@ describe("LocalProgressRepository", () => {
     });
   });
 
+  describe("completeLevelWithStars", () => {
+    it("returns true and saves with stars on first completion", async () => {
+      const result = await repo.completeLevelWithStars("sokoban", "hack-01", 3);
+      expect(result).toBe(true);
+      const state = await repo.getState();
+      expect(state.completedLevels).toHaveLength(1);
+      expect(state.completedLevels[0].stars).toBe(3);
+      expect(state.completedLevels[0].module).toBe("sokoban");
+      expect(state.completedLevels[0].levelId).toBe("hack-01");
+    });
+
+    it("returns false and keeps higher stars when new stars are lower", async () => {
+      await repo.completeLevelWithStars("sokoban", "hack-01", 3);
+      const result = await repo.completeLevelWithStars("sokoban", "hack-01", 1);
+      expect(result).toBe(false);
+      const state = await repo.getState();
+      expect(state.completedLevels).toHaveLength(1);
+      expect(state.completedLevels[0].stars).toBe(3);
+    });
+
+    it("returns true and updates stars when new stars are higher", async () => {
+      await repo.completeLevelWithStars("sokoban", "hack-01", 1);
+      const result = await repo.completeLevelWithStars("sokoban", "hack-01", 3);
+      expect(result).toBe(true);
+      const state = await repo.getState();
+      expect(state.completedLevels).toHaveLength(1);
+      expect(state.completedLevels[0].stars).toBe(3);
+    });
+
+    it("returns false and does not change stars when equal", async () => {
+      await repo.completeLevelWithStars("sokoban", "hack-01", 2);
+      const result = await repo.completeLevelWithStars("sokoban", "hack-01", 2);
+      expect(result).toBe(false);
+      const state = await repo.getState();
+      expect(state.completedLevels[0].stars).toBe(2);
+    });
+  });
+
   describe("feedPet", () => {
     it("increments xp by 1 and foodConsumed by 1", async () => {
       await repo.feedPet();

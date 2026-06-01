@@ -42,16 +42,31 @@ export class LocalProgressRepository implements ProgressRepository {
   }
 
   async completeLevel(module: string, levelId: string): Promise<boolean> {
+    return this.completeLevelWithStars(module, levelId, 1);
+  }
+
+  async completeLevelWithStars(module: string, levelId: string, stars: number): Promise<boolean> {
     const state = await this.getState();
-    const alreadyDone = state.completedLevels.some(
+    const existing = state.completedLevels.find(
       (l) => l.module === module && l.levelId === levelId
     );
-    if (alreadyDone) return false;
+    if (existing) {
+      if (stars <= existing.stars) return false;
+      await this.saveState({
+        ...state,
+        completedLevels: state.completedLevels.map((l) =>
+          l.module === module && l.levelId === levelId
+            ? { ...l, stars, completedAt: Date.now() }
+            : l
+        ),
+      });
+      return true;
+    }
     await this.saveState({
       ...state,
       completedLevels: [
         ...state.completedLevels,
-        { module, levelId, completedAt: Date.now() },
+        { module, levelId, stars, completedAt: Date.now() },
       ],
     });
     return true;

@@ -63,16 +63,28 @@ class LocalProgressRepository {
     }
   }
   async completeLevel(module, levelId) {
+    return this.completeLevelWithStars(module, levelId, 1);
+  }
+  async completeLevelWithStars(module, levelId, stars) {
     const state = await this.getState();
-    const alreadyDone = state.completedLevels.some(
+    const existing = state.completedLevels.find(
       (l) => l.module === module && l.levelId === levelId
     );
-    if (alreadyDone) return false;
+    if (existing) {
+      if (stars <= existing.stars) return false;
+      await this.saveState({
+        ...state,
+        completedLevels: state.completedLevels.map(
+          (l) => l.module === module && l.levelId === levelId ? { ...l, stars, completedAt: Date.now() } : l
+        )
+      });
+      return true;
+    }
     await this.saveState({
       ...state,
       completedLevels: [
         ...state.completedLevels,
-        { module, levelId, completedAt: Date.now() }
+        { module, levelId, stars, completedAt: Date.now() }
       ]
     });
     return true;
@@ -92,7 +104,7 @@ class LocalProgressRepository {
   }
 }
 
-const HUNGER_COOLDOWN = 4 * 60 * 60 * 1e3;
+const HUNGER_COOLDOWN = 10 * 60 * 1e3;
 class ProgressService {
   constructor(repo) {
     this.repo = repo;
@@ -107,10 +119,17 @@ class ProgressService {
     }
     return result;
   }
+  async completeLevelWithStars(module, levelId, stars) {
+    const result = await this.repo.completeLevelWithStars(module, levelId, stars);
+    if (result && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+    return result;
+  }
   async feedPet() {
     const state = await this.repo.getState();
     const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
-    const foodAvailable = Math.max(0, state.completedLevels.length - state.foodConsumed);
+    const foodAvailable = await this.getFoodAvailable();
     if (!isHungry || foodAvailable <= 0) return;
     await this.repo.feedPet();
     if (typeof window !== "undefined") {
@@ -119,11 +138,20 @@ class ProgressService {
   }
   async getFoodAvailable() {
     const state = await this.repo.getState();
-    return Math.max(0, state.completedLevels.length - state.foodConsumed);
+    const totalStars = state.completedLevels.reduce(
+      (sum, l) => sum + (l.stars ?? 1),
+      0
+    );
+    return Math.max(0, totalStars - state.foodConsumed);
   }
   async isPetHungry() {
     const state = await this.repo.getState();
     return Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+  }
+  async getHungryLevel() {
+    const state = await this.repo.getState();
+    const elapsed = Date.now() - state.pet.lastFedAt;
+    return Math.min(6, Math.floor(elapsed / HUNGER_COOLDOWN));
   }
   async getPetStage() {
     const state = await this.repo.getState();
@@ -150,7 +178,8 @@ const SOKOBAN_LEVELS = [
       "# $.$ #",
       "#  @  #",
       "#######"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-02",
@@ -164,7 +193,8 @@ const SOKOBAN_LEVELS = [
       "#   @  #",
       "#      #",
       "########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-03",
@@ -177,7 +207,8 @@ const SOKOBAN_LEVELS = [
       "#  #.  #",
       "##  @ ##",
       " ######"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-04",
@@ -191,7 +222,8 @@ const SOKOBAN_LEVELS = [
       "#   $  #",
       "#  .@ ##",
       "########"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-05",
@@ -205,7 +237,8 @@ const SOKOBAN_LEVELS = [
       "#   . $ #",
       "#    @  #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-06",
@@ -219,7 +252,8 @@ const SOKOBAN_LEVELS = [
       "## ##  ##",
       "#    @  #",
       "########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-07",
@@ -233,7 +267,8 @@ const SOKOBAN_LEVELS = [
       "#  $.#   #",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-08",
@@ -247,7 +282,8 @@ const SOKOBAN_LEVELS = [
       "##  .  $ #",
       " #   @  ##",
       " ########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-09",
@@ -261,7 +297,8 @@ const SOKOBAN_LEVELS = [
       "#  . $   #",
       "#   @   ##",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-10",
@@ -275,7 +312,8 @@ const SOKOBAN_LEVELS = [
       "## # .  ###",
       " #   @  #",
       " ########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-11",
@@ -290,7 +328,8 @@ const SOKOBAN_LEVELS = [
       "# ##  #  ##",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-12",
@@ -305,7 +344,8 @@ const SOKOBAN_LEVELS = [
       "#   $  # ##",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-13",
@@ -319,7 +359,8 @@ const SOKOBAN_LEVELS = [
       "#  ##.##  #",
       "#   $@    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-14",
@@ -334,7 +375,8 @@ const SOKOBAN_LEVELS = [
       "#  $  .   #",
       "##   @   ##",
       " #########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-15",
@@ -349,7 +391,8 @@ const SOKOBAN_LEVELS = [
       "# $  $  #  #",
       "#    @     #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-16",
@@ -365,7 +408,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #   ##",
       "#    @     #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-17",
@@ -380,7 +424,8 @@ const SOKOBAN_LEVELS = [
       "#  $  . $ ###",
       "#  #  #  @#",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-18",
@@ -395,7 +440,8 @@ const SOKOBAN_LEVELS = [
       "# $  $  ##  #",
       "#  #  #  @ ##",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-19",
@@ -410,7 +456,8 @@ const SOKOBAN_LEVELS = [
       "# $  $  ##$  #",
       "#  #  #   @ ##",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-20",
@@ -426,7 +473,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  #  ##",
       "#     @      #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-21",
@@ -442,7 +490,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  # # ##",
       "#     @       #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-22",
@@ -458,7 +507,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  #  ###",
       "#     @      #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-23",
@@ -474,7 +524,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  # #   #",
       "#     @       ##",
       "################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-24",
@@ -490,7 +541,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  #  # ##",
       "#     @        #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-25",
@@ -506,7 +558,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  # #  ###",
       "#     @         #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-26",
@@ -522,7 +575,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  #  ##  #",
       "#     @        ##",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-27",
@@ -538,7 +592,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  # # #  ##",
       "#     @          #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-28",
@@ -554,7 +609,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  #  # # ##",
       "#     @          #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-29",
@@ -570,7 +626,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  # # #   ##",
       "#     @           #",
       "###################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-30",
@@ -586,7 +643,8 @@ const SOKOBAN_LEVELS = [
       "#  #  #  #  # # # #",
       "#     @          ##",
       "###################"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-31",
@@ -600,7 +658,8 @@ const SOKOBAN_LEVELS = [
       "#   .  #",
       "#  @   #",
       "########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-32",
@@ -613,7 +672,8 @@ const SOKOBAN_LEVELS = [
       "##$  $  #",
       "#  .  @ #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-33",
@@ -627,7 +687,8 @@ const SOKOBAN_LEVELS = [
       "#  $  .  #",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-34",
@@ -641,7 +702,8 @@ const SOKOBAN_LEVELS = [
       "#  .  .  #",
       "#   @   ##",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-35",
@@ -654,7 +716,8 @@ const SOKOBAN_LEVELS = [
       "#  $# ##  #",
       "#  .  $ @ #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-36",
@@ -668,7 +731,8 @@ const SOKOBAN_LEVELS = [
       "#  . $ .  #",
       "#   @     #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 24, twoStars: 42 }
   },
   {
     "id": "hack-37",
@@ -682,7 +746,8 @@ const SOKOBAN_LEVELS = [
       "#  $  . $  #",
       "#   @   #  #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-38",
@@ -696,7 +761,8 @@ const SOKOBAN_LEVELS = [
       "#  .  . $  #",
       "#  #  #  @ #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-39",
@@ -710,7 +776,8 @@ const SOKOBAN_LEVELS = [
       "#  . $  . $ #",
       "#   @    #  #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-40",
@@ -725,7 +792,8 @@ const SOKOBAN_LEVELS = [
       "# $.    $ # #",
       "#  #  #   @ #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-41",
@@ -739,7 +807,8 @@ const SOKOBAN_LEVELS = [
       "#  . $  . $  #",
       "#   @    #  ##",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 32, twoStars: 56 }
   },
   {
     "id": "hack-42",
@@ -754,7 +823,8 @@ const SOKOBAN_LEVELS = [
       "# $.    $ ## #",
       "#  #  #   @  #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-43",
@@ -768,7 +838,8 @@ const SOKOBAN_LEVELS = [
       "#  . $  . $ $ #",
       "#   @    #   ##",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-44",
@@ -783,7 +854,8 @@ const SOKOBAN_LEVELS = [
       "# $.    $ ##  #",
       "#  #  #    @  #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 56, twoStars: 98 }
   },
   {
     "id": "hack-45",
@@ -797,7 +869,8 @@ const SOKOBAN_LEVELS = [
       "#  . $  . $ $  #",
       "#   @    #  #  #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-46",
@@ -812,7 +885,8 @@ const SOKOBAN_LEVELS = [
       "# $.    $ ##   #",
       "#  #  #    @  ##",
       "################"
-    ]
+    ],
+    targets: { threeStars: 64, twoStars: 112 }
   },
   {
     "id": "hack-47",
@@ -826,7 +900,8 @@ const SOKOBAN_LEVELS = [
       "#  . $  . $ $   #",
       "#   @    #  #  ##",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 70 }
   },
   {
     "id": "hack-48",
@@ -841,7 +916,8 @@ const SOKOBAN_LEVELS = [
       "# $.    $ ## #  #",
       "#  #  #     @  ##",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 72, twoStars: 126 }
   },
   {
     "id": "hack-49",
@@ -855,7 +931,8 @@ const SOKOBAN_LEVELS = [
       "#  . $  . $ $  $  #",
       "#   @    #  # #  ##",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 48, twoStars: 84 }
   },
   {
     "id": "hack-50",
@@ -870,7 +947,8 @@ const SOKOBAN_LEVELS = [
       "# $.    $ ## ##   #",
       "#  #  #      @  ###",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 88, twoStars: 154 }
   },
   {
     "id": "hack-51",
@@ -883,7 +961,8 @@ const SOKOBAN_LEVELS = [
       "## ##  #",
       "#  .@$ #",
       "########"
-    ]
+    ],
+    targets: { threeStars: 30, twoStars: 54 }
   },
   {
     "id": "hack-52",
@@ -897,7 +976,8 @@ const SOKOBAN_LEVELS = [
       "#  # $  #",
       "#    @  #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 30, twoStars: 54 }
   },
   {
     "id": "hack-53",
@@ -911,7 +991,8 @@ const SOKOBAN_LEVELS = [
       "#  $ $   #",
       "#    @   #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-54",
@@ -925,7 +1006,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  #",
       "#    @   #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-55",
@@ -939,7 +1021,8 @@ const SOKOBAN_LEVELS = [
       "#  $#$    #",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-56",
@@ -953,7 +1036,8 @@ const SOKOBAN_LEVELS = [
       "#  $#$#   #",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-57",
@@ -967,7 +1051,8 @@ const SOKOBAN_LEVELS = [
       "#  .  . $  #",
       "#   @   #  #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-58",
@@ -981,7 +1066,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$ $  #",
       "#    @  #  #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-59",
@@ -995,7 +1081,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $  #",
       "#    @   #  #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-60",
@@ -1009,7 +1096,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $  #",
       "#  #  #  @  #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-61",
@@ -1023,7 +1111,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $ #",
       "#    @   ##  #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-62",
@@ -1037,7 +1126,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $ #",
       "#  #  #   @  #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-63",
@@ -1051,7 +1141,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $  #",
       "#    @   ##   #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-64",
@@ -1065,7 +1156,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $  #",
       "#  #  #    @  #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-65",
@@ -1079,7 +1171,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $ $ #",
       "#    @   ##    #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-66",
@@ -1093,7 +1186,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $   #",
       "#  #  #     @  #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-67",
@@ -1107,7 +1201,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $ $  #",
       "#    @   ##   # #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-68",
@@ -1121,7 +1216,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $    #",
       "#  #  #      @  #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 90, twoStars: 162 }
   },
   {
     "id": "hack-69",
@@ -1135,7 +1231,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $ $ $  #",
       "#    @   ##    #  #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-70",
@@ -1149,7 +1246,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$  $ $   $  #",
       "#  #  #       @  ##",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 110, twoStars: 198 }
   },
   {
     "id": "hack-71",
@@ -1163,7 +1261,8 @@ const SOKOBAN_LEVELS = [
       "#  .  . #",
       "#  @ #  #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-72",
@@ -1177,7 +1276,8 @@ const SOKOBAN_LEVELS = [
       "#  .  .  #",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-73",
@@ -1191,7 +1291,8 @@ const SOKOBAN_LEVELS = [
       "#  .  .   #",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-74",
@@ -1205,7 +1306,8 @@ const SOKOBAN_LEVELS = [
       "#  .  .   #",
       "#   @     #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-75",
@@ -1219,7 +1321,8 @@ const SOKOBAN_LEVELS = [
       "#   .   .  #",
       "#   @    $ #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-76",
@@ -1233,7 +1336,8 @@ const SOKOBAN_LEVELS = [
       "#   .   .  #",
       "#  @     $ #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-77",
@@ -1247,7 +1351,8 @@ const SOKOBAN_LEVELS = [
       "#   .   . $ #",
       "#   @        #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-78",
@@ -1261,7 +1366,8 @@ const SOKOBAN_LEVELS = [
       "#   .   . $ #",
       "#  @      $ #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-79",
@@ -1275,7 +1381,8 @@ const SOKOBAN_LEVELS = [
       "#   .   . $ $#",
       "#   @      $ #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-80",
@@ -1289,7 +1396,8 @@ const SOKOBAN_LEVELS = [
       "#   .   . $  #",
       "#  @     $ $ #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-81",
@@ -1303,7 +1411,8 @@ const SOKOBAN_LEVELS = [
       "#  $ .  #",
       "#   @   #",
       "#########"
-    ]
+    ],
+    targets: { threeStars: 30, twoStars: 54 }
   },
   {
     "id": "hack-82",
@@ -1317,7 +1426,8 @@ const SOKOBAN_LEVELS = [
       "#  .  .  #",
       "#   @    #",
       "##########"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-83",
@@ -1331,7 +1441,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$   #",
       "#    @    #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-84",
@@ -1345,7 +1456,8 @@ const SOKOBAN_LEVELS = [
       "#  $##$   #",
       "#   @     #",
       "###########"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-85",
@@ -1360,7 +1472,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .   #",
       "#    @     #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-86",
@@ -1375,7 +1488,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .   #",
       "#   @      #",
       "############"
-    ]
+    ],
+    targets: { threeStars: 40, twoStars: 72 }
   },
   {
     "id": "hack-87",
@@ -1390,7 +1504,8 @@ const SOKOBAN_LEVELS = [
       "#   .  . $  #",
       "#    @      #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-88",
@@ -1405,7 +1520,8 @@ const SOKOBAN_LEVELS = [
       "#   .  . $  #",
       "#   @       #",
       "#############"
-    ]
+    ],
+    targets: { threeStars: 50, twoStars: 90 }
   },
   {
     "id": "hack-89",
@@ -1420,7 +1536,8 @@ const SOKOBAN_LEVELS = [
       "#   .  . $   #",
       "#    @       #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 60, twoStars: 108 }
   },
   {
     "id": "hack-90",
@@ -1435,7 +1552,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $  #",
       "#   @      $ #",
       "##############"
-    ]
+    ],
+    targets: { threeStars: 70, twoStars: 126 }
   },
   {
     "id": "hack-91",
@@ -1450,7 +1568,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $ #",
       "#    @      $ #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 80, twoStars: 144 }
   },
   {
     "id": "hack-92",
@@ -1465,7 +1584,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $ #",
       "#   @       $ #",
       "###############"
-    ]
+    ],
+    targets: { threeStars: 90, twoStars: 162 }
   },
   {
     "id": "hack-93",
@@ -1480,7 +1600,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $  #",
       "#    @       $ #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 90, twoStars: 162 }
   },
   {
     "id": "hack-94",
@@ -1495,7 +1616,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $   #",
       "#   @        $  #",
       "################"
-    ]
+    ],
+    targets: { threeStars: 100, twoStars: 180 }
   },
   {
     "id": "hack-95",
@@ -1510,7 +1632,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $ $ #",
       "#    @        $ #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 110, twoStars: 198 }
   },
   {
     "id": "hack-96",
@@ -1525,7 +1648,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $   #",
       "#   @         $ #",
       "#################"
-    ]
+    ],
+    targets: { threeStars: 100, twoStars: 180 }
   },
   {
     "id": "hack-97",
@@ -1540,7 +1664,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $ $   #",
       "#    @         $  #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 120, twoStars: 216 }
   },
   {
     "id": "hack-98",
@@ -1555,7 +1680,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $  $ #",
       "#   @          $ #",
       "##################"
-    ]
+    ],
+    targets: { threeStars: 110, twoStars: 198 }
   },
   {
     "id": "hack-99",
@@ -1570,7 +1696,8 @@ const SOKOBAN_LEVELS = [
       "#   .  .  $ $  $ $ #",
       "#    @           $ #",
       "###################"
-    ]
+    ],
+    targets: { threeStars: 130, twoStars: 234 }
   },
   {
     "id": "hack-100",
@@ -1587,7 +1714,8 @@ const SOKOBAN_LEVELS = [
       "#    .   .   $ .   #",
       "#    @          $  #",
       "####################"
-    ]
+    ],
+    targets: { threeStars: 160, twoStars: 288 }
   }
 ];
 
@@ -2266,19 +2394,25 @@ function Board() {
   );
 }
 
-function LevelSelect({ onSelect, completedLevelIds, currentLevelIdx }) {
+function LevelSelect({ onSelect, bestStars, currentLevelIdx }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-2 text-cozy-text font-mono w-full min-h-0 flex-1", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[12px] text-center my-2 shrink-0", children: "SELECT LEVEL" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-5 gap-3 p-2 overflow-y-auto flex-1 min-h-0", children: SOKOBAN_LEVELS.map((level, idx) => {
-      const completed = completedLevelIds.has(level.id);
+      const stars = bestStars[level.id] ?? 0;
       const active = currentLevelIdx === idx;
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
           onClick: () => onSelect(idx),
-          className: `w-10 h-10 border flex items-center justify-center font-press text-[11px] cursor-pointer transition-colors active:translate-y-0.5 ${active ? "border-[#FFB000] bg-[#FFB000]/10 text-[#FFB000]" : completed ? "border-cozy-border bg-black text-[#FFB000] hover:bg-cozy-text hover:text-black hover:scale-105" : "border-cozy-border bg-black text-cozy-text hover:bg-cozy-text hover:text-black hover:scale-105"}`,
-          "aria-label": `Select level ${idx + 1}${completed ? " (completed)" : ""}`,
-          children: completed ? "★" : idx + 1
+          className: `w-10 h-10 border flex flex-col items-center justify-center font-press cursor-pointer transition-colors active:translate-y-0.5 ${active ? "border-[#FFB000] bg-[#FFB000]/10 text-[#FFB000]" : stars > 0 ? "border-cozy-border bg-black text-[#FFB000] hover:bg-cozy-text hover:text-black hover:scale-105" : "border-cozy-border bg-black text-cozy-text hover:bg-cozy-text hover:text-black hover:scale-105"}`,
+          "aria-label": `Select level ${idx + 1}${stars > 0 ? ` (${stars} star${stars > 1 ? "s" : ""})` : ""}`,
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px]", children: idx + 1 }),
+            stars > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[6px] leading-none mt-0.5", children: [
+              "★".repeat(stars),
+              "☆".repeat(3 - stars)
+            ] })
+          ]
         },
         level.id
       );
@@ -2406,12 +2540,18 @@ function Controls() {
 const React = await importShared('react');
 const {useEffect: useEffect$1,useState: useState$1} = React;
 const progressService$1 = new ProgressService(new LocalProgressRepository());
+function calcStars(moves, threeStars, twoStars) {
+  if (moves <= threeStars) return 3;
+  if (moves <= twoStars) return 2;
+  return 1;
+}
 function WinModal({ onBack }) {
   const isWon = useSokobanStore((state) => state.isWon);
   const nextLevel = useSokobanStore((state) => state.nextLevel);
   const moves = useSokobanStore((state) => state.moves);
   const currentLevelIdx = useSokobanStore((state) => state.currentLevelIdx);
   const [rewardMsg, setRewardMsg] = useState$1(null);
+  const [earnedStars, setEarnedStars] = useState$1(0);
   useEffect$1(() => {
     if (isWon) {
       synth.playWin();
@@ -2420,15 +2560,23 @@ function WinModal({ onBack }) {
   useEffect$1(() => {
     if (!isWon) {
       setRewardMsg(null);
+      setEarnedStars(0);
       return;
     }
-    void progressService$1.completeLevel("sokoban", SOKOBAN_LEVELS[currentLevelIdx]?.id ?? `level-${currentLevelIdx}`).then((firstTime) => {
-      setRewardMsg(firstTime ? "+1 FOOD" : "ALREADY COMPLETE");
+    const level = SOKOBAN_LEVELS[currentLevelIdx];
+    const stars = level ? calcStars(moves, level.targets.threeStars, level.targets.twoStars) : 1;
+    setEarnedStars(stars);
+    void progressService$1.completeLevelWithStars("sokoban", level?.id ?? `level-${currentLevelIdx}`, stars).then((improved) => {
+      setRewardMsg(improved ? `+${stars} FOOD` : "ALREADY BEST");
     });
-  }, [isWon, currentLevelIdx]);
+  }, [isWon, currentLevelIdx, moves]);
   if (!isWon) return /* @__PURE__ */ jsxRuntimeExports.jsx(React.Fragment, {});
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-black/80 z-50 flex items-center justify-center p-4 select-none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-[#FFB000] bg-[#050505] p-6 max-w-xs w-full text-center flex flex-col items-center gap-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "font-press text-[14px] text-cozy-text animate-bounce", children: "STAGE CLEAR!" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[18px] tracking-widest", children: [
+      "★".repeat(earnedStars),
+      "☆".repeat(3 - earnedStars)
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "font-mono text-sm text-cozy-text", children: [
       "Finished in",
       " ",
@@ -2464,24 +2612,27 @@ const {useState,useEffect,useCallback} = await importShared('react');
 const progressService = new ProgressService(new LocalProgressRepository());
 function SokobanApp() {
   const [view, setView] = useState("menu");
-  const [completedLevelIds, setCompletedLevelIds] = useState(/* @__PURE__ */ new Set());
+  const [bestStars, setBestStars] = useState({});
   const loadLevel = useSokobanStore((state) => state.loadLevel);
   const currentLevelIdx = useSokobanStore((state) => state.currentLevelIdx);
-  const refreshCompleted = useCallback(async () => {
+  const refreshProgress = useCallback(async () => {
     const state = await progressService.getState();
-    const ids = new Set(
-      state.completedLevels.filter((c) => c.module === "sokoban").map((c) => c.levelId)
-    );
-    setCompletedLevelIds(ids);
+    const map = {};
+    for (const c of state.completedLevels) {
+      if (c.module === "sokoban") {
+        map[c.levelId] = c.stars ?? 1;
+      }
+    }
+    setBestStars(map);
   }, []);
   useEffect(() => {
-    void refreshCompleted();
+    void refreshProgress();
     const handler = () => {
-      void refreshCompleted();
+      void refreshProgress();
     };
     window.addEventListener("cozyos:progress-updated", handler);
     return () => window.removeEventListener("cozyos:progress-updated", handler);
-  }, [refreshCompleted]);
+  }, [refreshProgress]);
   const handleSelectLevel = (idx) => {
     loadLevel(idx);
     setView("game");
@@ -2490,7 +2641,7 @@ function SokobanApp() {
     LevelSelect,
     {
       onSelect: handleSelectLevel,
-      completedLevelIds,
+      bestStars,
       currentLevelIdx
     }
   ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-4 items-center w-full relative", children: [

@@ -841,16 +841,28 @@ class LocalProgressRepository {
     }
   }
   async completeLevel(module, levelId) {
+    return this.completeLevelWithStars(module, levelId, 1);
+  }
+  async completeLevelWithStars(module, levelId, stars) {
     const state = await this.getState();
-    const alreadyDone = state.completedLevels.some(
+    const existing = state.completedLevels.find(
       (l) => l.module === module && l.levelId === levelId
     );
-    if (alreadyDone) return false;
+    if (existing) {
+      if (stars <= existing.stars) return false;
+      await this.saveState({
+        ...state,
+        completedLevels: state.completedLevels.map(
+          (l) => l.module === module && l.levelId === levelId ? { ...l, stars, completedAt: Date.now() } : l
+        )
+      });
+      return true;
+    }
     await this.saveState({
       ...state,
       completedLevels: [
         ...state.completedLevels,
-        { module, levelId, completedAt: Date.now() }
+        { module, levelId, stars, completedAt: Date.now() }
       ]
     });
     return true;
@@ -870,7 +882,7 @@ class LocalProgressRepository {
   }
 }
 
-const HUNGER_COOLDOWN = 4 * 60 * 60 * 1e3;
+const HUNGER_COOLDOWN = 10 * 60 * 1e3;
 class ProgressService {
   constructor(repo) {
     this.repo = repo;
@@ -885,10 +897,17 @@ class ProgressService {
     }
     return result;
   }
+  async completeLevelWithStars(module, levelId, stars) {
+    const result = await this.repo.completeLevelWithStars(module, levelId, stars);
+    if (result && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+    return result;
+  }
   async feedPet() {
     const state = await this.repo.getState();
     const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
-    const foodAvailable = Math.max(0, state.completedLevels.length - state.foodConsumed);
+    const foodAvailable = await this.getFoodAvailable();
     if (!isHungry || foodAvailable <= 0) return;
     await this.repo.feedPet();
     if (typeof window !== "undefined") {
@@ -897,11 +916,20 @@ class ProgressService {
   }
   async getFoodAvailable() {
     const state = await this.repo.getState();
-    return Math.max(0, state.completedLevels.length - state.foodConsumed);
+    const totalStars = state.completedLevels.reduce(
+      (sum, l) => sum + (l.stars ?? 1),
+      0
+    );
+    return Math.max(0, totalStars - state.foodConsumed);
   }
   async isPetHungry() {
     const state = await this.repo.getState();
     return Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+  }
+  async getHungryLevel() {
+    const state = await this.repo.getState();
+    const elapsed = Date.now() - state.pet.lastFedAt;
+    return Math.min(6, Math.floor(elapsed / HUNGER_COOLDOWN));
   }
   async getPetStage() {
     const state = await this.repo.getState();
@@ -920,15 +948,18 @@ function useProgressService() {
   const [state, setState] = useState$2(EMPTY_STATE);
   const [isHungry, setIsHungry] = useState$2(false);
   const [foodAvailable, setFoodAvailable] = useState$2(0);
+  const [hungryLevel, setHungryLevel] = useState$2(0);
   const refresh = useCallback$1(async () => {
-    const [s, hungry, food] = await Promise.all([
+    const [s, hungry, food, level] = await Promise.all([
       progressService.getState(),
       progressService.isPetHungry(),
-      progressService.getFoodAvailable()
+      progressService.getFoodAvailable(),
+      progressService.getHungryLevel()
     ]);
     setState(s);
     setIsHungry(hungry);
     setFoodAvailable(food);
+    setHungryLevel(level);
   }, []);
   useEffect$2(() => {
     void refresh();
@@ -941,7 +972,7 @@ function useProgressService() {
   const feedPet = useCallback$1(async () => {
     await progressService.feedPet();
   }, []);
-  return { state, isHungry, foodAvailable, feedPet };
+  return { state, isHungry, foodAvailable, hungryLevel, feedPet };
 }
 
 const {useState: useState$1,useCallback,useEffect: useEffect$1,useRef: useRef$1} = await importShared('react');

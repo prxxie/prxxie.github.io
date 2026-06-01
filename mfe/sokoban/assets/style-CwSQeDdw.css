@@ -57,6 +57,7 @@
     --text-sm--line-height: calc(1.25 / .875);
     --font-weight-bold: 700;
     --tracking-tight: -.025em;
+    --tracking-widest: .1em;
     --radius-sm: .25rem;
     --ease-out: cubic-bezier(0, 0, .2, 1);
     --ease-in-out: cubic-bezier(.4, 0, .2, 1);
@@ -401,6 +402,10 @@
 
   .my-2 {
     margin-block: calc(var(--spacing) * 2);
+  }
+
+  .mt-0\.5 {
+    margin-top: calc(var(--spacing) * .5);
   }
 
   .mt-1 {
@@ -834,6 +839,10 @@
     font-size: 6.5px;
   }
 
+  .text-\[6px\] {
+    font-size: 6px;
+  }
+
   .text-\[7px\] {
     font-size: 7px;
   }
@@ -862,6 +871,10 @@
     font-size: 14px;
   }
 
+  .text-\[18px\] {
+    font-size: 18px;
+  }
+
   .leading-none {
     --tw-leading: 1;
     line-height: 1;
@@ -875,6 +888,11 @@
   .tracking-tight {
     --tw-tracking: var(--tracking-tight);
     letter-spacing: var(--tracking-tight);
+  }
+
+  .tracking-widest {
+    --tw-tracking: var(--tracking-widest);
+    letter-spacing: var(--tracking-widest);
   }
 
   .text-\[\#00FF99\]\/80 {

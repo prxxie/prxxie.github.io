@@ -1,5 +1,5 @@
 import { importShared } from './__federation_fn_import-D-nfbenS.js';
-import ShikakuApp, { j as jsxRuntimeExports } from './__federation_expose_ShikakuApp-sgG-Qesm.js';
+import SokobanApp, { j as jsxRuntimeExports } from './__federation_expose_SokobanApp-DqxVXL-P.js';
 import { r as reactDomExports } from './index-D9Af7wOI.js';
 
 true&&(function polyfill() {
@@ -49,10 +49,6 @@ var m = reactDomExports;
 }
 
 const React = await importShared('react');
-const rootElement = document.getElementById("root");
-if (!rootElement) {
-  throw new Error("Root element not found");
-}
-client.createRoot(rootElement).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 flex justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ShikakuApp, {}) }) })
+client.createRoot(document.getElementById("root")).render(
+  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 flex justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(SokobanApp, {}) }) })
 );

@@ -5,5 +5,7 @@ export interface ProgressRepository {
   completeLevel(module: string, levelId: string): Promise<boolean>;
   completeLevelWithStars(module: string, levelId: string, stars: number): Promise<boolean>;
   feedPet(): Promise<void>;
+  playWithPet(happiness: number): Promise<void>;
+  toggleSleep(): Promise<void>;
   saveState(state: ProgressState): Promise<void>;
 }

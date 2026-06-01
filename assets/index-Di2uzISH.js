@@ -198,12 +198,12 @@ function playBeepSound(frequency = 440, duration = 0.08) {
   }
 }
 
-const {useState: useState$6} = await importShared('react');
+const {useState: useState$5} = await importShared('react');
 function ConsoleFrame({
   children,
   onMobileHud
 }) {
-  const [muted, setMuted] = useState$6(getAudioMuted);
+  const [muted, setMuted] = useState$5(getAudioMuted);
   const handleAudioToggle = () => {
     const nextMuted = !muted;
     setAudioMuted(nextMuted);
@@ -319,6 +319,7 @@ class LocalProgressRepository {
       if (state.pet.happiness === void 0) state.pet.happiness = 50;
       if (state.pet.lastPlayedAt === void 0) state.pet.lastPlayedAt = Date.now();
       if (state.pet.isSleeping === void 0) state.pet.isSleeping = false;
+      state.pet.stage = getEvolutionStage(state.pet.xp);
       return state;
     } catch {
       return initialState();
@@ -502,7 +503,7 @@ class ProgressService {
   }
 }
 
-const {useState: useState$5,useEffect: useEffect$6,useCallback: useCallback$2} = await importShared('react');
+const {useState: useState$4,useEffect: useEffect$5,useCallback: useCallback$1} = await importShared('react');
 const progressService = new ProgressService(new LocalProgressRepository());
 const EMPTY_STATE = {
   completedLevels: [],
@@ -510,12 +511,12 @@ const EMPTY_STATE = {
   pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false }
 };
 function useProgressService() {
-  const [state, setState] = useState$5(EMPTY_STATE);
-  const [isHungry, setIsHungry] = useState$5(false);
-  const [foodAvailable, setFoodAvailable] = useState$5(0);
-  const [hungryLevel, setHungryLevel] = useState$5(0);
-  const [happiness, setHappiness] = useState$5(50);
-  const refresh = useCallback$2(async () => {
+  const [state, setState] = useState$4(EMPTY_STATE);
+  const [isHungry, setIsHungry] = useState$4(false);
+  const [foodAvailable, setFoodAvailable] = useState$4(0);
+  const [hungryLevel, setHungryLevel] = useState$4(0);
+  const [happiness, setHappiness] = useState$4(50);
+  const refresh = useCallback$1(async () => {
     const [s, hungry, food, level, happy] = await Promise.all([
       progressService.getState(),
       progressService.isPetHungry(),
@@ -529,7 +530,7 @@ function useProgressService() {
     setHungryLevel(level);
     setHappiness(happy);
   }, []);
-  useEffect$6(() => {
+  useEffect$5(() => {
     void refresh();
     const handler = () => {
       void refresh();
@@ -537,13 +538,13 @@ function useProgressService() {
     window.addEventListener("cozyos:progress-updated", handler);
     return () => window.removeEventListener("cozyos:progress-updated", handler);
   }, [refresh]);
-  const feedPet = useCallback$2(async () => {
+  const feedPet = useCallback$1(async () => {
     await progressService.feedPet();
   }, []);
-  const playWithPet = useCallback$2(async () => {
+  const playWithPet = useCallback$1(async () => {
     await progressService.playWithPet();
   }, []);
-  const toggleSleep = useCallback$2(async () => {
+  const toggleSleep = useCallback$1(async () => {
     await progressService.toggleSleep();
   }, []);
   return {
@@ -559,9 +560,9 @@ function useProgressService() {
   };
 }
 
-const {useState: useState$4,useEffect: useEffect$5,useCallback: useCallback$1} = await importShared('react');
+const {useState: useState$3,useEffect: useEffect$4,useCallback} = await importShared('react');
 
-const VALID_TABS = ["home", "about", "posts", "pets", "shikaku", "sokoban"];
+const VALID_TABS = ["home", "about", "posts", "shikaku", "sokoban"];
 function getTabFromHash() {
   const hash = typeof window !== "undefined" ? window.location.hash : "";
   const path = hash.replace(/^#\/?/, "");
@@ -571,15 +572,15 @@ function getTabFromHash() {
   return "home";
 }
 function useHashRouter() {
-  const [currentTab, setCurrentTab] = useState$4(getTabFromHash);
-  useEffect$5(() => {
+  const [currentTab, setCurrentTab] = useState$3(getTabFromHash);
+  useEffect$4(() => {
     const handleHashChange = () => {
       setCurrentTab(getTabFromHash());
     };
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
-  const navigate = useCallback$1((tab) => {
+  const navigate = useCallback((tab) => {
     window.location.hash = tab === "home" ? "" : `#/${tab}`;
     setCurrentTab(tab);
   }, []);
@@ -590,7 +591,6 @@ const GRID_ITEMS = [
   { tab: "home", key: "HM" },
   { tab: "about", key: "AB" },
   { tab: "posts", key: "PO" },
-  { tab: "pets", key: "PE" },
   { tab: "shikaku", key: "SH" },
   { tab: "sokoban", key: "SO" }
 ];
@@ -604,7 +604,7 @@ function MatrixMenu({
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-cozy-border p-2 bg-black", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[10px] font-press text-cozy-accent mb-2 text-center bg-cozy-muted/20 py-1", children: "COMMAND_MATRIX" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-2", children: GRID_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 gap-2", children: GRID_ITEMS.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
       "button",
       {
         onClick: () => handleButtonClick(item.tab),
@@ -621,16 +621,18 @@ function MatrixMenu({
   ] });
 }
 
-const {useEffect: useEffect$4,useState: useState$3} = await importShared('react');
+const {useEffect: useEffect$3,useState: useState$2} = await importShared('react');
 
+const PROGRESS_KEY = "cozyos.progress.v1";
 const STATIC_POSTS = [
   { date: "2026-05-30", title: "Monochrome Amber CRT theme conversion completed" },
   { date: "2026-05-29", title: "Building Sokoban micro-frontend puzzle game" }
 ];
 function StatsTelemetry() {
-  const [shikakuSolved, setShikakuSolved] = useState$3(0);
-  const [sokobanLevel, setSokobanLevel] = useState$3(0);
-  useEffect$4(() => {
+  const [shikakuSolved, setShikakuSolved] = useState$2(0);
+  const [sokobanSolved, setSokobanSolved] = useState$2(0);
+  const [sokobanMaxLevel, setSokobanMaxLevel] = useState$2(-1);
+  useEffect$3(() => {
     try {
       const savedShikaku = localStorage.getItem("cozy_os_shikaku_save");
       if (savedShikaku) {
@@ -643,11 +645,19 @@ function StatsTelemetry() {
       console.error("Failed to parse Shikaku save progress in dashboard", e);
     }
     try {
-      const savedSokoban = localStorage.getItem("cozy_os_sokoban_level");
-      if (savedSokoban) {
-        const parsed = parseInt(savedSokoban, 10);
-        if (!Number.isNaN(parsed)) {
-          setSokobanLevel(parsed);
+      const savedProgress = localStorage.getItem(PROGRESS_KEY);
+      if (savedProgress) {
+        const parsed = JSON.parse(savedProgress);
+        if (parsed?.version === 1 && Array.isArray(parsed.state?.completedLevels)) {
+          const sokobanLevels = parsed.state.completedLevels.filter(
+            (l) => l.module === "sokoban"
+          );
+          setSokobanSolved(sokobanLevels.length);
+          const maxIdx = sokobanLevels.reduce((max, l) => {
+            const idx = parseInt(l.levelId, 10);
+            return Number.isNaN(idx) ? max : Math.max(max, idx);
+          }, -1);
+          setSokobanMaxLevel(maxIdx);
         }
       }
     } catch {
@@ -669,10 +679,10 @@ function StatsTelemetry() {
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold", children: "● SOKOBAN CARGO" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("br", {}),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-          "LEVEL REACHED: ",
-          sokobanLevel + 1,
-          " | SOLVED: ",
-          sokobanLevel
+          "SOLVED: ",
+          sokobanSolved,
+          " | BEST LEVEL: ",
+          sokobanMaxLevel >= 0 ? sokobanMaxLevel + 1 : 0
         ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-dashed border-cozy-border pt-1.5 mt-1", children: [
@@ -688,13 +698,13 @@ function StatsTelemetry() {
   ] });
 }
 
-const {useEffect: useEffect$3,useRef: useRef$2} = await importShared('react');
+const {useEffect: useEffect$2,useRef: useRef$1} = await importShared('react');
 
 function HomeDashboard() {
-  const planetCanvasRef = useRef$2(null);
-  const waterfallRef = useRef$2(null);
-  const oscilloscopeRef = useRef$2(null);
-  useEffect$3(() => {
+  const planetCanvasRef = useRef$1(null);
+  const waterfallRef = useRef$1(null);
+  const oscilloscopeRef = useRef$1(null);
+  useEffect$2(() => {
     const canvas = planetCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -745,7 +755,7 @@ function HomeDashboard() {
     draw();
     return () => cancelAnimationFrame(animId);
   }, []);
-  useEffect$3(() => {
+  useEffect$2(() => {
     const osc = oscilloscopeRef.current;
     const wf = waterfallRef.current;
     if (!osc || !wf) return;
@@ -1024,87 +1034,6 @@ function PetSprite({
   );
 }
 
-const {useState: useState$2,useCallback,useEffect: useEffect$2,useRef: useRef$1} = await importShared('react');
-function PetWidget() {
-  const { state, isHungry, foodAvailable, feedPet, isSleeping } = useProgressService();
-  const [spriteStatus, setSpriteStatus] = useState$2("idle");
-  const resetTimerRef = useRef$1(null);
-  useEffect$2(() => {
-    return () => {
-      if (resetTimerRef.current !== null) {
-        clearTimeout(resetTimerRef.current);
-      }
-    };
-  }, []);
-  const handleFeed = useCallback(async () => {
-    await feedPet();
-    setSpriteStatus("eating");
-    if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2e3);
-  }, [feedPet]);
-  const canFeed = isHungry && foodAvailable > 0 && !isSleeping;
-  const getStageName = (stage) => {
-    switch (stage) {
-      case 1:
-        return "EGG";
-      case 2:
-        return "LEAFY SPROUT";
-      case 3:
-        return "BUDREPTILE";
-      case 4:
-        return "FLORASAUR";
-      case 5:
-        return "MEGA FLORASAUR";
-      default:
-        return "UNKNOWN";
-    }
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-2 p-2 text-cozy-text", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border p-2 bg-black flex items-center justify-center relative w-20 h-20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-      PetSprite,
-      {
-        size: 64,
-        stage: state.pet.stage,
-        status: isSleeping ? "sleeping" : spriteStatus,
-        isSleeping,
-        isHungry
-      }
-    ) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-1 font-mono text-[9px]", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press", children: "STAGE:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: getStageName(state.pet.stage) })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press", children: "XP:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: state.pet.xp })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press", children: "FOOD:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-          "★ ",
-          foodAvailable
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press", children: "STATUS:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: isSleeping ? "SLEEPING" : isHungry ? "HUNGRY" : "FULL" })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      "button",
-      {
-        onClick: () => {
-          void handleFeed();
-        },
-        disabled: !canFeed,
-        className: "w-full pixel-btn text-[8px] disabled:opacity-40 disabled:pointer-events-none",
-        children: isSleeping ? "AWAKE TO FEED" : canFeed ? "FEED PET" : isHungry ? "NO FOOD" : "NOT HUNGRY"
-      }
-    )
-  ] });
-}
-
 const {useEffect: useEffect$1,useState: useState$1} = await importShared('react');
 const MESSAGES = [
   "LOADING...",
@@ -1247,7 +1176,7 @@ function App() {
   const { currentTab, navigate } = useHashRouter();
   const windowRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isPetHudOpen, setIsPetHudOpen] = useState(false);
+  const [isMobileHudOpen, setIsMobileHudOpen] = useState(false);
   const progressService = useProgressService();
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -1277,8 +1206,6 @@ function App() {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(AboutApp, {});
       case "posts":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(PostsApp, {});
-      case "pets":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { progressState: progressService });
       case "shikaku":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(ShikakuApp, {});
       case "sokoban":
@@ -1292,14 +1219,14 @@ function App() {
     {
       currentTab,
       setTab: navigate,
-      onMobileHud: currentTab !== "pets" ? () => setIsPetHudOpen(true) : void 0,
+      onMobileHud: () => setIsMobileHudOpen(true),
       children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-20 gap-6 items-start", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "div",
             {
               ref: windowRef,
-              className: `col-span-1 ${currentTab === "pets" ? "md:col-span-20" : "md:col-span-13"} retro-window`,
+              className: "col-span-1 md:col-span-13 retro-window",
               children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
@@ -1332,7 +1259,7 @@ function App() {
               ]
             }
           ),
-          currentTab !== "pets" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden md:flex md:col-span-7 flex-col gap-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden md:flex md:col-span-7 flex-col gap-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(MatrixMenu, { currentTab, navigate }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "retro-window", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
@@ -1342,22 +1269,22 @@ function App() {
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[-]" })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[160px] p-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetWidget, {}) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { progressState: progressService }) }) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
           ] })
         ] }),
-        isPetHudOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
+        isMobileHudOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
             className: "fixed inset-0 bg-black/75 z-45 md:hidden",
-            onClick: () => setIsPetHudOpen(false)
+            onClick: () => setIsMobileHudOpen(false)
           }
         ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "div",
           {
-            className: `fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${isPetHudOpen ? "translate-x-0" : "translate-x-full"}`,
+            className: `fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${isMobileHudOpen ? "translate-x-0" : "translate-x-full"}`,
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b border-dashed border-cozy-border pb-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[9px] text-cozy-text flex items-center gap-1", children: [
@@ -1367,7 +1294,7 @@ function App() {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "button",
                   {
-                    onClick: () => setIsPetHudOpen(false),
+                    onClick: () => setIsMobileHudOpen(false),
                     className: "text-cozy-text font-bold cursor-pointer font-press text-[9px] bg-transparent border-none",
                     children: "[X]"
                   }
@@ -1379,12 +1306,12 @@ function App() {
                   currentTab,
                   navigate: (tab) => {
                     navigate(tab);
-                    setIsPetHudOpen(false);
+                    setIsMobileHudOpen(false);
                   }
                 }
               ),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 overflow-y-auto flex flex-col gap-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border p-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetWidget, {}) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { progressState: progressService }) }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
               ] })
             ]

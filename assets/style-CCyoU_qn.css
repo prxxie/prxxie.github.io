@@ -487,10 +487,6 @@
     min-height: calc(var(--spacing) * 0);
   }
 
-  .min-h-\[160px\] {
-    min-height: 160px;
-  }
-
   .min-h-\[350px\] {
     min-height: 350px;
   }
@@ -574,8 +570,8 @@
     grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 
-  .grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .flex-col {
@@ -922,10 +918,6 @@
 
     .md\:col-span-13 {
       grid-column: span 13 / span 13;
-    }
-
-    .md\:col-span-20 {
-      grid-column: span 20 / span 20;
     }
 
     .md\:flex {

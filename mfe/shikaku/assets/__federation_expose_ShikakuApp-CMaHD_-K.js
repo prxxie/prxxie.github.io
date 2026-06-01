@@ -59,6 +59,7 @@ class LocalProgressRepository {
       if (state.pet.happiness === void 0) state.pet.happiness = 50;
       if (state.pet.lastPlayedAt === void 0) state.pet.lastPlayedAt = Date.now();
       if (state.pet.isSleeping === void 0) state.pet.isSleeping = false;
+      state.pet.stage = getEvolutionStage(state.pet.xp);
       return state;
     } catch {
       return initialState();

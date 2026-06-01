@@ -3,7 +3,7 @@ const currentImports = {};
       let moduleMap = {
 "./ShikakuApp":()=>{
       dynamicLoadingCss(["style-ClfWMOno.css"], false, './ShikakuApp');
-      return __federation_import('/mfe/shikaku/assets/__federation_expose_ShikakuApp-CxreLTCK.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      return __federation_import('/mfe/shikaku/assets/__federation_expose_ShikakuApp-CMaHD_-K.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
         const metaUrl = import.meta.url;

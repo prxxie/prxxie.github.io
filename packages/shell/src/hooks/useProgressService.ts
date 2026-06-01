@@ -7,7 +7,7 @@ const progressService = new ProgressService(new LocalProgressRepository());
 const EMPTY_STATE: ProgressState = {
   completedLevels: [],
   foodConsumed: 0,
-  pet: { xp: 0, stage: 1, lastFedAt: 0 },
+  pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false },
 };
 
 export function useProgressService() {

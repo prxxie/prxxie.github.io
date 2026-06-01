@@ -18,7 +18,7 @@ describe("LocalProgressRepository", () => {
       expect(state.pet.stage).toBe(1);
       expect(state.pet.lastFedAt).toBe(0);
       expect(state.pet.happiness).toBe(50);
-      expect(state.pet.lastPlayedAt).toBe(0);
+      expect(state.pet.lastPlayedAt).toBeGreaterThan(0);
       expect(state.pet.isSleeping).toBe(false);
     });
 
@@ -51,7 +51,7 @@ describe("LocalProgressRepository", () => {
       }));
       const state = await repo.getState();
       expect(state.pet.happiness).toBe(50);
-      expect(state.pet.lastPlayedAt).toBe(0);
+      expect(state.pet.lastPlayedAt).toBeGreaterThan(0);
       expect(state.pet.isSleeping).toBe(false);
     });
   });

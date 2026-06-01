@@ -18,7 +18,7 @@ function initialState(): ProgressState {
       stage: 1,
       lastFedAt: 0,
       happiness: 50,
-      lastPlayedAt: 0,
+      lastPlayedAt: Date.now(),
       isSleeping: false,
     },
   };
@@ -36,7 +36,7 @@ export class LocalProgressRepository implements ProgressRepository {
       // Fill defaults for backward compatibility
       const state = data.state;
       if (state.pet.happiness === undefined) state.pet.happiness = 50;
-      if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = 0;
+      if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = Date.now();
       if (state.pet.isSleeping === undefined) state.pet.isSleeping = false;
       
       return state;
@@ -86,7 +86,7 @@ export class LocalProgressRepository implements ProgressRepository {
     return true;
   }
 
-  async feedPet(): Promise<void> {
+  async feedPet(lastPlayedAt?: number): Promise<void> {
     const state = await this.getState();
     const newXp = state.pet.xp + 1;
     await this.saveState({
@@ -98,6 +98,7 @@ export class LocalProgressRepository implements ProgressRepository {
         stage: getEvolutionStage(newXp),
         lastFedAt: Date.now(),
         isSleeping: false, // Auto-wakes up when fed
+        lastPlayedAt: lastPlayedAt !== undefined ? lastPlayedAt : state.pet.lastPlayedAt,
       },
     });
   }
@@ -114,13 +115,15 @@ export class LocalProgressRepository implements ProgressRepository {
     });
   }
 
-  async toggleSleep(): Promise<void> {
+  async toggleSleep(lastFedAt?: number, lastPlayedAt?: number): Promise<void> {
     const state = await this.getState();
     await this.saveState({
       ...state,
       pet: {
         ...state.pet,
         isSleeping: !state.pet.isSleeping,
+        lastFedAt: lastFedAt !== undefined ? lastFedAt : state.pet.lastFedAt,
+        lastPlayedAt: lastPlayedAt !== undefined ? lastPlayedAt : state.pet.lastPlayedAt,
       },
     });
   }

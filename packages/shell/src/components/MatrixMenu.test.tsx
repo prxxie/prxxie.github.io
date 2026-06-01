@@ -12,7 +12,7 @@ describe("MatrixMenu", () => {
     expect(screen.getByRole("button", { name: /\[HM\]\s+home/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /\[AB\]\s+about/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /\[PO\]\s+posts/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /\[PE\]\s+pets/i })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /\[PE\]\s+pets/i })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /\[SH\]\s+shikaku/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /\[SO\]\s+sokoban/i })).toBeInTheDocument();
   });

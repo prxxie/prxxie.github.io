@@ -107,7 +107,11 @@ export default function App(): React.ReactElement {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="w-full flex justify-center min-h-screen">
-        <ConsoleFrame currentTab={currentTab} setTab={navigate}>
+        <ConsoleFrame
+          currentTab={currentTab}
+          setTab={navigate}
+          onMobileHud={currentTab !== "pets" ? () => setIsPetHudOpen(true) : undefined}
+        >
           <div className="grid grid-cols-1 md:grid-cols-20 gap-6 items-start">
             <div
               ref={windowRef}
@@ -169,16 +173,6 @@ export default function App(): React.ReactElement {
               </div>
             )}
           </div>
-
-          {currentTab !== "pets" && (
-            <button
-              onClick={() => setIsPetHudOpen(true)}
-              className="md:hidden fixed bottom-6 right-6 z-40 pixel-btn text-[9px]"
-            >
-              [ MOBILE HUD ]
-            </button>
-          )}
-
           {isPetHudOpen && (
             <div
               className="fixed inset-0 bg-black/75 z-45 md:hidden"

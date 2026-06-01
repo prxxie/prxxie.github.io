@@ -6,10 +6,12 @@ interface ConsoleFrameProps {
   children: React.ReactNode;
   currentTab: Tab;
   setTab: (tab: Tab) => void;
+  onMobileHud?: () => void;
 }
 
 export default function ConsoleFrame({
   children,
+  onMobileHud,
 }: ConsoleFrameProps): React.ReactElement {
   const [muted, setMuted] = useState<boolean>(getAudioMuted);
 
@@ -55,6 +57,16 @@ export default function ConsoleFrame({
             >
               SOUND: {!muted ? "ON" : "OFF"}
             </button>
+
+            {onMobileHud && (
+              <button
+                onClick={onMobileHud}
+                className="md:hidden pixel-btn text-[9px] px-3 py-1"
+                aria-label="Open mobile HUD"
+              >
+                [ HUD ]
+              </button>
+            )}
           </div>
         </div>
       </header>

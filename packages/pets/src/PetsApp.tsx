@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { PixelChickenIcon, PixelBearIcon, PixelMoonIcon, PixelSunIcon } from "./Icons";
+import { PixelChickenIcon } from "./Icons";
 import PetSprite from "../../shell/src/components/PetSprite";
 import type { PetStatus } from "../../shell/src/types";
+import { EVOLUTION_THRESHOLDS } from "../../shared/src/pet/evolution";
 
 // --- Type matching useProgressService return shape ---
 interface ProgressState {
@@ -11,8 +12,6 @@ interface ProgressState {
       stage: number;
       lastFedAt: number;
       happiness: number;
-      lastPlayedAt: number;
-      isSleeping: boolean;
     };
     completedLevels: unknown[];
     foodConsumed: number;
@@ -21,10 +20,7 @@ interface ProgressState {
   foodAvailable: number;
   hungryLevel: number;
   happiness: number;
-  isSleeping: boolean;
   feedPet: () => Promise<void>;
-  playWithPet: () => Promise<void>;
-  toggleSleep: () => Promise<void>;
 }
 
 interface PetsAppProps {
@@ -61,21 +57,21 @@ const getStageLore = (stage: number): string => {
 };
 
 const getXpToNextStage = (stage: number): number => {
-  // XP thresholds from evolution.ts: stages at 5, 15, 30, 50, 80
-  const thresholds = [0, 5, 15, 30, 50, 80];
-  return thresholds[stage] ?? 80;
+  // EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100]
+  // threshold[stage] is the XP required to reach `stage` (1-indexed)
+  // so the XP needed to reach the NEXT stage is threshold[stage]
+  return EVOLUTION_THRESHOLDS[stage] ?? EVOLUTION_THRESHOLDS[EVOLUTION_THRESHOLDS.length - 1];
 };
 
 export default function PetsApp({
   progressState,
 }: PetsAppProps): React.ReactElement {
   const hasProgress = !!progressState;
-  const petState = progressState?.state.pet ?? { xp: 0, stage: 1, isSleeping: false, happiness: 50, lastFedAt: 0, lastPlayedAt: 0 };
+  const petState = progressState?.state.pet ?? { xp: 0, stage: 1, happiness: 50, lastFedAt: 0 };
   const foodAvailable = progressState?.foodAvailable ?? 0;
   const isHungry = progressState?.isHungry ?? false;
   const hungryLevel = progressState?.hungryLevel ?? 0;
   const happiness = progressState?.happiness ?? 50;
-  const isSleeping = progressState?.isSleeping ?? false;
 
   const [spriteStatus, setSpriteStatus] = useState<PetStatus>("idle");
   const [animationFrame, setAnimationFrame] = useState(0);
@@ -94,26 +90,15 @@ export default function PetsApp({
     setTimeout(() => setSpriteStatus("idle"), 2000);
   };
 
-  const handlePlay = async () => {
-    if (!hasProgress) return;
-    await progressState.playWithPet();
-    setSpriteStatus("playing");
-    setTimeout(() => setSpriteStatus("idle"), 2000);
-  };
-
-  const handleSleepToggle = async () => {
-    if (!hasProgress) return;
-    await progressState.toggleSleep();
-  };
-
-  const canFeed = isHungry && foodAvailable > 0 && !isSleeping;
-  const canPlay = !isSleeping;
+  const canFeed = isHungry && foodAvailable > 0;
 
   // Map 0-6 hunger level to 100% full down to 0%
   const hungerPct = Math.max(0, 100 - Math.round((hungryLevel / 6) * 100));
 
   // XP progress within current stage
-  const currentStageXpFloor = [0, 0, 5, 15, 30, 50][petState.stage] ?? 0;
+  // EVOLUTION_THRESHOLDS[stage-1] = XP floor for current stage
+  // EVOLUTION_THRESHOLDS[stage]   = XP needed for next stage
+  const currentStageXpFloor = EVOLUTION_THRESHOLDS[petState.stage - 1] ?? 0;
   const nextStageXp = getXpToNextStage(petState.stage);
   const xpRange = nextStageXp - currentStageXpFloor;
   const xpProgress = xpRange > 0
@@ -142,17 +127,11 @@ export default function PetsApp({
             <PetSprite
               size={120}
               stage={petState.stage}
-              status={isSleeping ? "sleeping" : spriteStatus}
-              isSleeping={isSleeping}
+              status={spriteStatus}
+              isSleeping={false}
               isHungry={isHungry}
               animationFrame={animationFrame}
             />
-
-            {isSleeping && (
-              <span className="absolute top-2 right-2 text-cozy-text font-press text-[8px] animate-pulse">
-                ZZZ...
-              </span>
-            )}
           </div>
 
           <div className="text-center">
@@ -200,8 +179,8 @@ export default function PetsApp({
             {/* Status badge */}
             <div className="flex justify-between items-center mt-1">
               <span>STATUS:</span>
-              <span className={isSleeping ? "text-blue-400" : isHungry ? "text-yellow-400" : "text-green-400"}>
-                {isSleeping ? "SLEEPING 💤" : isHungry ? "HUNGRY 🍽" : "CONTENT ✓"}
+              <span className={isHungry ? "text-yellow-400" : "text-green-400"}>
+                {isHungry ? "HUNGRY 🍽" : "CONTENT ✓"}
               </span>
             </div>
           </div>
@@ -218,30 +197,9 @@ export default function PetsApp({
               disabled={!canFeed || !hasProgress}
               className="pixel-btn text-[8px] py-1.5 w-full flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none"
             >
-              {isSleeping ? "WAKE UP TO FEED" : canFeed ? "FEED STAR-FOOD" : isHungry ? "NO STAR-FOOD" : "NOT HUNGRY"}
+              {canFeed ? "FEED STAR-FOOD" : isHungry ? "NO STAR-FOOD" : "NOT HUNGRY"}
               <PixelChickenIcon className="w-3.5 h-3.5" />
             </button>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => { void handlePlay(); }}
-                disabled={!canPlay || !hasProgress}
-                className="pixel-btn text-[8px] py-1.5 flex-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none"
-              >
-                PLAY <PixelBearIcon className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={() => { void handleSleepToggle(); }}
-                disabled={!hasProgress}
-                className="pixel-btn text-[8px] py-1.5 flex-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none"
-              >
-                {isSleeping ? (
-                  <>WAKE <PixelSunIcon className="w-3.5 h-3.5" /></>
-                ) : (
-                  <>SLEEP <PixelMoonIcon className="w-3.5 h-3.5" /></>
-                )}
-              </button>
-            </div>
           </div>
         </div>
       </div>

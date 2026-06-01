@@ -274,6 +274,12 @@ button:focus-visible,
   }
 }
 
+/* MFE loader progress bar slide */
+@keyframes mfe-progress-slide {
+  from { width: 15%; margin-left: 0%; }
+  to   { width: 40%; margin-left: 60%; }
+}
+
 /* Sokoban target pulse */
 @keyframes targetPulse {
   0%, 100% { opacity: 0.4; transform: scale(1); }

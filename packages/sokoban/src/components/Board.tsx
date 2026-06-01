@@ -4,7 +4,11 @@ import Tile from "./Tile";
 import BoxTile from "./Box";
 import PlayerLayer from "./PlayerLayer";
 
-export default function Board() {
+interface BoardProps {
+  petStage?: number;
+}
+
+export default function Board({ petStage = 1 }: BoardProps) {
   const { board, player, boxes, deadlockedBoxIds, lastDirection, isMoving } =
     useSokobanStore(
       (s) => ({
@@ -56,6 +60,7 @@ export default function Board() {
         tileHeightPercent={th}
         status={isMoving ? "moving" : "idle"}
         direction={lastDirection}
+        petStage={petStage}
       />
     </div>
   );

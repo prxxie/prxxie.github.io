@@ -19,9 +19,11 @@ vi.mock("./engine/synth", () => ({
 vi.mock("shared", () => ({
   ProgressService: vi.fn().mockImplementation(() => ({
     completeLevel: vi.fn().mockResolvedValue(true),
+    completeLevelWithStars: vi.fn().mockResolvedValue(true),
     feedPet: vi.fn().mockResolvedValue(undefined),
     getFoodAvailable: vi.fn().mockResolvedValue(0),
     isPetHungry: vi.fn().mockResolvedValue(false),
+    getHungryLevel: vi.fn().mockResolvedValue(0),
     getState: vi.fn().mockResolvedValue({
       completedLevels: [],
       foodConsumed: 0,

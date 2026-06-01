@@ -13,7 +13,14 @@ function initialState(): ProgressState {
   return {
     completedLevels: [],
     foodConsumed: 0,
-    pet: { xp: 0, stage: 1, lastFedAt: 0 },
+    pet: {
+      xp: 0,
+      stage: 1,
+      lastFedAt: 0,
+      happiness: 50,
+      lastPlayedAt: Date.now(),
+      isSleeping: false,
+    },
   };
 }
 
@@ -25,7 +32,14 @@ export class LocalProgressRepository implements ProgressRepository {
       if (!raw) return initialState();
       const data = JSON.parse(raw) as StoredData;
       if (data.version !== 1) return initialState();
-      return data.state;
+      
+      // Fill defaults for backward compatibility
+      const state = data.state;
+      if (state.pet.happiness === undefined) state.pet.happiness = 50;
+      if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = Date.now();
+      if (state.pet.isSleeping === undefined) state.pet.isSleeping = false;
+      
+      return state;
     } catch {
       return initialState();
     }
@@ -72,16 +86,44 @@ export class LocalProgressRepository implements ProgressRepository {
     return true;
   }
 
-  async feedPet(): Promise<void> {
+  async feedPet(lastPlayedAt?: number): Promise<void> {
     const state = await this.getState();
     const newXp = state.pet.xp + 1;
     await this.saveState({
       ...state,
       foodConsumed: state.foodConsumed + 1,
       pet: {
+        ...state.pet,
         xp: newXp,
         stage: getEvolutionStage(newXp),
         lastFedAt: Date.now(),
+        isSleeping: false, // Auto-wakes up when fed
+        lastPlayedAt: lastPlayedAt !== undefined ? lastPlayedAt : state.pet.lastPlayedAt,
+      },
+    });
+  }
+
+  async playWithPet(happiness: number): Promise<void> {
+    const state = await this.getState();
+    await this.saveState({
+      ...state,
+      pet: {
+        ...state.pet,
+        happiness,
+        lastPlayedAt: Date.now(),
+      },
+    });
+  }
+
+  async toggleSleep(lastFedAt?: number, lastPlayedAt?: number): Promise<void> {
+    const state = await this.getState();
+    await this.saveState({
+      ...state,
+      pet: {
+        ...state.pet,
+        isSleeping: !state.pet.isSleeping,
+        lastFedAt: lastFedAt !== undefined ? lastFedAt : state.pet.lastFedAt,
+        lastPlayedAt: lastPlayedAt !== undefined ? lastPlayedAt : state.pet.lastPlayedAt,
       },
     });
   }

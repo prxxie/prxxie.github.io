@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import ConsoleFrame from "./components/ConsoleFrame";
 import { PixelBookIcon, PixelPawIcon } from "./components/Icons";
-import { usePetStore } from "./store/petStore";
+import { useProgressService } from "./hooks/useProgressService";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHashRouter } from "./hooks/useHashRouter";
 import MatrixMenu from "./components/MatrixMenu";
@@ -60,6 +60,7 @@ export default function App(): React.ReactElement {
   const windowRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isPetHudOpen, setIsPetHudOpen] = useState(false);
+  const progressService = useProgressService();
 
   useEffect(() => {
     const handleFullscreenChange = (): void => {
@@ -92,7 +93,7 @@ export default function App(): React.ReactElement {
       case "posts":
         return <PostsApp />;
       case "pets":
-        return <PetsApp usePetStore={usePetStore} />;
+        return <PetsApp progressState={progressService} />;
       case "shikaku":
         return <ShikakuApp />;
       case "sokoban":

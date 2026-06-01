@@ -2,6 +2,7 @@ import type { ProgressRepository } from "../repository/ProgressRepository";
 import type { ProgressState } from "./types";
 
 export const HUNGER_COOLDOWN = 10 * 60 * 1000;
+export const HAPPINESS_COOLDOWN = 10 * 60 * 1000;
 
 export class ProgressService {
   constructor(private readonly repo: ProgressRepository) {}
@@ -28,10 +29,51 @@ export class ProgressService {
 
   async feedPet(): Promise<void> {
     const state = await this.repo.getState();
-    const isHungry = Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+    const isHungry = await this.isPetHungry();
     const foodAvailable = await this.getFoodAvailable();
     if (!isHungry || foodAvailable <= 0) return;
-    await this.repo.feedPet();
+
+    let nextLastPlayedAt: number | undefined;
+    if (state.pet.isSleeping && state.pet.lastPlayedAt !== 0) {
+      const elapsed = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+      const oldHappinessDivisor = HAPPINESS_COOLDOWN * 4;
+      const newElapsed = elapsed * (HAPPINESS_COOLDOWN / oldHappinessDivisor);
+      nextLastPlayedAt = Date.now() - newElapsed;
+    }
+
+    await this.repo.feedPet(nextLastPlayedAt);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+
+  async playWithPet(): Promise<void> {
+    const state = await this.repo.getState();
+    if (state.pet.isSleeping) return; // Can't play if asleep!
+    const currentHappiness = await this.getHappiness();
+    const newHappiness = Math.min(100, currentHappiness + 20);
+    await this.repo.playWithPet(newHappiness);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    }
+  }
+
+  async toggleSleep(): Promise<void> {
+    const state = await this.repo.getState();
+    
+    const oldHungerDivisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    const newHungerDivisor = !state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    const elapsedHunger = Math.max(0, Date.now() - state.pet.lastFedAt);
+    const newElapsedHunger = elapsedHunger * (newHungerDivisor / oldHungerDivisor);
+    const lastFedAt = state.pet.lastFedAt !== 0 ? Date.now() - newElapsedHunger : 0;
+
+    const oldHappinessDivisor = state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const newHappinessDivisor = !state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const elapsedHappiness = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+    const newElapsedHappiness = elapsedHappiness * (newHappinessDivisor / oldHappinessDivisor);
+    const lastPlayedAt = state.pet.lastPlayedAt !== 0 ? Date.now() - newElapsedHappiness : 0;
+
+    await this.repo.toggleSleep(lastFedAt, lastPlayedAt);
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
     }
@@ -47,14 +89,25 @@ export class ProgressService {
   }
 
   async isPetHungry(): Promise<boolean> {
-    const state = await this.repo.getState();
-    return Date.now() - state.pet.lastFedAt >= HUNGER_COOLDOWN;
+    const level = await this.getHungryLevel();
+    return level >= 1;
   }
 
   async getHungryLevel(): Promise<number> {
     const state = await this.repo.getState();
-    const elapsed = Date.now() - state.pet.lastFedAt;
-    return Math.min(6, Math.floor(elapsed / HUNGER_COOLDOWN));
+    if (state.pet.lastFedAt === 0) return 6; // Maximum hunger if never fed
+    const elapsed = Math.max(0, Date.now() - state.pet.lastFedAt);
+    const divisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    return Math.min(6, Math.floor(elapsed / divisor));
+  }
+
+  async getHappiness(): Promise<number> {
+    const state = await this.repo.getState();
+    if (state.pet.lastPlayedAt === 0) return state.pet.happiness;
+    const elapsed = Math.max(0, Date.now() - state.pet.lastPlayedAt);
+    const divisor = state.pet.isSleeping ? HAPPINESS_COOLDOWN * 4 : HAPPINESS_COOLDOWN;
+    const decay = Math.floor(elapsed / divisor) * 5;
+    return Math.max(0, state.pet.happiness - decay);
   }
 
   async getPetStage(): Promise<number> {

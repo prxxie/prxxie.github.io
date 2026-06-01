@@ -10,13 +10,16 @@ describe("LocalProgressRepository", () => {
   });
 
   describe("getState", () => {
-    it("returns initial state when localStorage is empty", async () => {
+    it("returns initial state with defaults when localStorage is empty", async () => {
       const state = await repo.getState();
       expect(state.completedLevels).toEqual([]);
       expect(state.foodConsumed).toBe(0);
       expect(state.pet.xp).toBe(0);
       expect(state.pet.stage).toBe(1);
       expect(state.pet.lastFedAt).toBe(0);
+      expect(state.pet.happiness).toBe(50);
+      expect(state.pet.lastPlayedAt).toBeGreaterThan(0);
+      expect(state.pet.isSleeping).toBe(false);
     });
 
     it("returns initial state when localStorage contains malformed JSON", async () => {
@@ -36,6 +39,21 @@ describe("LocalProgressRepository", () => {
       const state = await repo.getState();
       expect(state.completedLevels).toEqual([]);
     });
+
+    it("supplies missing fields for legacy saves", async () => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        version: 1,
+        state: {
+          completedLevels: [],
+          foodConsumed: 0,
+          pet: { xp: 5, stage: 1, lastFedAt: 12345 }
+        }
+      }));
+      const state = await repo.getState();
+      expect(state.pet.happiness).toBe(50);
+      expect(state.pet.lastPlayedAt).toBeGreaterThan(0);
+      expect(state.pet.isSleeping).toBe(false);
+    });
   });
 
   describe("saveState / getState round-trip", () => {
@@ -43,7 +61,7 @@ describe("LocalProgressRepository", () => {
       const saved = {
         completedLevels: [{ module: "shikaku", levelId: "easy-1", completedAt: 1000, stars: 1 }],
         foodConsumed: 1,
-        pet: { xp: 1, stage: 1, lastFedAt: 9000 },
+        pet: { xp: 1, stage: 1, lastFedAt: 9000, happiness: 80, lastPlayedAt: 12345, isSleeping: true },
       };
       await repo.saveState(saved);
       const loaded = await repo.getState();
@@ -136,12 +154,45 @@ describe("LocalProgressRepository", () => {
       await repo.saveState({
         completedLevels: [],
         foodConsumed: 9,
-        pet: { xp: 9, stage: 1, lastFedAt: 0 },
+        pet: { xp: 9, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false },
       });
       await repo.feedPet();
       const state = await repo.getState();
       expect(state.pet.xp).toBe(10);
       expect(state.pet.stage).toBe(2);
+    });
+
+    it("auto-wakes the pet when it is sleeping", async () => {
+      await repo.saveState({
+        completedLevels: [],
+        foodConsumed: 0,
+        pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: true },
+      });
+      await repo.feedPet();
+      const state = await repo.getState();
+      expect(state.pet.isSleeping).toBe(false);
+    });
+  });
+
+  describe("playWithPet", () => {
+    it("updates happiness and lastPlayedAt", async () => {
+      await repo.playWithPet(80);
+      const state = await repo.getState();
+      expect(state.pet.happiness).toBe(80);
+      expect(state.pet.lastPlayedAt).toBeGreaterThan(0);
+    });
+  });
+
+  describe("toggleSleep", () => {
+    it("toggles isSleeping field", async () => {
+      const state1 = await repo.getState();
+      expect(state1.pet.isSleeping).toBe(false);
+      await repo.toggleSleep();
+      const state2 = await repo.getState();
+      expect(state2.pet.isSleeping).toBe(true);
+      await repo.toggleSleep();
+      const state3 = await repo.getState();
+      expect(state3.pet.isSleeping).toBe(false);
     });
   });
 });

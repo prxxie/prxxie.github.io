@@ -1,58 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { PixelChickenIcon, PixelBearIcon, PixelMoonIcon, PixelSunIcon, PixelHeartIcon } from "./Icons";
+import { PixelChickenIcon, PixelBearIcon, PixelMoonIcon, PixelSunIcon } from "./Icons";
 import PetSprite from "../../shell/src/components/PetSprite";
-import { create, type StoreApi, type UseBoundStore } from "zustand";
+import type { PetStatus } from "../../shell/src/types";
 
-type PetStatus = "idle" | "eating" | "playing" | "sleeping";
-
-interface PetState {
-  hunger: number;
+// --- Type matching useProgressService return shape ---
+interface ProgressState {
+  state: {
+    pet: {
+      xp: number;
+      stage: number;
+      lastFedAt: number;
+      happiness: number;
+      lastPlayedAt: number;
+      isSleeping: boolean;
+    };
+    completedLevels: unknown[];
+    foodConsumed: number;
+  };
+  isHungry: boolean;
+  foodAvailable: number;
+  hungryLevel: number;
   happiness: number;
-  status: PetStatus;
   isSleeping: boolean;
-  feed: () => void;
-  play: () => void;
-  toggleSleep: () => void;
-  setStatus: (status: PetStatus) => void;
-  tick?: () => void; // Optional fallback tick
+  feedPet: () => Promise<void>;
+  playWithPet: () => Promise<void>;
+  toggleSleep: () => Promise<void>;
 }
 
-type PetStore = UseBoundStore<StoreApi<PetState>>;
-
-const useLocalStore = create<PetState>()((set) => ({
-  hunger: 50,
-  happiness: 50,
-  status: "idle",
-  isSleeping: false,
-
-  feed: () =>
-    set((state) => {
-      if (state.isSleeping) return state;
-      return {
-        ...state,
-        hunger: Math.max(0, state.hunger - 20),
-        status: "eating",
-      };
-    }),
-  play: () =>
-    set((state) => {
-      if (state.isSleeping) return state;
-      return {
-        ...state,
-        happiness: Math.min(100, state.happiness + 20),
-        status: "playing",
-      };
-    }),
-  toggleSleep: () =>
-    set((state) => ({
-      isSleeping: !state.isSleeping,
-      status: !state.isSleeping ? "sleeping" : "idle",
-    })),
-  setStatus: (status: PetStatus) => set({ status }),
-}));
-
 interface PetsAppProps {
-  usePetStore?: PetStore;
+  progressState?: ProgressState;
 }
 
 const getAsciiBar = (value: number): string => {
@@ -62,20 +38,46 @@ const getAsciiBar = (value: number): string => {
   return `[${"█".repeat(filledSegments)}${"░".repeat(emptySegments)}] ${value}%`;
 };
 
+const getStageName = (stage: number): string => {
+  switch (stage) {
+    case 1: return "EGG";
+    case 2: return "LEAFY SPROUT";
+    case 3: return "BUDREPTILE";
+    case 4: return "FLORASAUR";
+    case 5: return "MEGA FLORASAUR";
+    default: return "UNKNOWN";
+  }
+};
+
+const getStageLore = (stage: number): string => {
+  switch (stage) {
+    case 1: return "A mysterious egg pulsing with green energy.";
+    case 2: return "A tiny sprout! It wiggles when happy.";
+    case 3: return "A leafy reptile — strong and determined!";
+    case 4: return "A magnificent forest dinosaur with a blossomed flower.";
+    case 5: return "Mega-Evolved Legend! Emits a glowing aura on leaf wings.";
+    default: return "A mysterious digital creature.";
+  }
+};
+
+const getXpToNextStage = (stage: number): number => {
+  // XP thresholds from evolution.ts: stages at 5, 15, 30, 50, 80
+  const thresholds = [0, 5, 15, 30, 50, 80];
+  return thresholds[stage] ?? 80;
+};
+
 export default function PetsApp({
-  usePetStore,
+  progressState,
 }: PetsAppProps): React.ReactElement {
-  const store: PetStore = usePetStore || useLocalStore;
+  const hasProgress = !!progressState;
+  const petState = progressState?.state.pet ?? { xp: 0, stage: 1, isSleeping: false, happiness: 50, lastFedAt: 0, lastPlayedAt: 0 };
+  const foodAvailable = progressState?.foodAvailable ?? 0;
+  const isHungry = progressState?.isHungry ?? false;
+  const hungryLevel = progressState?.hungryLevel ?? 0;
+  const happiness = progressState?.happiness ?? 50;
+  const isSleeping = progressState?.isSleeping ?? false;
 
-  const hunger = store((state) => state.hunger);
-  const happiness = store((state) => state.happiness);
-  const status = store((state) => state.status);
-  const isSleeping = store((state) => state.isSleeping);
-  const feed = store((state) => state.feed);
-  const play = store((state) => state.play);
-  const toggleSleep = store((state) => state.toggleSleep);
-  const setStatus = store((state) => state.setStatus);
-
+  const [spriteStatus, setSpriteStatus] = useState<PetStatus>("idle");
   const [animationFrame, setAnimationFrame] = useState(0);
 
   useEffect(() => {
@@ -85,89 +87,165 @@ export default function PetsApp({
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    if (status === "eating" || status === "playing") {
-      const timer = setTimeout(() => {
-        setStatus("idle");
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [status, setStatus]);
+  const handleFeed = async () => {
+    if (!hasProgress) return;
+    await progressState.feedPet();
+    setSpriteStatus("eating");
+    setTimeout(() => setSpriteStatus("idle"), 2000);
+  };
+
+  const handlePlay = async () => {
+    if (!hasProgress) return;
+    await progressState.playWithPet();
+    setSpriteStatus("playing");
+    setTimeout(() => setSpriteStatus("idle"), 2000);
+  };
+
+  const handleSleepToggle = async () => {
+    if (!hasProgress) return;
+    await progressState.toggleSleep();
+  };
+
+  const canFeed = isHungry && foodAvailable > 0 && !isSleeping;
+  const canPlay = !isSleeping;
+
+  // Map 0-6 hunger level to 100% full down to 0%
+  const hungerPct = Math.max(0, 100 - Math.round((hungryLevel / 6) * 100));
+
+  // XP progress within current stage
+  const currentStageXpFloor = [0, 0, 5, 15, 30, 50][petState.stage] ?? 0;
+  const nextStageXp = getXpToNextStage(petState.stage);
+  const xpRange = nextStageXp - currentStageXpFloor;
+  const xpProgress = xpRange > 0
+    ? Math.min(100, Math.round(((petState.xp - currentStageXpFloor) / xpRange) * 100))
+    : 100;
 
   return (
-    <div className="flex flex-col items-center justify-between h-full py-2 box-border">
-      {!usePetStore && (
-        <div className="flex gap-4 text-xs font-press bg-black border border-cozy-border p-2 mb-2 box-border items-center text-cozy-text">
-          <span className="flex items-center gap-1"><PixelChickenIcon className="w-3.5 h-3.5" /> HNG: {hunger}</span>
-          <span className="flex items-center gap-1"><PixelHeartIcon className="w-3.5 h-3.5" /> HPP: {happiness}</span>
-        </div>
-      )}
-
-      {usePetStore && (
-        <div className="w-full flex flex-col gap-2 text-xs font-mono mb-4 text-cozy-text">
-          <div className="flex justify-between items-center">
-            <span>HUNGER:</span>
-            <span className="font-mono">{getAsciiBar(hunger)}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span>HAPPINESS:</span>
-            <span className="font-mono">{getAsciiBar(happiness)}</span>
-          </div>
-        </div>
-      )}
-
-      <div
-        className={`p-4 border border-cozy-border bg-black rounded flex items-center justify-center w-36 h-36 relative overflow-hidden`}
-      >
-        {/* Corner Crosshairs */}
-        <span className="absolute top-1 left-2 text-[10px] text-cozy-text font-mono select-none">+</span>
-        <span className="absolute top-1 right-2 text-[10px] text-cozy-text font-mono select-none">+</span>
-        <span className="absolute bottom-1 left-2 text-[10px] text-cozy-text font-mono select-none">+</span>
-        <span className="absolute bottom-1 right-2 text-[10px] text-cozy-text font-mono select-none">+</span>
-
-        <div style={{ filter: "sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2)" }}>
-          <PetSprite
-            size={112}
-            status={status}
-            isSleeping={isSleeping}
-            animationFrame={animationFrame}
-          />
-        </div>
-
-        {isSleeping && (
-          <span className="absolute top-2 right-2 text-cozy-text font-press text-[8px] animate-pulse">
-            ZZZ...
-          </span>
-        )}
+    <div className="flex flex-col items-center justify-between h-full py-4 px-2 box-border text-cozy-text font-mono">
+      {/* Header */}
+      <div className="w-full border-b border-dashed border-cozy-border pb-2 mb-4 text-center">
+        <h2 className="font-press text-xs text-cozy-text">PET STATUS CONSOLE</h2>
+        <p className="text-[8px] text-cozy-accent mt-1">
+          {hasProgress ? "SYSTEM SYNC: ACTIVE" : "STANDALONE MODE"}
+        </p>
       </div>
 
-      <div className="flex gap-2 w-full mt-4">
-        <button
-          onClick={feed}
-          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text"
-        >
-          FEED <PixelChickenIcon className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={play}
-          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text"
-        >
-          PLAY <PixelBearIcon className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={toggleSleep}
-          className="pixel-btn text-[8px] flex-1 py-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text"
-        >
-          {isSleeping ? (
-            <>
-              WAKE <PixelSunIcon className="w-3.5 h-3.5" />
-            </>
-          ) : (
-            <>
-              SLEEP <PixelMoonIcon className="w-3.5 h-3.5" />
-            </>
-          )}
-        </button>
+      <div className="flex flex-col md:flex-row gap-6 w-full items-center justify-center flex-1">
+        {/* Pet Screen Frame */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="p-4 border border-cozy-border bg-black rounded flex items-center justify-center w-40 h-40 relative overflow-hidden">
+            <span className="absolute top-1 left-2 text-[10px] text-cozy-text font-mono select-none">+</span>
+            <span className="absolute top-1 right-2 text-[10px] text-cozy-text font-mono select-none">+</span>
+            <span className="absolute bottom-1 left-2 text-[10px] text-cozy-text font-mono select-none">+</span>
+            <span className="absolute bottom-1 right-2 text-[10px] text-cozy-text font-mono select-none">+</span>
+
+            <div style={{ filter: "sepia(1) saturate(5) hue-rotate(5deg) brightness(1.2)" }}>
+              <PetSprite
+                size={120}
+                stage={petState.stage}
+                status={isSleeping ? "sleeping" : spriteStatus}
+                isSleeping={isSleeping}
+                isHungry={isHungry}
+                animationFrame={animationFrame}
+              />
+            </div>
+
+            {isSleeping && (
+              <span className="absolute top-2 right-2 text-cozy-text font-press text-[8px] animate-pulse">
+                ZZZ...
+              </span>
+            )}
+          </div>
+
+          <div className="text-center">
+            <span className="font-press text-[9px] block text-cozy-accent">
+              {getStageName(petState.stage)}
+            </span>
+            <span className="text-[8px] max-w-[160px] block mt-1 leading-normal text-cozy-text opacity-85 italic">
+              &ldquo;{getStageLore(petState.stage)}&rdquo;
+            </span>
+          </div>
+        </div>
+
+        {/* Stats and Action Buttons */}
+        <div className="flex-1 flex flex-col gap-4 max-w-xs w-full">
+          <div className="flex flex-col gap-2 text-[10px]">
+            {/* XP Progress */}
+            <div className="flex justify-between items-center">
+              <span>XP PROGRESS:</span>
+              <span>{petState.xp} XP</span>
+            </div>
+            <div className="border border-cozy-border h-2.5 bg-black p-0.5">
+              <div
+                className="bg-cozy-accent h-full transition-all duration-500"
+                style={{ width: `${xpProgress}%` }}
+              />
+            </div>
+            <div className="text-[8px] text-cozy-text opacity-60 text-right">
+              {petState.stage < 5
+                ? `→ STAGE ${petState.stage + 1} at ${nextStageXp} XP`
+                : "MAX EVOLUTION REACHED ★"}
+            </div>
+
+            {/* Hunger bar */}
+            <div className="flex justify-between items-center mt-1">
+              <span>HUNGER (FULLNESS):</span>
+              <span>{getAsciiBar(hungerPct)}</span>
+            </div>
+
+            {/* Happiness bar */}
+            <div className="flex justify-between items-center mt-1">
+              <span>HAPPINESS:</span>
+              <span>{getAsciiBar(happiness)}</span>
+            </div>
+
+            {/* Status badge */}
+            <div className="flex justify-between items-center mt-1">
+              <span>STATUS:</span>
+              <span className={isSleeping ? "text-blue-400" : isHungry ? "text-yellow-400" : "text-green-400"}>
+                {isSleeping ? "SLEEPING 💤" : isHungry ? "HUNGRY 🍽" : "CONTENT ✓"}
+              </span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="border-t border-dashed border-cozy-border pt-4 flex flex-col gap-2">
+            <div className="flex justify-between text-[9px] mb-1">
+              <span>AVAILABLE FOOD:</span>
+              <span className="text-cozy-accent">★ x {foodAvailable}</span>
+            </div>
+
+            <button
+              onClick={() => { void handleFeed(); }}
+              disabled={!canFeed || !hasProgress}
+              className="pixel-btn text-[8px] py-1.5 w-full flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none"
+            >
+              {isSleeping ? "WAKE UP TO FEED" : canFeed ? "FEED STAR-FOOD" : isHungry ? "NO STAR-FOOD" : "NOT HUNGRY"}
+              <PixelChickenIcon className="w-3.5 h-3.5" />
+            </button>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => { void handlePlay(); }}
+                disabled={!canPlay || !hasProgress}
+                className="pixel-btn text-[8px] py-1.5 flex-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none"
+              >
+                PLAY <PixelBearIcon className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => { void handleSleepToggle(); }}
+                disabled={!hasProgress}
+                className="pixel-btn text-[8px] py-1.5 flex-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none"
+              >
+                {isSleeping ? (
+                  <>WAKE <PixelSunIcon className="w-3.5 h-3.5" /></>
+                ) : (
+                  <>SLEEP <PixelMoonIcon className="w-3.5 h-3.5" /></>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

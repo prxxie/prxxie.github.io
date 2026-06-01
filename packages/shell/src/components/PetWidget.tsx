@@ -4,7 +4,7 @@ import { useProgressService } from "../hooks/useProgressService";
 import type { PetStatus } from "../types";
 
 export default function PetWidget(): React.ReactElement {
-  const { state, isHungry, foodAvailable, feedPet } = useProgressService();
+  const { state, isHungry, foodAvailable, feedPet, isSleeping } = useProgressService();
   const [spriteStatus, setSpriteStatus] = useState<PetStatus>("idle");
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -23,18 +23,36 @@ export default function PetWidget(): React.ReactElement {
     resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
   }, [feedPet]);
 
-  const canFeed = isHungry && foodAvailable > 0;
+  const canFeed = isHungry && foodAvailable > 0 && !isSleeping;
+
+  // Get evolution stage name
+  const getStageName = (stage: number) => {
+    switch (stage) {
+      case 1: return "EGG";
+      case 2: return "LEAFY SPROUT";
+      case 3: return "BUDREPTILE";
+      case 4: return "FLORASAUR";
+      case 5: return "MEGA FLORASAUR";
+      default: return "UNKNOWN";
+    }
+  };
 
   return (
     <div className="flex flex-col items-center gap-2 p-2 text-cozy-text">
-      <div className="border border-cozy-border p-2 bg-black flex items-center justify-center">
-        <PetSprite size={64} status={spriteStatus} />
+      <div className="border border-cozy-border p-2 bg-black flex items-center justify-center relative w-20 h-20">
+        <PetSprite
+          size={64}
+          stage={state.pet.stage}
+          status={isSleeping ? "sleeping" : spriteStatus}
+          isSleeping={isSleeping}
+          isHungry={isHungry}
+        />
       </div>
 
       <div className="w-full flex flex-col gap-1 font-mono text-[9px]">
         <div className="flex justify-between">
           <span className="font-press">STAGE:</span>
-          <span>{state.pet.stage}</span>
+          <span>{getStageName(state.pet.stage)}</span>
         </div>
         <div className="flex justify-between">
           <span className="font-press">XP:</span>
@@ -42,11 +60,11 @@ export default function PetWidget(): React.ReactElement {
         </div>
         <div className="flex justify-between">
           <span className="font-press">FOOD:</span>
-          <span>{foodAvailable}</span>
+          <span>★ {foodAvailable}</span>
         </div>
         <div className="flex justify-between">
           <span className="font-press">STATUS:</span>
-          <span>{isHungry ? "HUNGRY" : "FULL"}</span>
+          <span>{isSleeping ? "SLEEPING" : isHungry ? "HUNGRY" : "FULL"}</span>
         </div>
       </div>
 
@@ -55,8 +73,9 @@ export default function PetWidget(): React.ReactElement {
         disabled={!canFeed}
         className="w-full pixel-btn text-[8px] disabled:opacity-40 disabled:pointer-events-none"
       >
-        {canFeed ? "FEED PET" : isHungry ? "NO FOOD" : "NOT HUNGRY"}
+        {isSleeping ? "AWAKE TO FEED" : canFeed ? "FEED PET" : isHungry ? "NO FOOD" : "NOT HUNGRY"}
       </button>
     </div>
   );
 }
+

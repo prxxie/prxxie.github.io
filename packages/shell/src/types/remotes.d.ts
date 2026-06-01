@@ -14,20 +14,30 @@ declare module "shikaku/ShikakuApp" {
 }
 
 declare module "pets/PetsApp" {
-  const PetsApp: (props: {
-    usePetStore?: import("zustand").UseBoundStore<
-      import("zustand").StoreApi<{
-        hunger: number;
+  interface PetsProgressState {
+    state: {
+      pet: {
+        xp: number;
+        stage: number;
+        lastFedAt: number;
         happiness: number;
+        lastPlayedAt: number;
         isSleeping: boolean;
-        status: "idle" | "eating" | "playing" | "sleeping";
-        feed: () => void;
-        play: () => void;
-        toggleSleep: () => void;
-        setStatus: (status: "idle" | "eating" | "playing" | "sleeping") => void;
-        tick: () => void;
-      }>
-    >;
+      };
+      completedLevels: unknown[];
+      foodConsumed: number;
+    };
+    isHungry: boolean;
+    foodAvailable: number;
+    hungryLevel: number;
+    happiness: number;
+    isSleeping: boolean;
+    feedPet: () => Promise<void>;
+    playWithPet: () => Promise<void>;
+    toggleSleep: () => Promise<void>;
+  }
+  const PetsApp: (props: {
+    progressState?: PetsProgressState;
   }) => import("react").ReactElement;
   export default PetsApp;
 }

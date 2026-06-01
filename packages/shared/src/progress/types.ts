@@ -2,6 +2,7 @@ export type CompletedLevel = {
   module: string;
   levelId: string;
   completedAt: number;
+  stars: number;
 };
 
 export type PetState = {

@@ -11,26 +11,27 @@ const progressService = new ProgressService(new LocalProgressRepository());
 
 export default function SokobanApp(): React.ReactElement {
   const [view, setView] = useState<"menu" | "game">("menu");
-  const [completedLevelIds, setCompletedLevelIds] = useState<Set<string>>(new Set());
+  const [bestStars, setBestStars] = useState<Record<string, number>>({});
   const loadLevel = useSokobanStore((state) => state.loadLevel);
   const currentLevelIdx = useSokobanStore((state) => state.currentLevelIdx);
 
-  const refreshCompleted = useCallback(async () => {
+  const refreshProgress = useCallback(async () => {
     const state = await progressService.getState();
-    const ids = new Set(
-      state.completedLevels
-        .filter((c) => c.module === "sokoban")
-        .map((c) => c.levelId)
-    );
-    setCompletedLevelIds(ids);
+    const map: Record<string, number> = {};
+    for (const c of state.completedLevels) {
+      if (c.module === "sokoban") {
+        map[c.levelId] = c.stars ?? 1;
+      }
+    }
+    setBestStars(map);
   }, []);
 
   useEffect(() => {
-    void refreshCompleted();
-    const handler = () => { void refreshCompleted(); };
+    void refreshProgress();
+    const handler = () => { void refreshProgress(); };
     window.addEventListener("cozyos:progress-updated", handler);
     return () => window.removeEventListener("cozyos:progress-updated", handler);
-  }, [refreshCompleted]);
+  }, [refreshProgress]);
 
   const handleSelectLevel = (idx: number): void => {
     loadLevel(idx);
@@ -42,7 +43,7 @@ export default function SokobanApp(): React.ReactElement {
       {view === "menu" ? (
         <LevelSelect
           onSelect={handleSelectLevel}
-          completedLevelIds={completedLevelIds}
+          bestStars={bestStars}
           currentLevelIdx={currentLevelIdx}
         />
       ) : (

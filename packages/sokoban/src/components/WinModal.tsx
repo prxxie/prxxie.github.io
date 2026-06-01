@@ -6,6 +6,12 @@ import { SOKOBAN_LEVELS } from "../levels";
 
 const progressService = new ProgressService(new LocalProgressRepository());
 
+function calcStars(moves: number, threeStars: number, twoStars: number): number {
+  if (moves <= threeStars) return 3;
+  if (moves <= twoStars) return 2;
+  return 1;
+}
+
 interface WinModalProps {
   onBack: () => void;
 }
@@ -16,6 +22,7 @@ export default function WinModal({ onBack }: WinModalProps): React.ReactElement 
   const moves = useSokobanStore((state) => state.moves);
   const currentLevelIdx = useSokobanStore((state) => state.currentLevelIdx);
   const [rewardMsg, setRewardMsg] = useState<string | null>(null);
+  const [earnedStars, setEarnedStars] = useState(0);
 
   useEffect(() => {
     if (isWon) {
@@ -26,14 +33,20 @@ export default function WinModal({ onBack }: WinModalProps): React.ReactElement 
   useEffect(() => {
     if (!isWon) {
       setRewardMsg(null);
+      setEarnedStars(0);
       return;
     }
+    const level = SOKOBAN_LEVELS[currentLevelIdx];
+    const stars = level
+      ? calcStars(moves, level.targets.threeStars, level.targets.twoStars)
+      : 1;
+    setEarnedStars(stars);
     void progressService
-      .completeLevel("sokoban", SOKOBAN_LEVELS[currentLevelIdx]?.id ?? `level-${currentLevelIdx}`)
-      .then((firstTime) => {
-        setRewardMsg(firstTime ? "+1 FOOD" : "ALREADY COMPLETE");
+      .completeLevelWithStars("sokoban", level?.id ?? `level-${currentLevelIdx}`, stars)
+      .then((improved) => {
+        setRewardMsg(improved ? `+${stars} FOOD` : "ALREADY BEST");
       });
-  }, [isWon, currentLevelIdx]);
+  }, [isWon, currentLevelIdx, moves]);
 
   if (!isWon) return <React.Fragment />;
 
@@ -43,6 +56,9 @@ export default function WinModal({ onBack }: WinModalProps): React.ReactElement 
         <h2 className="font-press text-[14px] text-cozy-text animate-bounce">
           STAGE CLEAR!
         </h2>
+        <div className="text-[18px] tracking-widest">
+          {"★".repeat(earnedStars)}{"☆".repeat(3 - earnedStars)}
+        </div>
         <p className="font-mono text-sm text-cozy-text">
           Finished in{" "}
           <span className="font-bold font-press text-[11px] text-cozy-text">

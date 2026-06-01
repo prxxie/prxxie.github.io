@@ -8,6 +8,7 @@ describe("Sokoban Solver", () => {
       id: "test-trivial",
       name: "Trivial",
       grid: ["#####", "#@  #", "# * #", "#####"],
+      targets: { threeStars: 10, twoStars: 20 },
     };
 
     const result = solveSokoban(level);
@@ -20,6 +21,7 @@ describe("Sokoban Solver", () => {
       id: "test-simple",
       name: "Simple",
       grid: ["#####", "#@  #", "# $ #", "# . #", "#####"],
+      targets: { threeStars: 10, twoStars: 20 },
     };
 
     const result = solveSokoban(level);
@@ -33,6 +35,7 @@ describe("Sokoban Solver", () => {
       id: "test-unsolvable",
       name: "Unsolvable",
       grid: ["#####", "#@  #", "#$  #", "# . #", "#####"],
+      targets: { threeStars: 10, twoStars: 20 },
     };
 
     const result = solveSokoban(level);
@@ -44,6 +47,7 @@ describe("Sokoban Solver", () => {
       id: "test-two-box",
       name: "Two Box",
       grid: ["######", "#@   #", "# $$ #", "# .. #", "######"],
+      targets: { threeStars: 10, twoStars: 20 },
     };
 
     const result = solveSokoban(level);
@@ -63,6 +67,7 @@ describe("Sokoban Solver", () => {
         "#   @  #",
         "########",
       ],
+      targets: { threeStars: 10, twoStars: 20 },
     };
 
     const result = solveSokoban(level, 100, 30000); // very low state limit

@@ -15,18 +15,21 @@ export function useProgressService() {
   const [isHungry, setIsHungry] = useState(false);
   const [foodAvailable, setFoodAvailable] = useState(0);
   const [hungryLevel, setHungryLevel] = useState(0);
+  const [happiness, setHappiness] = useState(50);
 
   const refresh = useCallback(async () => {
-    const [s, hungry, food, level] = await Promise.all([
+    const [s, hungry, food, level, happy] = await Promise.all([
       progressService.getState(),
       progressService.isPetHungry(),
       progressService.getFoodAvailable(),
       progressService.getHungryLevel(),
+      progressService.getHappiness(),
     ]);
     setState(s);
     setIsHungry(hungry);
     setFoodAvailable(food);
     setHungryLevel(level);
+    setHappiness(happy);
   }, []);
 
   useEffect(() => {
@@ -40,5 +43,23 @@ export function useProgressService() {
     await progressService.feedPet();
   }, []);
 
-  return { state, isHungry, foodAvailable, hungryLevel, feedPet };
+  const playWithPet = useCallback(async () => {
+    await progressService.playWithPet();
+  }, []);
+
+  const toggleSleep = useCallback(async () => {
+    await progressService.toggleSleep();
+  }, []);
+
+  return {
+    state,
+    isHungry,
+    foodAvailable,
+    hungryLevel,
+    happiness,
+    isSleeping: state.pet.isSleeping,
+    feedPet,
+    playWithPet,
+    toggleSleep,
+  };
 }

@@ -33,28 +33,6 @@ const PixelChickenIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE_
   /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "11", y: "9", width: "3", height: "2" }),
   /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "12", width: "2", height: "3" })
 ] });
-const PixelBearIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "3", width: "3", height: "3" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "10", y: "3", width: "3", height: "3" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "5", width: "8", height: "8" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "8", width: "1", height: "1", fill: "#fff" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "8", width: "1", height: "1", fill: "#fff" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "10", width: "2", height: "1" })
-] });
-const PixelMoonIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "2", width: "4", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "4", width: "4", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "3", y: "6", width: "3", height: "4" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "4", y: "10", width: "4", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "12", width: "4", height: "2" })
-] });
-const PixelSunIcon = ({ className = "w-4 h-4 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className, viewBox: "0 0 16 16", fill: "currentColor", children: [
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "6", y: "6", width: "4", height: "4" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "2", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "7", y: "12", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "2", y: "7", width: "2", height: "2" }),
-  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "12", y: "7", width: "2", height: "2" })
-] });
 
 function PetSprite({
   size = 16,
@@ -200,6 +178,8 @@ function PetSprite({
   );
 }
 
+const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
+
 const {useEffect,useState} = await importShared('react');
 const getAsciiBar = (value) => {
   const totalSegments = 12;
@@ -240,8 +220,7 @@ const getStageLore = (stage) => {
   }
 };
 const getXpToNextStage = (stage) => {
-  const thresholds = [0, 5, 15, 30, 50, 80];
-  return thresholds[stage] ?? 80;
+  return EVOLUTION_THRESHOLDS[stage] ?? EVOLUTION_THRESHOLDS[EVOLUTION_THRESHOLDS.length - 1];
 };
 function PetsApp({
   progressState
@@ -252,7 +231,6 @@ function PetsApp({
   const isHungry = progressState?.isHungry ?? false;
   const hungryLevel = progressState?.hungryLevel ?? 0;
   const happiness = progressState?.happiness ?? 50;
-  const isSleeping = progressState?.isSleeping ?? false;
   const [spriteStatus, setSpriteStatus] = useState("idle");
   const [animationFrame, setAnimationFrame] = useState(0);
   useEffect(() => {
@@ -267,20 +245,9 @@ function PetsApp({
     setSpriteStatus("eating");
     setTimeout(() => setSpriteStatus("idle"), 2e3);
   };
-  const handlePlay = async () => {
-    if (!hasProgress) return;
-    await progressState.playWithPet();
-    setSpriteStatus("playing");
-    setTimeout(() => setSpriteStatus("idle"), 2e3);
-  };
-  const handleSleepToggle = async () => {
-    if (!hasProgress) return;
-    await progressState.toggleSleep();
-  };
-  const canFeed = isHungry && foodAvailable > 0 && !isSleeping;
-  const canPlay = !isSleeping;
+  const canFeed = isHungry && foodAvailable > 0;
   const hungerPct = Math.max(0, 100 - Math.round(hungryLevel / 6 * 100));
-  const currentStageXpFloor = [0, 0, 5, 15, 30, 50][petState.stage] ?? 0;
+  const currentStageXpFloor = EVOLUTION_THRESHOLDS[petState.stage - 1] ?? 0;
   const nextStageXp = getXpToNextStage(petState.stage);
   const xpRange = nextStageXp - currentStageXpFloor;
   const xpProgress = xpRange > 0 ? Math.min(100, Math.round((petState.xp - currentStageXpFloor) / xpRange * 100)) : 100;
@@ -301,13 +268,12 @@ function PetsApp({
             {
               size: 120,
               stage: petState.stage,
-              status: isSleeping ? "sleeping" : spriteStatus,
-              isSleeping,
+              status: spriteStatus,
+              isSleeping: false,
               isHungry,
               animationFrame
             }
-          ),
-          isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute top-2 right-2 text-cozy-text font-press text-[8px] animate-pulse", children: "ZZZ..." })
+          )
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-[9px] block text-cozy-accent", children: getStageName(petState.stage) }),
@@ -345,7 +311,7 @@ function PetsApp({
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center mt-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "STATUS:" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: isSleeping ? "text-blue-400" : isHungry ? "text-yellow-400" : "text-green-400", children: isSleeping ? "SLEEPING 💤" : isHungry ? "HUNGRY 🍽" : "CONTENT ✓" })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: isHungry ? "text-yellow-400" : "text-green-400", children: isHungry ? "HUNGRY 🍽" : "CONTENT ✓" })
           ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-dashed border-cozy-border pt-4 flex flex-col gap-2", children: [
@@ -365,44 +331,11 @@ function PetsApp({
               disabled: !canFeed || !hasProgress,
               className: "pixel-btn text-[8px] py-1.5 w-full flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none",
               children: [
-                isSleeping ? "WAKE UP TO FEED" : canFeed ? "FEED STAR-FOOD" : isHungry ? "NO STAR-FOOD" : "NOT HUNGRY",
+                canFeed ? "FEED STAR-FOOD" : isHungry ? "NO STAR-FOOD" : "NOT HUNGRY",
                 /* @__PURE__ */ jsxRuntimeExports.jsx(PixelChickenIcon, { className: "w-3.5 h-3.5" })
               ]
             }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "button",
-              {
-                onClick: () => {
-                  void handlePlay();
-                },
-                disabled: !canPlay || !hasProgress,
-                className: "pixel-btn text-[8px] py-1.5 flex-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none",
-                children: [
-                  "PLAY ",
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBearIcon, { className: "w-3.5 h-3.5" })
-                ]
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                onClick: () => {
-                  void handleSleepToggle();
-                },
-                disabled: !hasProgress,
-                className: "pixel-btn text-[8px] py-1.5 flex-1 flex items-center justify-center gap-1 bg-cozy-accent text-cozy-bg border-cozy-border hover:bg-black hover:text-cozy-text disabled:opacity-40 disabled:pointer-events-none",
-                children: isSleeping ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                  "WAKE ",
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(PixelSunIcon, { className: "w-3.5 h-3.5" })
-                ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                  "SLEEP ",
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(PixelMoonIcon, { className: "w-3.5 h-3.5" })
-                ] })
-              }
-            )
-          ] })
+          )
         ] })
       ] })
     ] })

@@ -17,14 +17,12 @@
     --font-mono: "Geist Mono", ui-monospace, monospace;
     --color-yellow-400: oklch(85.2% .199 91.936);
     --color-green-400: oklch(79.2% .209 151.711);
-    --color-blue-400: oklch(70.7% .165 254.624);
     --color-black: #000;
     --spacing: .25rem;
     --container-xs: 20rem;
     --text-xs: .75rem;
     --text-xs--line-height: calc(1 / .75);
     --leading-normal: 1.5;
-    --animate-pulse: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
     --default-transition-duration: .15s;
     --default-transition-timing-function: cubic-bezier(.4, 0, .2, 1);
     --default-font-family: var(--font-sans);
@@ -299,10 +297,6 @@
     top: calc(var(--spacing) * 1);
   }
 
-  .top-2 {
-    top: calc(var(--spacing) * 2);
-  }
-
   .right-2 {
     right: calc(var(--spacing) * 2);
   }
@@ -393,10 +387,6 @@
 
   .flex-1 {
     flex: 1;
-  }
-
-  .animate-pulse {
-    animation: var(--animate-pulse);
   }
 
   .flex-col {
@@ -535,10 +525,6 @@
   .leading-normal {
     --tw-leading: var(--leading-normal);
     line-height: var(--leading-normal);
-  }
-
-  .text-blue-400 {
-    color: var(--color-blue-400);
   }
 
   .text-cozy-accent {
@@ -874,9 +860,4 @@ button:focus-visible, [role="button"]:focus-visible, .pixel-btn:focus-visible {
 @property --tw-duration {
   syntax: "*";
   inherits: false
-}
-@keyframes pulse {
-  50% {
-    opacity: .5;
-  }
 }

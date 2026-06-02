@@ -1,5 +1,5 @@
 import { importShared } from './__federation_fn_import-D-nfbenS.js';
-import ShikakuApp, { j as jsxRuntimeExports } from './__federation_expose_ShikakuApp-Dsu9UySS.js';
+import ShikakuApp, { j as jsxRuntimeExports } from './__federation_expose_ShikakuApp-D0r1pHCg.js';
 import { r as reactDomExports } from './index-D9Af7wOI.js';
 
 true&&(function polyfill() {

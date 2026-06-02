@@ -101,7 +101,7 @@ class LocalProgressRepository {
     });
     return true;
   }
-  async feedPet(lastPlayedAt) {
+  async feedPet(lastFedAt, lastPlayedAt) {
     const state = await this.getState();
     const newXp = state.pet.xp + 1;
     await this.saveState({
@@ -111,7 +111,7 @@ class LocalProgressRepository {
         ...state.pet,
         xp: newXp,
         stage: getEvolutionStage(newXp),
-        lastFedAt: Date.now(),
+        lastFedAt: lastFedAt !== void 0 ? lastFedAt : Date.now(),
         isSleeping: false,
         // Auto-wakes up when fed
         lastPlayedAt: lastPlayedAt !== void 0 ? lastPlayedAt : state.pet.lastPlayedAt
@@ -171,6 +171,9 @@ class ProgressService {
     const isHungry = await this.isPetHungry();
     const foodAvailable = await this.getFoodAvailable();
     if (!isHungry || foodAvailable <= 0) return;
+    const divisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    const currentLastFedAt = state.pet.lastFedAt === 0 ? Date.now() - 5 * divisor : state.pet.lastFedAt;
+    const nextLastFed = Math.min(Date.now(), currentLastFedAt + divisor);
     let nextLastPlayedAt;
     if (state.pet.isSleeping && state.pet.lastPlayedAt !== 0) {
       const elapsed = Math.max(0, Date.now() - state.pet.lastPlayedAt);
@@ -178,7 +181,7 @@ class ProgressService {
       const newElapsed = elapsed * (HAPPINESS_COOLDOWN / oldHappinessDivisor);
       nextLastPlayedAt = Date.now() - newElapsed;
     }
-    await this.repo.feedPet(nextLastPlayedAt);
+    await this.repo.feedPet(nextLastFed, nextLastPlayedAt);
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
     }
@@ -224,10 +227,10 @@ class ProgressService {
   }
   async getHungryLevel() {
     const state = await this.repo.getState();
-    if (state.pet.lastFedAt === 0) return 6;
+    if (state.pet.lastFedAt === 0) return 5;
     const elapsed = Math.max(0, Date.now() - state.pet.lastFedAt);
     const divisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
-    return Math.min(6, Math.floor(elapsed / divisor));
+    return Math.min(5, Math.floor(elapsed / divisor));
   }
   async getHappiness() {
     const state = await this.repo.getState();
@@ -11149,6 +11152,7 @@ function ShikakuApp() {
   const isWon = useShikakuStore((state) => state.isWon);
   const puzzle = useShikakuStore((state) => state.puzzle);
   const loadLevel = useShikakuStore((state) => state.loadLevel);
+  const starsAchieved = useShikakuStore((state) => state.starsAchieved);
   useEffect(() => {
     if (isWon) {
       synth.playWin();
@@ -11156,10 +11160,10 @@ function ShikakuApp() {
   }, [isWon]);
   useEffect(() => {
     if (!isWon || !puzzle || selectedIdx === null) return;
-    void progressService.completeLevel("shikaku", puzzle.id).then((firstTime) => {
-      setRewardMsg(firstTime ? "+1 FOOD" : "ALREADY COMPLETE");
+    void progressService.completeLevelWithStars("shikaku", puzzle.id, starsAchieved).then((improved) => {
+      setRewardMsg(improved ? `+${starsAchieved} FOOD` : "ALREADY BEST");
     });
-  }, [isWon, puzzle, selectedIdx]);
+  }, [isWon, puzzle, selectedIdx, starsAchieved]);
   const handleSelectLevel = (idx) => {
     setSelectedIdx(idx);
     setRewardMsg(null);

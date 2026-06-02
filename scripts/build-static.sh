@@ -10,6 +10,7 @@ npm run build -w packages/posts
 npm run build -w packages/pets
 npm run build -w packages/shikaku
 npm run build -w packages/sokoban
+npm run build -w packages/slitherlink
 
 # Build shell host
 npm run build -w packages/shell
@@ -20,6 +21,7 @@ mkdir -p dist/mfe/posts
 mkdir -p dist/mfe/pets
 mkdir -p dist/mfe/shikaku
 mkdir -p dist/mfe/sokoban
+mkdir -p dist/mfe/slitherlink
 
 cp -r packages/shell/dist/* dist/
 cp -r packages/about/dist/* dist/mfe/about/
@@ -27,5 +29,6 @@ cp -r packages/posts/dist/* dist/mfe/posts/
 cp -r packages/pets/dist/* dist/mfe/pets/
 cp -r packages/shikaku/dist/* dist/mfe/shikaku/
 cp -r packages/sokoban/dist/* dist/mfe/sokoban/
+cp -r packages/slitherlink/dist/* dist/mfe/slitherlink/
 
 echo "Build assembled successfully in dist/!"

@@ -1,9 +1,9 @@
 [submodule "packages/shikaku"]
 	path = packages/shikaku
-	url = git@github.com:prxxie/cozyos-shikaku.git
+	url = ../cozyos-shikaku.git
 [submodule "packages/sokoban"]
 	path = packages/sokoban
-	url = git@github.com:prxxie/cozyos-sokoban.git
+	url = ../cozyos-sokoban.git
 [submodule "packages/slitherlink"]
 	path = packages/slitherlink
-	url = git@github.com:prxxie/cozyos-slitherlink.git
+	url = ../cozyos-slitherlink.git

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { supabase, isSupabaseConfigured } from "../utils/supabase";
 
 interface CloudSyncModalProps {
@@ -14,6 +14,7 @@ export default function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps)
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!supabase) return;
@@ -37,6 +38,9 @@ export default function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps)
       if (subscription) {
         subscription.unsubscribe();
       }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
     };
   }, []);
 
@@ -58,7 +62,7 @@ export default function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps)
         const { error } = await client.auth.signInWithPassword({ email, password });
         if (error) throw error;
         setMessage("LOGIN SUCCESSFUL. CLOUD PROGRESS SYNCED.");
-        setTimeout(onClose, 1500);
+        timeoutRef.current = setTimeout(onClose, 1500);
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -76,7 +80,7 @@ export default function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps)
       const { error } = await client.auth.signOut();
       if (error) throw error;
       setMessage("LOGOUT SUCCESSFUL. LOCAL REPO REMAINS ACTIVE.");
-      setTimeout(onClose, 1500);
+      timeoutRef.current = setTimeout(onClose, 1500);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       setErrorMsg(errorMessage.toUpperCase() || "LOGOUT ERROR");
@@ -95,6 +99,7 @@ export default function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps)
           <button
             onClick={onClose}
             className="text-cozy-accent hover:underline bg-transparent border-none cursor-pointer font-press text-[9px]"
+            aria-label="Close Cloud Sync Modal"
           >
             [X]
           </button>

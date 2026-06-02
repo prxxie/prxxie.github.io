@@ -1,8 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import { ProgressService, LocalProgressRepository } from "shared";
+import { ProgressService, LocalProgressRepository, SupabaseProgressRepository } from "shared";
 import type { ProgressState } from "shared";
+import { supabase, isSupabaseConfigured } from "../utils/supabase";
 
-const progressService = new ProgressService(new LocalProgressRepository());
+const repo = isSupabaseConfigured && supabase
+  ? new SupabaseProgressRepository(supabase)
+  : new LocalProgressRepository();
+
+const progressService = new ProgressService(repo);
 
 const EMPTY_STATE: ProgressState = {
   completedLevels: [],
@@ -36,7 +41,21 @@ export function useProgressService() {
     void refresh();
     const handler = () => { void refresh(); };
     window.addEventListener("cozyos:progress-updated", handler);
-    return () => window.removeEventListener("cozyos:progress-updated", handler);
+
+    let subscription: { unsubscribe: () => void } | undefined;
+    if (supabase) {
+      const { data: { subscription: sub } } = supabase.auth.onAuthStateChange(() => {
+        void refresh();
+      });
+      subscription = sub;
+    }
+
+    return () => {
+      window.removeEventListener("cozyos:progress-updated", handler);
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, [refresh]);
 
   const feedPet = useCallback(async () => {

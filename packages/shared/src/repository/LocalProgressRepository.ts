@@ -88,7 +88,7 @@ export class LocalProgressRepository implements ProgressRepository {
     return true;
   }
 
-  async feedPet(lastPlayedAt?: number): Promise<void> {
+  async feedPet(lastFedAt?: number, lastPlayedAt?: number): Promise<void> {
     const state = await this.getState();
     const newXp = state.pet.xp + 1;
     await this.saveState({
@@ -98,7 +98,7 @@ export class LocalProgressRepository implements ProgressRepository {
         ...state.pet,
         xp: newXp,
         stage: getEvolutionStage(newXp),
-        lastFedAt: Date.now(),
+        lastFedAt: lastFedAt !== undefined ? lastFedAt : Date.now(),
         isSleeping: false, // Auto-wakes up when fed
         lastPlayedAt: lastPlayedAt !== undefined ? lastPlayedAt : state.pet.lastPlayedAt,
       },

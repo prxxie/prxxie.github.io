@@ -108,12 +108,12 @@ describe("ProgressService", () => {
       expect(await service.getHungryLevel()).toBe(2); // 4 elapsed / 2 = 2
     });
 
-    it("caps at 6 even when many cooldowns have elapsed", async () => {
+    it("caps at 5 even when many cooldowns have elapsed", async () => {
       const state = makeState({
         pet: { xp: 0, stage: 1, lastFedAt: Date.now() - HUNGER_COOLDOWN * 100, happiness: 50, lastPlayedAt: 0, isSleeping: false },
       });
       const service = new ProgressService(makeMockRepo(state));
-      expect(await service.getHungryLevel()).toBe(6);
+      expect(await service.getHungryLevel()).toBe(5);
     });
 
     it("guards against clock skew (negative elapsed time)", async () => {
@@ -278,9 +278,31 @@ describe("ProgressService", () => {
       const service = new ProgressService(repo);
       await service.feedPet();
 
-      // Expected newElapsed = elapsed * (HAPPINESS_COOLDOWN / (HAPPINESS_COOLDOWN * 4)) = elapsed / 4 = HAPPINESS_COOLDOWN * 2
       const expectedLastPlayedAt = now - HAPPINESS_COOLDOWN * 2;
-      expect(repo.feedPet).toHaveBeenCalledWith(expectedLastPlayedAt);
+      const expectedLastFedAt = now - HUNGER_COOLDOWN * 2 + HUNGER_COOLDOWN * 2; // Incremented by sleep divisor (HUNGER_COOLDOWN * 2)
+      expect(repo.feedPet).toHaveBeenCalledWith(expectedLastFedAt, expectedLastPlayedAt);
+      dateSpy.mockRestore();
+    });
+
+    it("increments lastFedAt by exactly one divisor per feed", async () => {
+      const now = 1700000000000;
+      const dateSpy = vi.spyOn(Date, "now").mockReturnValue(now);
+      const state = makeState({
+        completedLevels: [{ module: "s", levelId: "1", completedAt: 1, stars: 5 }],
+        foodConsumed: 0,
+        pet: {
+          xp: 0,
+          stage: 1,
+          lastFedAt: now - HUNGER_COOLDOWN * 4, // Hunger level 4
+          happiness: 50,
+          lastPlayedAt: now,
+          isSleeping: false,
+        },
+      });
+      const repo = makeMockRepo(state);
+      const service = new ProgressService(repo);
+      await service.feedPet();
+      expect(repo.feedPet).toHaveBeenCalledWith(now - HUNGER_COOLDOWN * 3, undefined);
       dateSpy.mockRestore();
     });
   });

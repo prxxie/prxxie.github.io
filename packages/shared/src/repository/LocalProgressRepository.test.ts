@@ -172,6 +172,13 @@ describe("LocalProgressRepository", () => {
       const state = await repo.getState();
       expect(state.pet.isSleeping).toBe(false);
     });
+
+    it("saves a specific lastFedAt timestamp when provided", async () => {
+      const customTime = 123456789;
+      await repo.feedPet(customTime);
+      const state = await repo.getState();
+      expect(state.pet.lastFedAt).toBe(customTime);
+    });
   });
 
   describe("playWithPet", () => {

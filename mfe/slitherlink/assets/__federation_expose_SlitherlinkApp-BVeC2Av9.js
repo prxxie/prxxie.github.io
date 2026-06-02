@@ -345,8 +345,10 @@ function validateBoard(level, board) {
 }
 
 class RetroSynth {
-  ctx = null;
-  muted = false;
+  constructor() {
+    this.ctx = null;
+    this.muted = false;
+  }
   init() {
     if (!this.ctx) {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;

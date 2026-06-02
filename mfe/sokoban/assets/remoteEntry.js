@@ -2,7 +2,7 @@ const currentImports = {};
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
 "./SokobanApp":()=>{
-      dynamicLoadingCss(["style-DRd4oZBZ.css"], false, './SokobanApp');
+      dynamicLoadingCss(["style-CV4EaBJZ.css"], false, './SokobanApp');
       return __federation_import('/mfe/sokoban/assets/__federation_expose_SokobanApp-BDBTxF7k.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {

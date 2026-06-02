@@ -958,8 +958,6 @@ const SHIKAKU_LEVELS = [
 ];
 
 class RetroSynth {
-  ctx;
-  muted;
   constructor() {
     this.ctx = null;
     this.muted = false;

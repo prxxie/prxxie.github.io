@@ -2,8 +2,8 @@ const currentImports = {};
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
 "./ShikakuApp":()=>{
-      dynamicLoadingCss(["style-ClfWMOno.css"], false, './ShikakuApp');
-      return __federation_import('/mfe/shikaku/assets/__federation_expose_ShikakuApp-CMaHD_-K.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      dynamicLoadingCss(["style-CepVLTru.css"], false, './ShikakuApp');
+      return __federation_import('/mfe/shikaku/assets/__federation_expose_ShikakuApp-Dsu9UySS.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
         const metaUrl = import.meta.url;

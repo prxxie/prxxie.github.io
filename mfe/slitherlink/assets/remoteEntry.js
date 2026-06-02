@@ -2,8 +2,8 @@ const currentImports = {};
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
 "./SlitherlinkApp":()=>{
-      dynamicLoadingCss(["style-D4_AT6or.css"], false, './SlitherlinkApp');
-      return __federation_import('/mfe/slitherlink/assets/__federation_expose_SlitherlinkApp-CsDFKfRS.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      dynamicLoadingCss(["style-B8_Rj6qk.css"], false, './SlitherlinkApp');
+      return __federation_import('/mfe/slitherlink/assets/__federation_expose_SlitherlinkApp-BVeC2Av9.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
         const metaUrl = import.meta.url;

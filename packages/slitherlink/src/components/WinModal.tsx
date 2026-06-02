@@ -27,7 +27,7 @@ export default function WinModal({ onBack, rewardMsg }: WinModalProps): React.Re
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="border border-cozy-border bg-black max-w-[300px] w-full p-6 flex flex-col items-center gap-4 text-center box-shadow-[0_0_15px_rgba(255,176,0,0.2)]"
+        className="border border-cozy-border bg-black max-w-[300px] w-full p-6 flex flex-col items-center gap-4 text-center shadow-[0_0_15px_rgba(255,176,0,0.2)]"
       >
         <h2 className="text-[12px] text-cozy-accent animate-pulse font-mono font-bold">LEVEL SOLVED!</h2>
         

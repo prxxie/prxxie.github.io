@@ -35,8 +35,8 @@ export default function Board(): React.ReactElement | null {
           const isSatisfied = current === target;
 
           let textColor = "text-cozy-muted"; // Under
-          if (isError) textColor = "text-red-500 text-shadow-[0_0_4px_#ff0000]";
-          else if (isSatisfied) textColor = "text-cozy-text text-shadow-[0_0_6px_#ffb000] font-bold";
+          if (isError) textColor = "text-red-500 [text-shadow:0_0_4px_#ff0000]";
+          else if (isSatisfied) textColor = "text-cozy-text [text-shadow:0_0_6px_#ffb000] font-bold";
 
           return (
             <div
@@ -64,7 +64,7 @@ export default function Board(): React.ReactElement | null {
           return (
             <div
               key={`hedge-${x}-${y}`}
-              className="absolute cursor-pointer flex items-center justify-center"
+              className="absolute cursor-pointer flex items-center justify-center group"
               style={{
                 left: `${offset + x * cellSize}px`,
                 top: `${offset + y * cellSize - 7}px`,
@@ -79,7 +79,7 @@ export default function Board(): React.ReactElement | null {
                 className={`w-full transition-all duration-75 ${
                   isLine 
                     ? "bg-cozy-text shadow-[0_0_8px_#ffb000] h-[3px]" 
-                    : "bg-transparent h-[1px]"
+                    : "bg-transparent h-[1px] group-hover:bg-cozy-muted/40 group-hover:h-[2px]"
                 }`}
               />
               {/* Visual Cross 'x' */}
@@ -100,7 +100,7 @@ export default function Board(): React.ReactElement | null {
           return (
             <div
               key={`vedge-${x}-${y}`}
-              className="absolute cursor-pointer flex items-center justify-center"
+              className="absolute cursor-pointer flex items-center justify-center group"
               style={{
                 left: `${offset + x * cellSize - 7}px`,
                 top: `${offset + y * cellSize}px`,
@@ -115,7 +115,7 @@ export default function Board(): React.ReactElement | null {
                 className={`h-full transition-all duration-75 ${
                   isLine 
                     ? "bg-cozy-text shadow-[0_0_8px_#ffb000] w-[3px]" 
-                    : "bg-transparent w-[1px]"
+                    : "bg-transparent w-[1px] group-hover:bg-cozy-muted/40 group-hover:w-[2px]"
                 }`}
               />
               {/* Visual Cross 'x' */}

@@ -12,7 +12,8 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
   const undo = useSlitherlinkStore((state) => state.undo);
   const resetLevel = useSlitherlinkStore((state) => state.resetLevel);
   const tickTimer = useSlitherlinkStore((state) => state.tickTimer);
-  const [muted, setMuted] = React.useState(false);
+  const isMuted = useSlitherlinkStore((state) => state.isMuted);
+  const setMuted = useSlitherlinkStore((state) => state.setMuted);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -22,9 +23,7 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
   }, [tickTimer]);
 
   const handleMute = () => {
-    const nextMuted = !muted;
-    synth.setMuted(nextMuted);
-    setMuted(nextMuted);
+    setMuted(!isMuted);
     synth.playClick();
   };
 
@@ -69,7 +68,7 @@ export default function HUD({ onBack }: HUDProps): React.ReactElement {
           onClick={handleMute}
           className="border border-cozy-border bg-black text-cozy-text hover:bg-cozy-text hover:text-black px-2 py-1 cursor-pointer font-mono"
         >
-          {muted ? "UNMUTE" : "MUTE"}
+          {isMuted ? "UNMUTE" : "MUTE"}
         </button>
       </div>
     </div>

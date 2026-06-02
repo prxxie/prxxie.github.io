@@ -25,6 +25,15 @@ describe("useHashRouter", () => {
     expect(result.current.currentTab).toBe("about");
   });
 
+  it("should update tab to slitherlink when window hash changes to slitherlink", () => {
+    const { result } = renderHook(() => useHashRouter());
+    act(() => {
+      window.location.hash = "#/slitherlink";
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    expect(result.current.currentTab).toBe("slitherlink");
+  });
+
   it("should navigate to a tab and update hash location", () => {
     const { result } = renderHook(() => useHashRouter());
     act(() => {

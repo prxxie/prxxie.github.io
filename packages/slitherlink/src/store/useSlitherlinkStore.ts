@@ -108,12 +108,6 @@ export const useSlitherlinkStore = create<SlitherlinkState>((set, get) => ({
       }
     }
 
-    if (playSound) {
-      synth.playPlace();
-    } else if (isRemove) {
-      synth.playRemove();
-    }
-
     // Validate new state
     const validation = validateBoard(level, { hEdges: nextH, vEdges: nextV });
 
@@ -131,6 +125,12 @@ export const useSlitherlinkStore = create<SlitherlinkState>((set, get) => ({
       } else {
         stars = 1;
       }
+    } else {
+      if (playSound) {
+        synth.playPlace();
+      } else if (isRemove) {
+        synth.playRemove();
+      }
     }
 
     set({
@@ -138,6 +138,7 @@ export const useSlitherlinkStore = create<SlitherlinkState>((set, get) => ({
       vEdges: nextV,
       history: newHistory,
       isWon: won,
+      timerActive: !won,
       starsAchieved: stars,
       cellErrors: validation.cellErrors,
       vertexErrors: validation.vertexErrors

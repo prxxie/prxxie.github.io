@@ -13,6 +13,7 @@ const GRID_ITEMS: Array<{ tab: Tab; key: string }> = [
   { tab: "posts", key: "PO" },
   { tab: "shikaku", key: "SH" },
   { tab: "sokoban", key: "SO" },
+  { tab: "slitherlink", key: "SL" },
 ];
 
 export default function MatrixMenu({

@@ -93,15 +93,35 @@ describe("Slitherlink Game State Store", () => {
     expect(useSlitherlinkStore.getState().history.length).toBe(0);
   });
 
+  it("should not allow undo if the game is won", () => {
+    useSlitherlinkStore.getState().loadLevel(mockLevel);
+
+    useSlitherlinkStore.getState().toggleEdge("h", 0, 0);
+    useSlitherlinkStore.getState().toggleEdge("h", 0, 1);
+    useSlitherlinkStore.getState().toggleEdge("v", 0, 0);
+    useSlitherlinkStore.getState().toggleEdge("v", 1, 0);
+
+    expect(useSlitherlinkStore.getState().isWon).toBe(true);
+    const originalHistoryLength = useSlitherlinkStore.getState().history.length;
+
+    useSlitherlinkStore.getState().undo();
+
+    expect(useSlitherlinkStore.getState().isWon).toBe(true);
+    expect(useSlitherlinkStore.getState().history.length).toBe(originalHistoryLength);
+  });
+
   it("should handle resetLevel correctly", () => {
     useSlitherlinkStore.getState().loadLevel(mockLevel);
     useSlitherlinkStore.getState().toggleEdge("h", 0, 0);
+    useSlitherlinkStore.setState({ elapsedTime: 10, timerActive: false });
 
     useSlitherlinkStore.getState().resetLevel();
     const state = useSlitherlinkStore.getState();
     expect(state.hEdges[0][0]).toBe("none");
     expect(state.history.length).toBe(0);
     expect(state.isWon).toBe(false);
+    expect(state.elapsedTime).toBe(0);
+    expect(state.timerActive).toBe(true);
   });
 
   it("should tick timer when active", () => {

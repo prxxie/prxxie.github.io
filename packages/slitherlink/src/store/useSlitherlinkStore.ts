@@ -145,8 +145,8 @@ export const useSlitherlinkStore = create<SlitherlinkState>((set, get) => ({
   },
 
   undo: () => {
-    const { history, level } = get();
-    if (history.length === 0 || !level) return;
+    const { history, level, isWon } = get();
+    if (history.length === 0 || !level || isWon) return;
 
     const previous = history[history.length - 1];
     const newHistory = history.slice(0, history.length - 1);
@@ -177,7 +177,9 @@ export const useSlitherlinkStore = create<SlitherlinkState>((set, get) => ({
       cellErrors: {},
       vertexErrors: {},
       isWon: false,
-      starsAchieved: 0
+      starsAchieved: 0,
+      elapsedTime: 0,
+      timerActive: true
     });
   },
 

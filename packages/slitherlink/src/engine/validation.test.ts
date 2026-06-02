@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { validateBoard } from "./validation";
-import type { Level, BoardState } from "../types";
+import type { Level, BoardState, EdgeState } from "../types";
 
 const dummyLevel: Level = {
   id: "dummy",

@@ -18,9 +18,9 @@ packages/
   about/        — MFE: About page
   posts/        — MFE: Blog/posts reader
   pets/         — MFE: Virtual pet display (state-injected by shell)
-  shikaku/      — MFE: Shikaku puzzle game
-  slitherlink/  — MFE: Slitherlink puzzle game
-  sokoban/      — MFE: Sokoban puzzle game
+  shikaku/      — [GIT SUBMODULE] MFE: Shikaku puzzle game (github.com/prxxie/cozyos-shikaku)
+  slitherlink/  — [GIT SUBMODULE] MFE: Slitherlink puzzle game (github.com/prxxie/cozyos-slitherlink)
+  sokoban/      — [GIT SUBMODULE] MFE: Sokoban puzzle game (github.com/prxxie/cozyos-sokoban)
   shared/       — Internal library: ProgressService, PetState, evolution logic
 ```
 
@@ -93,6 +93,31 @@ shell/useProgressService  →  petStore (Zustand)
         ↑
 MFE game apps (sokoban, shikaku, slitherlink) call completeLevelWithStars on win
 ```
+
+---
+
+## Submodule MFE CI/CD
+
+Game MFEs (shikaku, sokoban, slitherlink) are separate GitHub repos mounted as git submodules.
+
+**Each MFE repo has its own CI:**
+- Push to `main` → GitHub Actions builds the MFE → creates a GitHub release with `dist.tar.gz`
+- After release, dispatches `repository_dispatch` to `prxxie.github.io` to trigger re-deploy
+
+**Main repo deploy workflow:**
+- Triggers on: push to `main` OR `repository_dispatch` from MFE repos
+- Downloads pre-built `dist.tar.gz` from each MFE's latest GitHub release
+- Builds shell + non-submodule MFEs locally
+- Assembles everything into `dist/` and deploys to gh-pages
+
+**Updating a submodule to latest:**
+```bash
+cd packages/shikaku && git pull origin main && cd ../..
+git add packages/shikaku
+git commit -m "chore: update shikaku submodule"
+```
+
+**`shared` dependency:** Stays in the main monorepo. MFE repos resolve it via npm workspace (`"shared": "*"`). In CI, the MFE workflow sparse-checks out `packages/shared` from the main repo.
 
 ---
 

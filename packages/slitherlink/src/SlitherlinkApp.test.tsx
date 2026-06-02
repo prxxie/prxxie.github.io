@@ -21,15 +21,17 @@ describe("SlitherlinkApp Integration", () => {
     vi.clearAllMocks();
   });
 
-  it("renders level select menu initially", () => {
+  it("renders level select menu initially", async () => {
     render(<SlitherlinkApp />);
+    await screen.findByText("★★★");
     expect(screen.getByText("SELECT LEVEL")).toBeInTheDocument();
     expect(screen.getByText("EASY (5x5)")).toBeInTheDocument();
     expect(screen.getByText("MEDIUM (6x6)")).toBeInTheDocument();
   });
 
-  it("launches game view on level selection", () => {
+  it("launches game view on level selection", async () => {
     render(<SlitherlinkApp />);
+    await screen.findByText("★★★");
     const buttons = screen.getAllByRole("button");
     fireEvent.click(buttons[0]); // Select Level 1
 

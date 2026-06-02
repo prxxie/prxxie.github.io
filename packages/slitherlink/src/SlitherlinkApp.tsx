@@ -39,7 +39,7 @@ export default function SlitherlinkApp(): React.ReactElement {
 
   // Handle level completion saving
   useEffect(() => {
-    if (isWon && level) {
+    if (isWon && level && view === "game") {
       progressService.completeLevelWithStars("slitherlink", level.id, starsAchieved)
         .then((firstTime) => {
           setRewardMsg(firstTime ? "+1 FOOD" : "ALREADY COMPLETE");
@@ -48,7 +48,7 @@ export default function SlitherlinkApp(): React.ReactElement {
           console.error("Failed to complete level:", err);
         });
     }
-  }, [isWon, level, starsAchieved]);
+  }, [isWon, level, starsAchieved, view]);
 
   const handleSelectLevel = (idx: number): void => {
     setRewardMsg(null);

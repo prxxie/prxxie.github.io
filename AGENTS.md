@@ -14,13 +14,14 @@ A **retro-styled personal home page** (CRT/pixel aesthetic) built as a Vite + Re
 
 ```
 packages/
-  shell/      — Host app (Module Federation consumer, routing, global state)
-  about/      — MFE: About page
-  posts/      — MFE: Blog/posts reader
-  pets/       — MFE: Virtual pet display (state-injected by shell)
-  shikaku/    — MFE: Shikaku puzzle game
-  sokoban/    — MFE: Sokoban puzzle game
-  shared/     — Internal library: ProgressService, PetState, evolution logic
+  shell/        — Host app (Module Federation consumer, routing, global state)
+  about/        — MFE: About page
+  posts/        — MFE: Blog/posts reader
+  pets/         — MFE: Virtual pet display (state-injected by shell)
+  shikaku/      — MFE: Shikaku puzzle game
+  slitherlink/  — MFE: Slitherlink puzzle game
+  sokoban/      — MFE: Sokoban puzzle game
+  shared/       — Internal library: ProgressService, PetState, evolution logic
 ```
 
 ---
@@ -38,10 +39,18 @@ packages/
 - **MFE remotes served at**: `/mfe/<name>/assets/remoteEntry.js`
 - **Dev**: sirv middleware mounts each MFE's `dist/` at `/mfe/<name>`
 
-### `about` / `posts` / `shikaku` / `sokoban`
+### `about` / `posts` / `shikaku` / `slitherlink` / `sokoban`
 - **Role**: Self-contained MFE remotes. No shell state injected.
 - **Exposes**: `./XxxApp` component via `remoteEntry.js`
 - **Build base**: `/mfe/<name>/`
+
+### `slitherlink`
+- **Role**: Slitherlink loop-drawing puzzle game.
+- **Engine**: `src/engine/validation.ts` — loop validation (vertex degrees, clue counts, single closed loop traversal)
+- **Store**: `src/store/useSlitherlinkStore.ts` — Zustand store with undo stack, timer, win detection
+- **Synth**: `src/engine/synth.ts` — RetroSynth audio (WebAudio API)
+- **Levels**: `src/engine/levels.ts` — 10 pre-baked levels (5 Easy, 5 Medium)
+- **Integrates**: Dispatches `cozyos:progress-updated` CustomEvent on win for shell ProgressService pickup
 
 ### `pets`
 - **Role**: MFE remote that receives shell's `usePetStore` hook as a prop.
@@ -59,12 +68,12 @@ packages/
 
 ```
 shell vite.config.ts
-  remotes: { about, posts, pets, shikaku, sokoban }
+  remotes: { about, posts, pets, shikaku, slitherlink, sokoban }
   shared:  react, react-dom, zustand, @tanstack/react-query
 
 each MFE vite.config.ts
   exposes: { ./XxxApp: ./src/XxxApp.tsx }
-  shared:  react, react-dom  (+ zustand for pets)
+  shared:  react, react-dom  (+ zustand for pets, slitherlink)
 ```
 
 Adding a new MFE requires changes in **three places**:
@@ -82,7 +91,7 @@ shared/ProgressService  ←→  LocalProgressRepository (localStorage)
 shell/useProgressService  →  petStore (Zustand)
                           →  pets MFE (via props)
         ↑
-MFE game apps (sokoban, shikaku) call completeLevelWithStars on win
+MFE game apps (sokoban, shikaku, slitherlink) call completeLevelWithStars on win
 ```
 
 ---
@@ -91,7 +100,7 @@ MFE game apps (sokoban, shikaku) call completeLevelWithStars on win
 
 - Test files live beside source: `Foo.test.tsx` next to `Foo.tsx`
 - Shell tests **mock all MFE remotes** (see `MockMfe.tsx`)
-- Game engines (`sokoban/engine`, `shikaku/engine`) are pure TS — test them directly, no React needed
+- Game engines (`sokoban/engine`, `shikaku/engine`, `slitherlink/engine`) are pure TS — test them directly, no React needed
 - Run all tests: `rtk npm run test`
 
 ---

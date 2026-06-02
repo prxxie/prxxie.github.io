@@ -1,16 +1,24 @@
 #!/bin/bash
 set -e
 
-# Clean dist folders
-rm -rf dist packages/*/dist
+# Clean top-level dist only (don't wipe pre-downloaded MFE dists)
+rm -rf dist
+rm -rf packages/about/dist packages/posts/dist packages/pets/dist packages/shell/dist
 
-# Build remotes
+# Build non-submodule remotes
 npm run build -w packages/about
 npm run build -w packages/posts
 npm run build -w packages/pets
-npm run build -w packages/shikaku
-npm run build -w packages/sokoban
-npm run build -w packages/slitherlink
+
+# Build submodule MFEs only if their dist doesn't already exist (CI pre-downloads them)
+for mfe in shikaku sokoban slitherlink; do
+  if [ -d "packages/$mfe/dist" ] && [ -f "packages/$mfe/dist/assets/remoteEntry.js" ]; then
+    echo "Using pre-built dist for $mfe"
+  else
+    echo "Building $mfe from source..."
+    npm run build -w packages/$mfe
+  fi
+done
 
 # Build shell host
 npm run build -w packages/shell

@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  repository_dispatch:
+    types: [mfe-updated]
 
 permissions:
   contents: write
@@ -14,6 +16,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -22,6 +26,17 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
+
+      - name: Download MFE pre-built artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for mfe in shikaku sokoban slitherlink; do
+            echo "Downloading latest dist for $mfe..."
+            mkdir -p packages/$mfe/dist
+            gh release download --repo prxxie/cozyos-$mfe --pattern 'dist.tar.gz' --output /tmp/$mfe-dist.tar.gz --clobber
+            tar -xzf /tmp/$mfe-dist.tar.gz -C packages/$mfe/dist
+          done
 
       - name: Run Build Script
         run: npm run build:static

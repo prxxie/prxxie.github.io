@@ -46,3 +46,9 @@ declare module "sokoban/SokobanApp" {
   const SokobanApp: () => import("react").ReactElement;
   export default SokobanApp;
 }
+
+declare module "slitherlink/SlitherlinkApp" {
+  const SlitherlinkApp: () => import("react").ReactElement;
+  export default SlitherlinkApp;
+}
+

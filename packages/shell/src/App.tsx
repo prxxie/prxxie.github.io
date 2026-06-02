@@ -46,6 +46,13 @@ const SokobanApp = lazy(
     }))
 );
 
+const SlitherlinkApp = lazy(
+  () =>
+    import("slitherlink/SlitherlinkApp").catch(() => ({
+      default: () => <Fallback name="Slitherlink" />,
+    }))
+);
+
 function Fallback({ name }: { name: string }): React.ReactElement {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-2 p-4">
@@ -96,6 +103,8 @@ export default function App(): React.ReactElement {
         return <ShikakuApp />;
       case "sokoban":
         return <SokobanApp />;
+      case "slitherlink":
+        return <SlitherlinkApp />;
       default:
         return <HomeDashboard />;
     }

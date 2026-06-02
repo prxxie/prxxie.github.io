@@ -15,7 +15,7 @@ export default defineConfig(({ command }) => {
   // In dev: served from sibling package dist folders via sirv middleware
   // In prod: served from deployed static files
   const mfePath = "/mfe";
-  const mfePackages = ["about", "posts", "pets", "shikaku", "sokoban"];
+  const mfePackages = ["about", "posts", "pets", "shikaku", "sokoban", "slitherlink"];
 
   return {
     publicDir: "../../public",

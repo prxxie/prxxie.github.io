@@ -33,6 +33,10 @@ export class ProgressService {
     const foodAvailable = await this.getFoodAvailable();
     if (!isHungry || foodAvailable <= 0) return;
 
+    const divisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
+    const currentLastFedAt = state.pet.lastFedAt === 0 ? Date.now() - 5 * divisor : state.pet.lastFedAt;
+    const nextLastFed = Math.min(Date.now(), currentLastFedAt + divisor);
+
     let nextLastPlayedAt: number | undefined;
     if (state.pet.isSleeping && state.pet.lastPlayedAt !== 0) {
       const elapsed = Math.max(0, Date.now() - state.pet.lastPlayedAt);
@@ -41,7 +45,7 @@ export class ProgressService {
       nextLastPlayedAt = Date.now() - newElapsed;
     }
 
-    await this.repo.feedPet(nextLastPlayedAt);
+    await this.repo.feedPet(nextLastFed, nextLastPlayedAt);
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
     }
@@ -95,10 +99,10 @@ export class ProgressService {
 
   async getHungryLevel(): Promise<number> {
     const state = await this.repo.getState();
-    if (state.pet.lastFedAt === 0) return 6; // Maximum hunger if never fed
+    if (state.pet.lastFedAt === 0) return 5; // Maximum hunger if never fed (capped at 5)
     const elapsed = Math.max(0, Date.now() - state.pet.lastFedAt);
     const divisor = state.pet.isSleeping ? HUNGER_COOLDOWN * 2 : HUNGER_COOLDOWN;
-    return Math.min(6, Math.floor(elapsed / divisor));
+    return Math.min(5, Math.floor(elapsed / divisor));
   }
 
   async getHappiness(): Promise<number> {

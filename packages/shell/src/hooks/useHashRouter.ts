@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { Tab } from "../types";
 
-const VALID_TABS: Tab[] = ["home", "about", "posts", "shikaku", "sokoban"];
+const VALID_TABS: Tab[] = ["home", "about", "posts", "shikaku", "sokoban", "slitherlink"];
 
 function getTabFromHash(): Tab {
   const hash = typeof window !== "undefined" ? window.location.hash : "";

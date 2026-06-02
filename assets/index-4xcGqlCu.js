@@ -53,7 +53,8 @@ const remotesMap = {
   'posts':{url:'/mfe/posts/assets/remoteEntry.js',format:'esm',from:'vite'},
   'pets':{url:'/mfe/pets/assets/remoteEntry.js',format:'esm',from:'vite'},
   'shikaku':{url:'/mfe/shikaku/assets/remoteEntry.js',format:'esm',from:'vite'},
-  'sokoban':{url:'/mfe/sokoban/assets/remoteEntry.js',format:'esm',from:'vite'}
+  'sokoban':{url:'/mfe/sokoban/assets/remoteEntry.js',format:'esm',from:'vite'},
+  'slitherlink':{url:'/mfe/slitherlink/assets/remoteEntry.js',format:'esm',from:'vite'}
 };
                 const currentImports = {};
                 const loadJS = async (url, fn) => {
@@ -592,7 +593,8 @@ const GRID_ITEMS = [
   { tab: "about", key: "AB" },
   { tab: "posts", key: "PO" },
   { tab: "shikaku", key: "SH" },
-  { tab: "sokoban", key: "SO" }
+  { tab: "sokoban", key: "SO" },
+  { tab: "slitherlink", key: "SL" }
 ];
 function MatrixMenu({
   currentTab,
@@ -1162,6 +1164,11 @@ const SokobanApp = lazy(
     default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Sokoban" })
   }))
 );
+const SlitherlinkApp = lazy(
+  () => __federation_method_getRemote("slitherlink" , "./SlitherlinkApp").then(module=>__federation_method_wrapDefault(module, true)).catch(() => ({
+    default: () => /* @__PURE__ */ jsxRuntimeExports.jsx(Fallback, { name: "Slitherlink" })
+  }))
+);
 function Fallback({ name }) {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full gap-2 p-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-press text-[10px] text-red-600", children: "⚠ MFE LOAD ERROR" }),
@@ -1210,6 +1217,8 @@ function App() {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(ShikakuApp, {});
       case "sokoban":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(SokobanApp, {});
+      case "slitherlink":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(SlitherlinkApp, {});
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsx(HomeDashboard, {});
     }

@@ -12,13 +12,14 @@ The workspace is organized as a monorepo using npm workspaces. It consists of a 
 
 ```text
 packages/
-├── shell/     (Host - Port 3000)      — Layout chrome, navigation, Zustand state store, remote MFE lazy-loading
-├── about/     (Remote - Port 3001)    — Skill display and bio folders
-├── posts/     (Remote - Port 3002)    — Markdown-driven devlog/blog viewer
-├── pets/      (Remote - Port 3003)    — TAMAGOTCHI-style virtual pet interactive widget
-├── shikaku/   (Remote - Port 3004)    — Grid puzzle game with 20 levels, validation engine, solver, and audio synth
-├── sokoban/   (Remote - Port 3005)    — Classic crate-pushing game
-└── shared/    (Shared library)        — Core interfaces, local storage repositories, and evolution algorithms
+├── shell/       (Host - Port 3000)                  — Layout chrome, navigation, Zustand state store, remote MFE lazy-loading
+├── about/       (Remote - Port 3001)                — Skill display and bio folders
+├── posts/       (Remote - Port 3002)                — Markdown-driven devlog/blog viewer
+├── pets/        (Remote - Port 3003)                — TAMAGOTCHI-style virtual pet interactive widget
+├── shikaku/     [SUBMODULE] (Remote - Port 3004)    — Shikaku puzzle game (github.com/prxxie/cozyos-shikaku)
+├── sokoban/     [SUBMODULE] (Remote - Port 3005)    — Sokoban puzzle game (github.com/prxxie/cozyos-sokoban)
+├── slitherlink/ [SUBMODULE] (Remote - Port 3006)    — Slitherlink loop puzzle game (github.com/prxxie/cozyos-slitherlink)
+└── shared/      (Shared library)                    — Core interfaces, local storage repositories, and evolution algorithms
 ```
 
 ### Module Federation & Build Setup
@@ -51,6 +52,7 @@ In dev mode, sibling micro-frontends compile via Vite watch builds to their `dis
 4. **Pets**: Pixel-art Tamagotchi companion. Uses a shared Zustand state from the shell, decaying hunger/happiness over time, with evolution progression.
 5. **Shikaku**: Hands-on grid puzzle game with dragging selections, hint engines, backtracking solver, and sound synth.
 6. **Sokoban**: Grid-based box-moving puzzle game.
+7. **Slitherlink**: Slitherlink loop puzzle game.
 
 ---
 
@@ -59,6 +61,16 @@ In dev mode, sibling micro-frontends compile via Vite watch builds to their `dis
 ### Prerequisites
 - Node.js (v18+)
 - npm
+
+### Submodule Initialization
+Since this project uses git submodules for some of the micro-frontends (Shikaku, Sokoban, Slitherlink), you need to initialize them:
+```bash
+# If cloning for the first time
+git clone --recurse-submodules git@github.com:prxxie/prxxie.github.io.git
+
+# Or if you have already cloned the repository
+git submodule update --init --recursive
+```
 
 ### Development
 1. Install dependencies:

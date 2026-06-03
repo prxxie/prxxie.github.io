@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
 import { SupabaseClient } from "@supabase/supabase-js";
 import { LocalProgressRepository } from "./LocalProgressRepository";
 import type { ProgressRepository } from "./ProgressRepository";
@@ -6,15 +7,96 @@ import { getEvolutionStage } from "../pet/evolution";
 
 export class SupabaseProgressRepository implements ProgressRepository {
   private localRepo = new LocalProgressRepository();
+  private cachedUserId: string | null = null;
+  private userIdInitialized = false;
 
-  constructor(private supabase: SupabaseClient) {}
+  constructor(private supabase: SupabaseClient) {
+    if (this.supabase.auth && typeof this.supabase.auth.onAuthStateChange === "function") {
+      this.supabase.auth.onAuthStateChange((event, session) => {
+        this.cachedUserId = session?.user?.id || null;
+        this.userIdInitialized = true;
+      });
+    }
+  }
 
   private async getUserId(): Promise<string | null> {
+    if (this.userIdInitialized) {
+      return this.cachedUserId;
+    }
     try {
       const { data: { user } } = await this.supabase.auth.getUser();
-      return user?.id || null;
+      this.cachedUserId = user?.id || null;
+      this.userIdInitialized = true;
+      return this.cachedUserId;
     } catch {
       return null;
+    }
+  }
+
+  private sanitizeProgressState(state: any): ProgressState {
+    try {
+      if (!state || typeof state !== "object") {
+        throw new Error("ProgressState is not an object");
+      }
+
+      if (!Array.isArray(state.completedLevels)) {
+        throw new Error("completedLevels is not an array");
+      }
+
+      for (const level of state.completedLevels) {
+        if (
+          !level ||
+          typeof level !== "object" ||
+          typeof level.module !== "string" ||
+          typeof level.levelId !== "string"
+        ) {
+          throw new Error("Invalid completed level schema");
+        }
+      }
+
+      if (state.foodConsumed !== undefined && typeof state.foodConsumed !== "number") {
+        throw new Error("foodConsumed is not a number");
+      }
+
+      if (state.pet !== undefined && (state.pet === null || typeof state.pet !== "object")) {
+        throw new Error("pet is not an object");
+      }
+
+      const completedLevels = state.completedLevels.map((lvl: any) => ({
+        module: lvl.module,
+        levelId: lvl.levelId,
+        completedAt: typeof lvl.completedAt === "number" ? lvl.completedAt : Date.now(),
+        stars: typeof lvl.stars === "number" ? lvl.stars : 0,
+      }));
+
+      const foodConsumed = typeof state.foodConsumed === "number" ? state.foodConsumed : 0;
+
+      const defaultPet = {
+        xp: 0,
+        stage: 1,
+        lastFedAt: 0,
+        happiness: 50,
+        lastPlayedAt: Date.now(),
+        isSleeping: false,
+      };
+
+      const pet = state.pet ? {
+        xp: typeof state.pet.xp === "number" ? state.pet.xp : defaultPet.xp,
+        stage: typeof state.pet.stage === "number" ? state.pet.stage : defaultPet.stage,
+        lastFedAt: typeof state.pet.lastFedAt === "number" ? state.pet.lastFedAt : defaultPet.lastFedAt,
+        happiness: typeof state.pet.happiness === "number" ? state.pet.happiness : defaultPet.happiness,
+        lastPlayedAt: typeof state.pet.lastPlayedAt === "number" ? state.pet.lastPlayedAt : defaultPet.lastPlayedAt,
+        isSleeping: typeof state.pet.isSleeping === "boolean" ? state.pet.isSleeping : defaultPet.isSleeping,
+      } : defaultPet;
+
+      return {
+        completedLevels,
+        foodConsumed,
+        pet,
+      };
+    } catch (err) {
+      console.error("Invalid progress state schema:", err);
+      throw err;
     }
   }
 
@@ -30,19 +112,34 @@ export class SupabaseProgressRepository implements ProgressRepository {
     };
     
     local.completedLevels.forEach(addLevel);
-    cloud.completedLevels.forEach(addLevel);
-
-    // Sanitize cloud pet defaults in case it is a legacy save
-    if (cloud.pet) {
-      if (cloud.pet.happiness === undefined) cloud.pet.happiness = 50;
-      if (cloud.pet.lastPlayedAt === undefined) cloud.pet.lastPlayedAt = Date.now();
-      if (cloud.pet.isSleeping === undefined) cloud.pet.isSleeping = false;
+    
+    if (cloud && Array.isArray(cloud.completedLevels)) {
+      cloud.completedLevels.forEach(addLevel);
     }
 
-    const useLocalPet = local.pet.xp > cloud.pet.xp;
-    const pet = useLocalPet ? { ...local.pet } : { ...cloud.pet };
+    const defaultPet = {
+      xp: 0,
+      stage: 1,
+      lastFedAt: 0,
+      happiness: 50,
+      lastPlayedAt: Date.now(),
+      isSleeping: false,
+    };
+
+    const cloudPet: typeof local.pet = cloud.pet ? {
+      xp: typeof cloud.pet.xp === "number" ? cloud.pet.xp : (local.pet?.xp ?? defaultPet.xp),
+      stage: typeof cloud.pet.stage === "number" ? cloud.pet.stage : (local.pet?.stage ?? defaultPet.stage),
+      lastFedAt: typeof cloud.pet.lastFedAt === "number" ? cloud.pet.lastFedAt : (local.pet?.lastFedAt ?? defaultPet.lastFedAt),
+      happiness: typeof cloud.pet.happiness === "number" ? cloud.pet.happiness : (local.pet?.happiness ?? defaultPet.happiness),
+      lastPlayedAt: typeof cloud.pet.lastPlayedAt === "number" ? cloud.pet.lastPlayedAt : (local.pet?.lastPlayedAt ?? defaultPet.lastPlayedAt),
+      isSleeping: typeof cloud.pet.isSleeping === "boolean" ? cloud.pet.isSleeping : (local.pet?.isSleeping ?? defaultPet.isSleeping),
+    } : { ...local.pet };
+
+    const cloudXp = cloud.pet?.xp ?? 0;
+    const useLocalPet = (local.pet?.xp ?? 0) > cloudXp;
+    const pet = useLocalPet ? { ...local.pet } : { ...cloudPet };
     pet.stage = getEvolutionStage(pet.xp);
-    const foodConsumed = Math.max(local.foodConsumed, cloud.foodConsumed);
+    const foodConsumed = Math.max(local.foodConsumed ?? 0, cloud.foodConsumed ?? 0);
 
     return {
       completedLevels: Array.from(levelsMap.values()),
@@ -66,19 +163,25 @@ export class SupabaseProgressRepository implements ProgressRepository {
         .eq("user_id", userId)
         .single();
 
-      if (error || !data) {
-        // First time cloud sync: push local state
-        await this.supabase.from("user_progress").upsert({
-          user_id: userId,
-          state: localState,
-        });
-        return localState;
+      if (error) {
+        if (error.code === "PGRST116") {
+          await this.supabase.from("user_progress").upsert({
+            user_id: userId,
+            state: localState,
+          });
+          return localState;
+        } else {
+          throw error;
+        }
       }
 
-      const cloudState = data.state as ProgressState;
+      if (!data) {
+        throw new Error("No data returned from user_progress query");
+      }
+
+      const cloudState = this.sanitizeProgressState(data.state);
       const mergedState = this.mergeStates(localState, cloudState);
       
-      // Keep both stores updated with merged achievements
       await this.localRepo.saveState(mergedState);
       await this.supabase.from("user_progress").upsert({
         user_id: userId,
@@ -92,18 +195,48 @@ export class SupabaseProgressRepository implements ProgressRepository {
     }
   }
 
-  async saveState(state: ProgressState): Promise<void> {
-    await this.localRepo.saveState(state);
-
+  async saveState(state: ProgressState, skipLocalWrite = false): Promise<void> {
     const userId = await this.getUserId();
-    if (userId) {
-      try {
-        const { error } = await this.supabase
-          .from("user_progress")
-          .upsert({ user_id: userId, state });
-        if (error) throw error;
-      } catch (err) {
-        console.error("Failed to sync state to Supabase:", err);
+    
+    if (!userId) {
+      if (!skipLocalWrite) {
+        await this.localRepo.saveState(state);
+      }
+      return;
+    }
+
+    try {
+      const { data, error } = await this.supabase
+        .from("user_progress")
+        .select("state")
+        .eq("user_id", userId)
+        .single();
+
+      let mergedState = state;
+
+      if (error) {
+        if (error.code !== "PGRST116") {
+          throw error;
+        }
+      } else if (data?.state) {
+        const cloudState = this.sanitizeProgressState(data.state);
+        mergedState = this.mergeStates(state, cloudState);
+      }
+
+      const changed = JSON.stringify(state) !== JSON.stringify(mergedState);
+      if (changed || !skipLocalWrite) {
+        await this.localRepo.saveState(mergedState);
+      }
+
+      const { error: upsertError } = await this.supabase
+        .from("user_progress")
+        .upsert({ user_id: userId, state: mergedState });
+      if (upsertError) throw upsertError;
+
+    } catch (err) {
+      console.error("Failed to sync state to Supabase:", err);
+      if (!skipLocalWrite) {
+        await this.localRepo.saveState(state);
       }
     }
   }
@@ -112,7 +245,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
     const changed = await this.localRepo.completeLevel(module, levelId);
     if (changed) {
       const newState = await this.localRepo.getState();
-      await this.saveState(newState);
+      await this.saveState(newState, true);
     }
     return changed;
   }
@@ -121,7 +254,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
     const changed = await this.localRepo.completeLevelWithStars(module, levelId, stars);
     if (changed) {
       const newState = await this.localRepo.getState();
-      await this.saveState(newState);
+      await this.saveState(newState, true);
     }
     return changed;
   }
@@ -129,18 +262,18 @@ export class SupabaseProgressRepository implements ProgressRepository {
   async feedPet(lastFedAt?: number, lastPlayedAt?: number): Promise<void> {
     await this.localRepo.feedPet(lastFedAt, lastPlayedAt);
     const newState = await this.localRepo.getState();
-    await this.saveState(newState);
+    await this.saveState(newState, true);
   }
 
   async playWithPet(happiness: number): Promise<void> {
     await this.localRepo.playWithPet(happiness);
     const newState = await this.localRepo.getState();
-    await this.saveState(newState);
+    await this.saveState(newState, true);
   }
 
   async toggleSleep(lastFedAt?: number, lastPlayedAt?: number): Promise<void> {
     await this.localRepo.toggleSleep(lastFedAt, lastPlayedAt);
     const newState = await this.localRepo.getState();
-    await this.saveState(newState);
+    await this.saveState(newState, true);
   }
 }

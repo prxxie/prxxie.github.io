@@ -216,10 +216,11 @@ export class SupabaseProgressRepository implements ProgressRepository {
       const mergedState = this.mergeStates(localState, cloudState);
       
       await this.localRepo.saveState(mergedState);
-      await this.supabase.from("user_progress").upsert({
+      const { error: upsertError } = await this.supabase.from("user_progress").upsert({
         user_id: userId,
         state: mergedState,
       });
+      if (upsertError) throw upsertError;
 
       return mergedState;
     } catch (err) {

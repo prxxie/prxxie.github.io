@@ -766,6 +766,22 @@ describe("SupabaseProgressRepository", () => {
       newRepo.dispose();
     }
   });
+
+  it("should merge levels by keeping the later completedAt timestamp when stars are equal", () => {
+    const localState: ProgressState = {
+      completedLevels: [{ module: "shikaku", levelId: "1", completedAt: 1000, stars: 3 }],
+      foodConsumed: 0,
+      pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false }
+    };
+    const cloudState: ProgressState = {
+      completedLevels: [{ module: "shikaku", levelId: "1", completedAt: 2000, stars: 3 }],
+      foodConsumed: 0,
+      pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false }
+    };
+
+    const merged = (repo as any).mergeStates(localState, cloudState);
+    expect(merged.completedLevels[0].completedAt).toBe(2000);
+  });
 });
 
 

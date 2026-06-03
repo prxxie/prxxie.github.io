@@ -42,6 +42,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
     if (this.userIdPromise) {
       return this.userIdPromise;
     }
+    const holder = { promise: null as Promise<string | null> | null };
     const currentUserIdPromise = (async () => {
       try {
         const { data: { user } } = await this.supabase.auth.getUser();
@@ -53,11 +54,12 @@ export class SupabaseProgressRepository implements ProgressRepository {
         this.userIdInitialized = true;
         return null;
       } finally {
-        if (this.userIdPromise === currentUserIdPromise) {
+        if (this.userIdPromise === holder.promise) {
           this.userIdPromise = null;
         }
       }
     })();
+    holder.promise = currentUserIdPromise;
     this.userIdPromise = currentUserIdPromise;
     return currentUserIdPromise;
   }
@@ -166,7 +168,11 @@ export class SupabaseProgressRepository implements ProgressRepository {
     const addLevel = (lvl: typeof local.completedLevels[0]) => {
       const key = `${lvl.module}:${lvl.levelId}`;
       const existing = levelsMap.get(key);
-      if (!existing || lvl.stars > existing.stars) {
+      if (!existing) {
+        levelsMap.set(key, lvl);
+      } else if (lvl.stars > existing.stars) {
+        levelsMap.set(key, lvl);
+      } else if (lvl.stars === existing.stars && lvl.completedAt > existing.completedAt) {
         levelsMap.set(key, lvl);
       }
     };
@@ -260,6 +266,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
       return this.activeGetState;
     }
 
+    const holder = { promise: null as Promise<ProgressState> | null };
     const currentPromise = (async () => {
       try {
         const userId = await this.getUserId();
@@ -317,12 +324,13 @@ export class SupabaseProgressRepository implements ProgressRepository {
           return localState;
         }
       } finally {
-        if (this.activeGetState === currentPromise) {
+        if (this.activeGetState === holder.promise) {
           this.activeGetState = null;
         }
       }
     })();
 
+    holder.promise = currentPromise;
     this.activeGetState = currentPromise;
     return currentPromise;
   }

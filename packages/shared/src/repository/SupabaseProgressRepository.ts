@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
 import { SupabaseClient } from "@supabase/supabase-js";
 import { LocalProgressRepository } from "./LocalProgressRepository";
 import type { ProgressRepository } from "./ProgressRepository";
@@ -9,13 +9,27 @@ export class SupabaseProgressRepository implements ProgressRepository {
   private localRepo = new LocalProgressRepository();
   private cachedUserId: string | null = null;
   private userIdInitialized = false;
+  private authSubscription: { unsubscribe: () => void } | null = null;
+  private saveQueue: Promise<void> = Promise.resolve();
 
   constructor(private supabase: SupabaseClient) {
     if (this.supabase.auth && typeof this.supabase.auth.onAuthStateChange === "function") {
-      this.supabase.auth.onAuthStateChange((event, session) => {
+      const { data } = this.supabase.auth.onAuthStateChange((event, session) => {
         this.cachedUserId = session?.user?.id || null;
         this.userIdInitialized = true;
       });
+      if (data && data.subscription) {
+        this.authSubscription = data.subscription;
+      } else if ((data as any)?.unsubscribe) {
+        this.authSubscription = data as any;
+      }
+    }
+  }
+
+  dispose(): void {
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+      this.authSubscription = null;
     }
   }
 
@@ -133,12 +147,30 @@ export class SupabaseProgressRepository implements ProgressRepository {
       happiness: typeof cloud.pet.happiness === "number" ? cloud.pet.happiness : (local.pet?.happiness ?? defaultPet.happiness),
       lastPlayedAt: typeof cloud.pet.lastPlayedAt === "number" ? cloud.pet.lastPlayedAt : (local.pet?.lastPlayedAt ?? defaultPet.lastPlayedAt),
       isSleeping: typeof cloud.pet.isSleeping === "boolean" ? cloud.pet.isSleeping : (local.pet?.isSleeping ?? defaultPet.isSleeping),
-    } : { ...local.pet };
+    } : { ...(local.pet ?? defaultPet) };
 
-    const cloudXp = cloud.pet?.xp ?? 0;
-    const useLocalPet = (local.pet?.xp ?? 0) > cloudXp;
-    const pet = useLocalPet ? { ...local.pet } : { ...cloudPet };
-    pet.stage = getEvolutionStage(pet.xp);
+    // Timestamp-based pet property merging
+    const mergedXp = Math.max(local.pet?.xp ?? 0, cloudPet.xp);
+    const lastFedAt = Math.max(local.pet?.lastFedAt ?? 0, cloudPet.lastFedAt);
+    const lastPlayedAt = Math.max(local.pet?.lastPlayedAt ?? 0, cloudPet.lastPlayedAt);
+    
+    // Select happiness based on the latest play action
+    const happiness = (local.pet?.lastPlayedAt ?? 0) >= cloudPet.lastPlayedAt ? (local.pet?.happiness ?? 50) : cloudPet.happiness;
+    
+    // Select sleeping status based on the latest overall interaction (play or feed)
+    const localLatestInteraction = Math.max(local.pet?.lastPlayedAt ?? 0, local.pet?.lastFedAt ?? 0);
+    const cloudLatestInteraction = Math.max(cloudPet.lastPlayedAt, cloudPet.lastFedAt);
+    const isSleeping = localLatestInteraction >= cloudLatestInteraction ? (local.pet?.isSleeping ?? false) : cloudPet.isSleeping;
+
+    const pet = {
+      xp: mergedXp,
+      stage: getEvolutionStage(mergedXp),
+      lastFedAt,
+      lastPlayedAt,
+      happiness,
+      isSleeping
+    };
+
     const foodConsumed = Math.max(local.foodConsumed ?? 0, cloud.foodConsumed ?? 0);
 
     return {
@@ -196,49 +228,60 @@ export class SupabaseProgressRepository implements ProgressRepository {
   }
 
   async saveState(state: ProgressState, skipLocalWrite = false): Promise<void> {
-    const userId = await this.getUserId();
-    
-    if (!userId) {
-      if (!skipLocalWrite) {
-        await this.localRepo.saveState(state);
-      }
-      return;
-    }
-
-    try {
-      const { data, error } = await this.supabase
-        .from("user_progress")
-        .select("state")
-        .eq("user_id", userId)
-        .single();
-
-      let mergedState = state;
-
-      if (error) {
-        if (error.code !== "PGRST116") {
-          throw error;
+    this.saveQueue = this.saveQueue.then(async () => {
+      const userId = await this.getUserId();
+      
+      if (!userId) {
+        if (!skipLocalWrite) {
+          await this.localRepo.saveState(state);
         }
-      } else if (data?.state) {
-        const cloudState = this.sanitizeProgressState(data.state);
-        mergedState = this.mergeStates(state, cloudState);
+        return;
       }
 
-      const changed = JSON.stringify(state) !== JSON.stringify(mergedState);
-      if (changed || !skipLocalWrite) {
-        await this.localRepo.saveState(mergedState);
-      }
+      try {
+        const { data, error } = await this.supabase
+          .from("user_progress")
+          .select("state")
+          .eq("user_id", userId)
+          .single();
 
-      const { error: upsertError } = await this.supabase
-        .from("user_progress")
-        .upsert({ user_id: userId, state: mergedState });
-      if (upsertError) throw upsertError;
+        let mergedState = state;
 
-    } catch (err) {
-      console.error("Failed to sync state to Supabase:", err);
-      if (!skipLocalWrite) {
-        await this.localRepo.saveState(state);
+        if (error) {
+          if (error.code !== "PGRST116") {
+            throw error;
+          }
+        } else if (data?.state) {
+          try {
+            const cloudState = this.sanitizeProgressState(data.state);
+            mergedState = this.mergeStates(state, cloudState);
+          } catch (sanitizationError) {
+            console.warn("Corrupted cloud state detected during save. Repairing by overwriting with local state.", sanitizationError);
+            mergedState = state;
+          }
+        }
+
+        const changed = JSON.stringify(state) !== JSON.stringify(mergedState);
+        if (changed || !skipLocalWrite) {
+          await this.localRepo.saveState(mergedState);
+        }
+
+        const { error: upsertError } = await this.supabase
+          .from("user_progress")
+          .upsert({ user_id: userId, state: mergedState });
+        if (upsertError) throw upsertError;
+
+      } catch (err) {
+        console.error("Failed to sync state to Supabase:", err);
+        if (!skipLocalWrite) {
+          await this.localRepo.saveState(state);
+        }
       }
-    }
+    }).catch((err) => {
+      console.error("Queue execution error:", err);
+    });
+
+    await this.saveQueue;
   }
 
   async completeLevel(module: string, levelId: string): Promise<boolean> {

@@ -280,4 +280,171 @@ describe("SupabaseProgressRepository", () => {
     // Verify getUser was not called at all since the ID was cached via onAuthStateChange callback
     expect(mockAuthListener.auth.getUser).not.toHaveBeenCalled();
   });
+
+  it("should merge pet state properties individually based on latest timestamps (Review 1)", async () => {
+    // Cloud pet: played later but fed earlier than local, has higher XP
+    const cloudProgress = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 50, stage: 3, lastFedAt: 100, happiness: 80, lastPlayedAt: 1000, isSleeping: true }
+    };
+    
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { state: cloudProgress },
+        error: null
+      }),
+      upsert: vi.fn().mockResolvedValue({ error: null })
+    }));
+
+    // Local state: played earlier (lower timestamp), but fed later (higher timestamp), has lower XP
+    const localState = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 10, stage: 1, lastFedAt: 500, happiness: 100, lastPlayedAt: 200, isSleeping: false }
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, state: localState }));
+
+    const state = await repo.getState();
+
+    // Verify individual property merge
+    expect(state.pet.xp).toBe(50);
+    expect(state.pet.lastFedAt).toBe(500);
+    expect(state.pet.lastPlayedAt).toBe(1000);
+    expect(state.pet.happiness).toBe(80); // cloud played later -> cloud happiness
+    expect(state.pet.isSleeping).toBe(true); // cloud latest interaction (1000) > local (500) -> cloud sleeping
+  });
+
+  it("should merge pet state using local values when local has newer interaction timestamps", async () => {
+    // Cloud pet: played earlier, fed earlier, lower XP
+    const cloudProgress = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 5, stage: 1, lastFedAt: 100, happiness: 40, lastPlayedAt: 100, isSleeping: true }
+    };
+    
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { state: cloudProgress },
+        error: null
+      }),
+      upsert: vi.fn().mockResolvedValue({ error: null })
+    }));
+
+    // Local state: played later (1000), fed later (500), higher XP
+    const localState = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 20, stage: 2, lastFedAt: 500, happiness: 90, lastPlayedAt: 1000, isSleeping: false }
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, state: localState }));
+
+    const state = await repo.getState();
+
+    expect(state.pet.xp).toBe(20);
+    expect(state.pet.lastFedAt).toBe(500);
+    expect(state.pet.lastPlayedAt).toBe(1000);
+    expect(state.pet.happiness).toBe(90); // local played later -> local happiness
+    expect(state.pet.isSleeping).toBe(false); // local interaction (1000) > cloud (100) -> local sleeping
+  });
+
+  it("should self-heal corrupt cloud schema on saveState by overwriting with local state (Review 2)", async () => {
+    const upsertSpy = vi.fn().mockResolvedValue({ error: null });
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: {
+          state: {
+            completedLevels: "this-is-corrupted-and-should-be-an-array",
+            foodConsumed: 0,
+            pet: null
+          }
+        },
+        error: null
+      }),
+      upsert: upsertSpy
+    }));
+
+    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const localToSave: ProgressState = {
+      completedLevels: [{ module: "sokoban", levelId: "1", completedAt: 200, stars: 1 }],
+      foodConsumed: 3,
+      pet: { xp: 10, stage: 1, lastFedAt: 100, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+
+    await repo.saveState(localToSave);
+
+    expect(consoleWarnSpy).toHaveBeenCalled();
+    expect(upsertSpy).toHaveBeenCalled();
+
+    consoleWarnSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+  });
+
+  it("should serialize saveState calls sequentially through saveQueue (Review 3)", async () => {
+    const executionOrder: string[] = [];
+    
+    const upsertSpy = vi.fn().mockImplementation(() => {
+      executionOrder.push("upsert");
+      return Promise.resolve({ error: null });
+    });
+
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockImplementation(async () => {
+        executionOrder.push("select-start");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        executionOrder.push("select-end");
+        return { data: { state: null }, error: null };
+      }),
+      upsert: upsertSpy
+    }));
+
+    const state1 = {
+      completedLevels: [],
+      foodConsumed: 1,
+      pet: { xp: 1, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+    const state2 = {
+      completedLevels: [],
+      foodConsumed: 2,
+      pet: { xp: 2, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+
+    const p1 = repo.saveState(state1);
+    const p2 = repo.saveState(state2);
+
+    await Promise.all([p1, p2]);
+
+    expect(executionOrder).toEqual([
+      "select-start",
+      "select-end",
+      "upsert",
+      "select-start",
+      "select-end",
+      "upsert"
+    ]);
+  });
+
+  it("should unsubscribe from auth listener on dispose (Review 4)", () => {
+    const unsubscribeSpy = vi.fn();
+    const mockAuthListener = {
+      auth: {
+        onAuthStateChange: vi.fn().mockReturnValue({
+          data: { subscription: { unsubscribe: unsubscribeSpy } }
+        })
+      }
+    };
+    const newRepo = new SupabaseProgressRepository(mockAuthListener as any);
+    newRepo.dispose();
+    expect(unsubscribeSpy).toHaveBeenCalled();
+  });
 });

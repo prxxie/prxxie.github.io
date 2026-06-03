@@ -25,13 +25,25 @@ function initialState(): ProgressState {
 }
 
 export class LocalProgressRepository implements ProgressRepository {
+  private cachedState: ProgressState | null = null;
+
   async getState(): Promise<ProgressState> {
+    if (this.cachedState !== null) {
+      return this.cachedState;
+    }
+
     await Promise.resolve();
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return initialState();
+      if (!raw) {
+        this.cachedState = initialState();
+        return this.cachedState;
+      }
       const data = JSON.parse(raw) as StoredData;
-      if (data.version !== 1) return initialState();
+      if (data.version !== 1) {
+        this.cachedState = initialState();
+        return this.cachedState;
+      }
       
       // Fill defaults for backward compatibility
       const state = data.state;
@@ -41,9 +53,11 @@ export class LocalProgressRepository implements ProgressRepository {
       // Always recompute stage from XP — guards against stale stored stage
       state.pet.stage = getEvolutionStage(state.pet.xp);
       
-      return state;
+      this.cachedState = state;
+      return this.cachedState;
     } catch {
-      return initialState();
+      this.cachedState = initialState();
+      return this.cachedState;
     }
   }
 
@@ -52,6 +66,7 @@ export class LocalProgressRepository implements ProgressRepository {
     const data: StoredData = { version: 1, state };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      this.cachedState = state;
     } catch (err) {
       throw new Error(`Failed to save progress: ${String(err)}`);
     }

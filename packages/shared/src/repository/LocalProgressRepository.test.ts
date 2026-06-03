@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { LocalProgressRepository, STORAGE_KEY } from "./LocalProgressRepository";
 
 describe("LocalProgressRepository", () => {
@@ -200,6 +200,41 @@ describe("LocalProgressRepository", () => {
       await repo.toggleSleep();
       const state3 = await repo.getState();
       expect(state3.pet.isSleeping).toBe(false);
+    });
+  });
+
+  describe("caching behavior", () => {
+    it("caches the state and avoids repeated localStorage reads", async () => {
+      const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+      
+      // First read: reads from localStorage
+      const state1 = await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+      // Second read: should use cache, not call localStorage again
+      const state2 = await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(1);
+      expect(state2).toBe(state1);
+      
+      getItemSpy.mockRestore();
+    });
+
+    it("updates cache on saveState and subsequent getState avoids localStorage read", async () => {
+      const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+      const saved = {
+        completedLevels: [],
+        foodConsumed: 5,
+        pet: { xp: 5, stage: 1, lastFedAt: 100, happiness: 50, lastPlayedAt: 100, isSleeping: false },
+      };
+
+      await repo.saveState(saved);
+      
+      // subsequent getState should return the cached value directly without reading localStorage
+      const loaded = await repo.getState();
+      expect(loaded).toEqual(saved);
+      expect(getItemSpy).not.toHaveBeenCalled();
+
+      getItemSpy.mockRestore();
     });
   });
 });

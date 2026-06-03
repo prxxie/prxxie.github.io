@@ -27,6 +27,16 @@ function initialState(): ProgressState {
 export class LocalProgressRepository implements ProgressRepository {
   private cachedState: ProgressState | null = null;
 
+  constructor() {
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      window.addEventListener("storage", (event) => {
+        if (event.key === STORAGE_KEY) {
+          this.cachedState = null;
+        }
+      });
+    }
+  }
+
   async getState(): Promise<ProgressState> {
     if (this.cachedState !== null) {
       return this.cachedState;

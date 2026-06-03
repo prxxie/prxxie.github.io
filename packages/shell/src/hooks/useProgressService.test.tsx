@@ -2,6 +2,7 @@ import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { ProgressServiceProvider, useProgressService } from "./useProgressService";
+import { ProgressService } from "shared";
 
 describe("useProgressService", () => {
   beforeEach(() => {
@@ -88,5 +89,41 @@ describe("useProgressService", () => {
     await waitFor(() => {
       expect(result.current.isHungry).toBe(false);
     });
+  });
+
+  it("propagates errors and logs to console when feedPet, playWithPet, or toggleSleep fails", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const feedSpy = vi.spyOn(ProgressService.prototype, "feedPet").mockRejectedValue(new Error("Feed Failure"));
+    const playSpy = vi.spyOn(ProgressService.prototype, "playWithPet").mockRejectedValue(new Error("Play Failure"));
+    const sleepSpy = vi.spyOn(ProgressService.prototype, "toggleSleep").mockRejectedValue(new Error("Sleep Failure"));
+
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <ProgressServiceProvider>{children}</ProgressServiceProvider>
+    );
+
+    const { result } = renderHook(() => useProgressService(), { wrapper });
+
+    // Wait for initial load/refresh to complete
+    await waitFor(() => {
+      expect(result.current.isHungry).toBe(true);
+    });
+
+    // Call feedPet and assert failure and log
+    await expect(result.current.feedPet()).rejects.toThrow("Feed Failure");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("ProgressService: feedPet failed:", expect.any(Error));
+
+    // Call playWithPet and assert failure and log
+    await expect(result.current.playWithPet()).rejects.toThrow("Play Failure");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("ProgressService: playWithPet failed:", expect.any(Error));
+
+    // Call toggleSleep and assert failure and log
+    await expect(result.current.toggleSleep()).rejects.toThrow("Sleep Failure");
+    expect(consoleErrorSpy).toHaveBeenCalledWith("ProgressService: toggleSleep failed:", expect.any(Error));
+
+    // Cleanup mocks
+    feedSpy.mockRestore();
+    playSpy.mockRestore();
+    sleepSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
   });
 });

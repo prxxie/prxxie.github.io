@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { PixelChickenIcon } from "./Icons";
 import PetSprite from "../../shell/src/components/PetSprite";
 import type { PetStatus } from "../../shell/src/types";
@@ -75,6 +75,8 @@ export default function PetsApp({
 
   const [spriteStatus, setSpriteStatus] = useState<PetStatus>("idle");
   const [animationFrame, setAnimationFrame] = useState(0);
+  const [isFeeding, setIsFeeding] = useState(false);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -83,16 +85,30 @@ export default function PetsApp({
     return () => clearInterval(timer);
   }, []);
 
-  const canFeed = isHungry && foodAvailable > 0;
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current !== null) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
+
+  const canFeed = isHungry && foodAvailable > 0 && !isFeeding;
 
   const handleFeed = async () => {
-    if (!hasProgress || !canFeed) return;
+    if (!hasProgress || !canFeed || isFeeding) return;
+    setIsFeeding(true);
     try {
       await progressState.feedPet();
       setSpriteStatus("eating");
-      setTimeout(() => setSpriteStatus("idle"), 2000);
+      if (resetTimerRef.current !== null) {
+        clearTimeout(resetTimerRef.current);
+      }
+      resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
     } catch {
       // Error is logged by progressState, we ignore it here
+    } finally {
+      setIsFeeding(false);
     }
   };
 

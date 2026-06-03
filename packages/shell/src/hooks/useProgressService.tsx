@@ -49,8 +49,8 @@ export function ProgressServiceProvider({ children }: ProgressServiceProviderPro
 
   const refresh = useCallback(async () => {
     try {
-      const s = await progressService.getState();
-      const [hungry, food, level, happy] = await Promise.all([
+      const [s, hungry, food, level, happy] = await Promise.all([
+        progressService.getState(),
         progressService.isPetHungry(),
         progressService.getFoodAvailable(),
         progressService.getHungryLevel(),

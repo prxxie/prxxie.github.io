@@ -143,7 +143,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
     if (a.completedLevels.length !== b.completedLevels.length) return false;
 
     const getLevelKey = (l: { module: string; levelId: string; completedAt: number; stars?: number }) => 
-      `${l.module}:${l.levelId}:${l.completedAt}:${l.stars ?? 1}`;
+      `${l.module}:${l.levelId}:${l.completedAt}:${l.stars ?? 0}`;
 
     const setA = new Set(a.completedLevels.map(getLevelKey));
     for (const level of b.completedLevels) {
@@ -198,10 +198,19 @@ export class SupabaseProgressRepository implements ProgressRepository {
     // Select happiness based on the latest play action
     const happiness = (local.pet?.lastPlayedAt ?? 0) >= cloudPet.lastPlayedAt ? (local.pet?.happiness ?? 50) : cloudPet.happiness;
     
-    // Select sleeping status based on the latest overall interaction (play or feed)
-    const localLatestInteraction = Math.max(local.pet?.lastPlayedAt ?? 0, local.pet?.lastFedAt ?? 0);
-    const cloudLatestInteraction = Math.max(cloudPet.lastPlayedAt, cloudPet.lastFedAt);
-    const isSleeping = localLatestInteraction > cloudLatestInteraction ? (local.pet?.isSleeping ?? false) : cloudPet.isSleeping;
+    // Select sleeping status based on the latest unscaled interaction (play or feed)
+    const localRealTime = this.getUnscaledInteractionTime(
+      local.pet?.lastFedAt ?? 0,
+      local.pet?.lastPlayedAt ?? 0,
+      local.pet?.isSleeping ?? false
+    );
+    const cloudRealTime = this.getUnscaledInteractionTime(
+      cloudPet.lastFedAt,
+      cloudPet.lastPlayedAt,
+      cloudPet.isSleeping
+    );
+
+    const isSleeping = localRealTime > cloudRealTime ? (local.pet?.isSleeping ?? false) : cloudPet.isSleeping;
 
     const pet = {
       xp: mergedXp,
@@ -219,6 +228,25 @@ export class SupabaseProgressRepository implements ProgressRepository {
       foodConsumed,
       pet,
     };
+  }
+
+  private getUnscaledInteractionTime(lastFedAt: number, lastPlayedAt: number, isSleeping: boolean): number {
+    const maxTime = Math.max(lastFedAt, lastPlayedAt);
+    const now = maxTime < 10000000000 ? maxTime : Date.now();
+    
+    // Unscale hunger timestamp
+    const hungerDivisor = isSleeping ? 2 : 1;
+    const elapsedHunger = Math.max(0, now - lastFedAt);
+    const unscaledElapsedHunger = elapsedHunger / hungerDivisor;
+    const realLastFedAt = lastFedAt === 0 ? 0 : now - unscaledElapsedHunger;
+
+    // Unscale happiness timestamp
+    const happinessDivisor = isSleeping ? 4 : 1;
+    const elapsedHappiness = Math.max(0, now - lastPlayedAt);
+    const unscaledElapsedHappiness = elapsedHappiness / happinessDivisor;
+    const realLastPlayedAt = lastPlayedAt === 0 ? 0 : now - unscaledElapsedHappiness;
+
+    return Math.max(realLastFedAt, realLastPlayedAt);
   }
 
   async getState(): Promise<ProgressState> {

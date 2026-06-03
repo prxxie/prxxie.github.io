@@ -293,29 +293,32 @@ describe("SupabaseProgressRepository", () => {
     };
 
     const newRepo = new SupabaseProgressRepository(mockAuth as any);
+    try {
+      const state: ProgressState = {
+        completedLevels: [],
+        foodConsumed: 0,
+        pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+      };
 
-    const state: ProgressState = {
-      completedLevels: [],
-      foodConsumed: 0,
-      pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
-    };
+      // First saveState call: fetches user and caches it
+      await newRepo.saveState(state);
+      expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(1);
 
-    // First saveState call: fetches user and caches it
-    await newRepo.saveState(state);
-    expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(1);
+      // Second saveState call: uses cached userId
+      await newRepo.saveState(state);
+      expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(1);
 
-    // Second saveState call: uses cached userId
-    await newRepo.saveState(state);
-    expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(1);
+      // Dispatch the cozyos:progress-updated event on window to invalidate cache
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("cozyos:progress-updated"));
+      }
 
-    // Dispatch the cozyos:progress-updated event on window to invalidate cache
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event("cozyos:progress-updated"));
+      // Third saveState call: fetches user again because cache was invalidated
+      await newRepo.saveState(state);
+      expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(2);
+    } finally {
+      newRepo.dispose();
     }
-
-    // Third saveState call: fetches user again because cache was invalidated
-    await newRepo.saveState(state);
-    expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(2);
   });
 
   it("should merge pet state properties individually based on latest timestamps (Review 1)", async () => {
@@ -520,19 +523,22 @@ describe("SupabaseProgressRepository", () => {
     };
     
     const newRepo = new SupabaseProgressRepository(mockSupabaseWithAuth as any);
-    
-    const state: ProgressState = {
-      completedLevels: [],
-      foodConsumed: 0,
-      pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
-    };
-    
-    const p1 = newRepo.getState();
-    const p2 = newRepo.saveState(state);
-    
-    await Promise.all([p1, p2]);
-    
-    expect(getUserCallCount).toBe(1);
+    try {
+      const state: ProgressState = {
+        completedLevels: [],
+        foodConsumed: 0,
+        pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+      };
+      
+      const p1 = newRepo.getState();
+      const p2 = newRepo.saveState(state);
+      
+      await Promise.all([p1, p2]);
+      
+      expect(getUserCallCount).toBe(1);
+    } finally {
+      newRepo.dispose();
+    }
   });
 
   it("should cache null user ID on getUser failure and not retry repeatedly", async () => {
@@ -553,23 +559,26 @@ describe("SupabaseProgressRepository", () => {
     };
     
     const newRepo = new SupabaseProgressRepository(mockAuth as any);
-    
-    // First getState: triggers getUser, fails, and should cache null and set initialized to true
-    await newRepo.getState();
-    expect(getUserCallCount).toBe(1);
-    
-    // Second getState: should reuse the cached null ID and NOT trigger getUser again
-    await newRepo.getState();
-    expect(getUserCallCount).toBe(1);
-    
-    // Dispatch event to invalidate cache
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event("cozyos:progress-updated"));
+    try {
+      // First getState: triggers getUser, fails, and should cache null and set initialized to true
+      await newRepo.getState();
+      expect(getUserCallCount).toBe(1);
+      
+      // Second getState: should reuse the cached null ID and NOT trigger getUser again
+      await newRepo.getState();
+      expect(getUserCallCount).toBe(1);
+      
+      // Dispatch event to invalidate cache
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("cozyos:progress-updated"));
+      }
+      
+      // Third getState: cache was invalidated, should trigger getUser again
+      await newRepo.getState();
+      expect(getUserCallCount).toBe(2);
+    } finally {
+      newRepo.dispose();
     }
-    
-    // Third getState: cache was invalidated, should trigger getUser again
-    await newRepo.getState();
-    expect(getUserCallCount).toBe(2);
   });
 
   it("should check that areStatesEqual handles out-of-order levels correctly", () => {
@@ -630,9 +639,12 @@ describe("SupabaseProgressRepository", () => {
     };
 
     const newRepo = new SupabaseProgressRepository(mockSupabaseAuth as any);
-
-    // Call getState and expect it to reject due to auth change during operation
-    await expect(newRepo.getState()).rejects.toThrow("Auth state changed during getState");
+    try {
+      // Call getState and expect it to reject due to auth change during operation
+      await expect(newRepo.getState()).rejects.toThrow("Auth state changed during getState");
+    } finally {
+      newRepo.dispose();
+    }
   });
 
   it("should resolve isSleeping correctly on tie-breaks using > (preferring cloud state if interactions are equal)", async () => {
@@ -700,3 +712,5 @@ describe("SupabaseProgressRepository", () => {
     expect(state.pet.isSleeping).toBe(false);
   });
 });
+
+

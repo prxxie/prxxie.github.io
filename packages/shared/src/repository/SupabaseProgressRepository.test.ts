@@ -477,4 +477,25 @@ describe("SupabaseProgressRepository", () => {
     newRepo.dispose();
     expect(unsubscribeSpy).toHaveBeenCalled();
   });
+
+  it("should reject when Supabase call fails during saveState", async () => {
+    const dbError = new Error("Database connection lost");
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockRejectedValue(dbError)
+    }));
+
+    const state: ProgressState = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(repo.saveState(state)).rejects.toThrow("Database connection lost");
+
+    consoleErrorSpy.mockRestore();
+  });
 });

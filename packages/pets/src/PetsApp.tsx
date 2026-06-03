@@ -20,6 +20,7 @@ interface ProgressState {
   foodAvailable: number;
   hungryLevel: number;
   happiness: number;
+  isSleeping: boolean;
   feedPet: () => Promise<void>;
 }
 
@@ -93,7 +94,7 @@ export default function PetsApp({
     };
   }, []);
 
-  const canFeed = isHungry && foodAvailable > 0 && !isFeeding;
+  const canFeed = isHungry && foodAvailable > 0 && !(progressState?.isSleeping ?? false) && !isFeeding;
 
   const handleFeed = async () => {
     if (!hasProgress || !canFeed || isFeeding) return;
@@ -148,7 +149,7 @@ export default function PetsApp({
               size={120}
               stage={petState.stage}
               status={spriteStatus}
-              isSleeping={false}
+              isSleeping={progressState?.isSleeping ?? false}
               isHungry={isHungry}
               animationFrame={animationFrame}
             />

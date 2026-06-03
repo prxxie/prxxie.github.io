@@ -395,7 +395,9 @@ export class SupabaseProgressRepository implements ProgressRepository {
         console.error("Failed to sync state to Supabase:", err);
         if (!skipLocalWrite && !localWriteDone) {
           try {
-            await this.localRepo.saveState(state);
+            const currentLocal = await this.localRepo.getState();
+            const fallbackState = this.mergeStates(currentLocal, state);
+            await this.localRepo.saveState(fallbackState);
           } catch (localErr) {
             throw localErr instanceof Error ? localErr : new Error(String(localErr));
           }

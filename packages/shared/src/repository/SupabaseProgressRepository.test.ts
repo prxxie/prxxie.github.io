@@ -782,6 +782,47 @@ describe("SupabaseProgressRepository", () => {
     const merged = (repo as any).mergeStates(localState, cloudState);
     expect(merged.completedLevels[0].completedAt).toBe(2000);
   });
+
+  it("should merge changes with pre-existing local state on saveState query failure", async () => {
+    const mockSupabase = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } } }) },
+      from: vi.fn().mockImplementation(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockRejectedValue(new Error("Supabase is down"))
+      }))
+    };
+
+    const newRepo = new SupabaseProgressRepository(mockSupabase as any);
+    try {
+      // 1. Setup local state with some initial synced cloud progress
+      const initialLocalState: ProgressState = {
+        completedLevels: [{ module: "shikaku", levelId: "1", completedAt: 100, stars: 3 }],
+        foodConsumed: 1,
+        pet: { xp: 10, stage: 1, lastFedAt: 100, happiness: 50, lastPlayedAt: 100, isSleeping: false }
+      };
+      await (newRepo as any).localRepo.saveState(initialLocalState);
+
+      // 2. Perform a saveState with a new local action (e.g. food consumed incremented, XP incremented)
+      // but without the level completion progress which might have been missed in memory load
+      const newStateUpdate: ProgressState = {
+        completedLevels: [], // simulates local-only snapshot constructed without knowledge of synced levels
+        foodConsumed: 2,
+        pet: { xp: 15, stage: 1, lastFedAt: 150, happiness: 50, lastPlayedAt: 100, isSleeping: false }
+      };
+
+      await expect(newRepo.saveState(newStateUpdate)).rejects.toThrow("Supabase is down");
+
+      // 3. Verify the final local state contains the merged result (both level progress AND new XP/food)
+      const finalLocal = await (newRepo as any).localRepo.getState();
+      expect(finalLocal.completedLevels.length).toBe(1);
+      expect(finalLocal.completedLevels[0].levelId).toBe("1");
+      expect(finalLocal.foodConsumed).toBe(2);
+      expect(finalLocal.pet.xp).toBe(15);
+    } finally {
+      newRepo.dispose();
+    }
+  });
 });
 
 

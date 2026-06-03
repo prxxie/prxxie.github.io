@@ -711,6 +711,61 @@ describe("SupabaseProgressRepository", () => {
     // Since local interaction is strictly greater, it should prefer the local state (isSleeping = false)
     expect(state.pet.isSleeping).toBe(false);
   });
+
+  it("should not clear a newer in-flight promise when an older one resolves after cache invalidation", async () => {
+    let resolveFirst: (val: any) => void = () => {};
+    let resolveSecond: (val: any) => void = () => {};
+    const firstPromise = new Promise<any>((resolve) => { resolveFirst = resolve; });
+    const secondPromise = new Promise<any>((resolve) => { resolveSecond = resolve; });
+
+    const singleMock = vi.fn()
+      .mockReturnValueOnce(firstPromise)
+      .mockReturnValueOnce(secondPromise);
+    const mockFromObj = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: singleMock,
+      upsert: vi.fn().mockResolvedValue({ error: null })
+    };
+
+    const mockAuth = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } } }) },
+      from: vi.fn().mockReturnValue(mockFromObj)
+    };
+
+    const newRepo = new SupabaseProgressRepository(mockAuth as any);
+    try {
+      // Trigger first load
+      const p1 = newRepo.getState();
+      const firstCachedPromise = (newRepo as any).activeGetState;
+      expect(firstCachedPromise).not.toBeNull();
+
+      // Dispatch event to invalidate/clear activeGetState
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("cozyos:progress-updated"));
+      }
+      expect((newRepo as any).activeGetState).toBeNull();
+
+      // Trigger second load (starts a new in-flight request)
+      const p2 = newRepo.getState();
+      const secondCachedPromise = (newRepo as any).activeGetState;
+      expect(secondCachedPromise).not.toBeNull();
+      expect(secondCachedPromise).not.toBe(firstCachedPromise);
+
+      // Resolve first query. It should NOT clear activeGetState because activeGetState now holds the second promise.
+      resolveFirst({ data: { state: { completedLevels: [], foodConsumed: 0, pet: { xp: 0 } } }, error: null });
+      await p1;
+
+      expect((newRepo as any).activeGetState).toBe(secondCachedPromise);
+
+      // Resolve second query. It should clear activeGetState.
+      resolveSecond({ data: { state: { completedLevels: [], foodConsumed: 0, pet: { xp: 0 } } }, error: null });
+      await p2;
+      expect((newRepo as any).activeGetState).toBeNull();
+    } finally {
+      newRepo.dispose();
+    }
+  });
 });
 
 

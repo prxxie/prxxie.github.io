@@ -42,7 +42,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
     if (this.userIdPromise) {
       return this.userIdPromise;
     }
-    this.userIdPromise = (async () => {
+    const currentUserIdPromise = (async () => {
       try {
         const { data: { user } } = await this.supabase.auth.getUser();
         this.cachedUserId = user?.id || null;
@@ -53,10 +53,13 @@ export class SupabaseProgressRepository implements ProgressRepository {
         this.userIdInitialized = true;
         return null;
       } finally {
-        this.userIdPromise = null;
+        if (this.userIdPromise === currentUserIdPromise) {
+          this.userIdPromise = null;
+        }
       }
     })();
-    return this.userIdPromise;
+    this.userIdPromise = currentUserIdPromise;
+    return currentUserIdPromise;
   }
 
   private sanitizeProgressState(state: any): ProgressState {
@@ -257,7 +260,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
       return this.activeGetState;
     }
 
-    this.activeGetState = (async () => {
+    const currentPromise = (async () => {
       try {
         const userId = await this.getUserId();
         const localState = await this.localRepo.getState();
@@ -314,11 +317,14 @@ export class SupabaseProgressRepository implements ProgressRepository {
           return localState;
         }
       } finally {
-        this.activeGetState = null;
+        if (this.activeGetState === currentPromise) {
+          this.activeGetState = null;
+        }
       }
     })();
 
-    return this.activeGetState;
+    this.activeGetState = currentPromise;
+    return currentPromise;
   }
 
   async saveState(state: ProgressState, skipLocalWrite = false): Promise<void> {

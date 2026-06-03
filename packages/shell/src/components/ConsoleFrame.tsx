@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import type { Tab } from "../types";
 import { getAudioMuted, setAudioMuted, playBeepSound } from "../utils/audio";
 
 interface ConsoleFrameProps {
   children: React.ReactNode;
-  currentTab: Tab;
-  setTab: (tab: Tab) => void;
   onMobileHud?: () => void;
   onCloudClick?: () => void;
   cloudUser?: string | null;

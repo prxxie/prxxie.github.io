@@ -145,8 +145,6 @@ export default function App(): React.ReactElement {
     <QueryClientProvider client={queryClient}>
       <div className="w-full flex justify-center min-h-screen">
         <ConsoleFrame
-          currentTab={currentTab}
-          setTab={navigate}
           onMobileHud={() => setIsMobileHudOpen(true)}
           onCloudClick={() => setIsCloudModalOpen(true)}
           cloudUser={cloudUser}

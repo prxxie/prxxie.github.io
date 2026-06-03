@@ -52,7 +52,7 @@ afterAll(() => {
 describe("ConsoleFrame", () => {
   it("does not render top horizontal nav buttons (matrix moved to side panels)", () => {
     render(
-      <ConsoleFrame currentTab="home" setTab={() => {}} cloudUser={null}>
+      <ConsoleFrame cloudUser={null}>
         <div>test</div>
       </ConsoleFrame>
     );
@@ -63,7 +63,7 @@ describe("ConsoleFrame", () => {
 
   it("does not render a [MENU] button in the header (mobile nav via HUD)", () => {
     render(
-      <ConsoleFrame currentTab="home" setTab={() => {}} cloudUser={null}>
+      <ConsoleFrame cloudUser={null}>
         <div>test</div>
       </ConsoleFrame>
     );
@@ -75,7 +75,7 @@ describe("ConsoleFrame", () => {
 
   it("renders the audio toggle button defaulting to OFF", () => {
     render(
-      <ConsoleFrame currentTab="home" setTab={() => {}} cloudUser={null}>
+      <ConsoleFrame cloudUser={null}>
         <div>test</div>
       </ConsoleFrame>
     );
@@ -87,7 +87,7 @@ describe("ConsoleFrame", () => {
 
   it("toggles audio state when clicking the SOUND button", () => {
     render(
-      <ConsoleFrame currentTab="home" setTab={() => {}} cloudUser={null}>
+      <ConsoleFrame cloudUser={null}>
         <div>test</div>
       </ConsoleFrame>
     );

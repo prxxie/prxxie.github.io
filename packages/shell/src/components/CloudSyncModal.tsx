@@ -17,6 +17,16 @@ export default function CloudSyncModal({ isOpen, onClose, cloudUser }: CloudSync
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    if (isOpen) {
+      setEmail("");
+      setPassword("");
+      setErrorMsg(null);
+      setMessage(null);
+      setLoading(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

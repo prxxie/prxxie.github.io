@@ -124,6 +124,37 @@ export class SupabaseProgressRepository implements ProgressRepository {
     }
   }
 
+  private areStatesEqual(a: ProgressState, b: ProgressState): boolean {
+    if (a.foodConsumed !== b.foodConsumed) return false;
+    
+    const petA = a.pet;
+    const petB = b.pet;
+    if (
+      petA.xp !== petB.xp ||
+      petA.stage !== petB.stage ||
+      petA.lastFedAt !== petB.lastFedAt ||
+      petA.happiness !== petB.happiness ||
+      petA.lastPlayedAt !== petB.lastPlayedAt ||
+      petA.isSleeping !== petB.isSleeping
+    ) {
+      return false;
+    }
+
+    if (a.completedLevels.length !== b.completedLevels.length) return false;
+
+    const getLevelKey = (l: { module: string; levelId: string; completedAt: number; stars?: number }) => 
+      `${l.module}:${l.levelId}:${l.completedAt}:${l.stars ?? 1}`;
+
+    const setA = new Set(a.completedLevels.map(getLevelKey));
+    for (const level of b.completedLevels) {
+      if (!setA.has(getLevelKey(level))) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   private mergeStates(local: ProgressState, cloud: ProgressState): ProgressState {
     const levelsMap = new Map<string, typeof local.completedLevels[0]>();
     
@@ -170,7 +201,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
     // Select sleeping status based on the latest overall interaction (play or feed)
     const localLatestInteraction = Math.max(local.pet?.lastPlayedAt ?? 0, local.pet?.lastFedAt ?? 0);
     const cloudLatestInteraction = Math.max(cloudPet.lastPlayedAt, cloudPet.lastFedAt);
-    const isSleeping = localLatestInteraction >= cloudLatestInteraction ? (local.pet?.isSleeping ?? false) : cloudPet.isSleeping;
+    const isSleeping = localLatestInteraction > cloudLatestInteraction ? (local.pet?.isSleeping ?? false) : cloudPet.isSleeping;
 
     const pet = {
       xp: mergedXp,
@@ -211,6 +242,11 @@ export class SupabaseProgressRepository implements ProgressRepository {
             .eq("user_id", userId)
             .single();
 
+          const currentUserId = await this.getUserId();
+          if (currentUserId !== userId) {
+            throw new Error("Auth state changed during getState");
+          }
+
           if (error) {
             if (error.code === "PGRST116") {
               const { error: upsertError } = await this.supabase.from("user_progress").upsert({
@@ -240,6 +276,9 @@ export class SupabaseProgressRepository implements ProgressRepository {
 
           return mergedState;
         } catch (err) {
+          if (err instanceof Error && err.message === "Auth state changed during getState") {
+            throw err;
+          }
           console.error("Supabase load error, using local fallback:", err);
           return localState;
         }
@@ -255,6 +294,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
     const previousQueueTail = this.saveQueue;
 
     const currentSaveOperation = async () => {
+      let localWriteDone = false;
       try {
         await previousQueueTail;
       } catch {
@@ -278,6 +318,11 @@ export class SupabaseProgressRepository implements ProgressRepository {
           .eq("user_id", userId)
           .single();
 
+        const currentUserId = await this.getUserId();
+        if (currentUserId !== userId) {
+          throw new Error("Auth state changed during saveState");
+        }
+
         if (error) {
           if (error.code !== "PGRST116") {
             throw error;
@@ -291,9 +336,10 @@ export class SupabaseProgressRepository implements ProgressRepository {
           }
         }
 
-        const changed = JSON.stringify(state) !== JSON.stringify(finalState);
+        const changed = !this.areStatesEqual(state, finalState);
         if (changed || !skipLocalWrite) {
           await this.localRepo.saveState(finalState);
+          localWriteDone = true;
         }
 
         const { error: upsertError } = await this.supabase
@@ -302,7 +348,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
         if (upsertError) throw upsertError;
       } catch (err) {
         console.error("Failed to sync state to Supabase:", err);
-        if (!skipLocalWrite) {
+        if (!skipLocalWrite && !localWriteDone) {
           try {
             await this.localRepo.saveState(state);
           } catch (localErr) {

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { SupabaseProgressRepository } from "./SupabaseProgressRepository";
 import { STORAGE_KEY } from "./LocalProgressRepository";
@@ -570,5 +570,133 @@ describe("SupabaseProgressRepository", () => {
     // Third getState: cache was invalidated, should trigger getUser again
     await newRepo.getState();
     expect(getUserCallCount).toBe(2);
+  });
+
+  it("should check that areStatesEqual handles out-of-order levels correctly", () => {
+    const stateA: ProgressState = {
+      completedLevels: [
+        { module: "shikaku", levelId: "1", completedAt: 100, stars: 3 },
+        { module: "sokoban", levelId: "2", completedAt: 200, stars: 2 }
+      ],
+      foodConsumed: 5,
+      pet: { xp: 10, stage: 1, lastFedAt: 100, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+
+    const stateB: ProgressState = {
+      completedLevels: [
+        { module: "sokoban", levelId: "2", completedAt: 200, stars: 2 },
+        { module: "shikaku", levelId: "1", completedAt: 100, stars: 3 }
+      ],
+      foodConsumed: 5,
+      pet: { xp: 10, stage: 1, lastFedAt: 100, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+
+    expect((repo as any).areStatesEqual(stateA, stateB)).toBe(true);
+
+    const stateC: ProgressState = {
+      ...stateB,
+      completedLevels: [
+        { module: "sokoban", levelId: "2", completedAt: 200, stars: 1 },
+        { module: "shikaku", levelId: "1", completedAt: 100, stars: 3 }
+      ]
+    };
+
+    expect((repo as any).areStatesEqual(stateA, stateC)).toBe(false);
+  });
+
+  it("should throw an error and abort if auth state changes during getState()", async () => {
+    let mockUserId = "user-A";
+    const mockSupabaseAuth = {
+      auth: {
+        getUser: vi.fn().mockImplementation(async () => {
+          await Promise.resolve();
+          return { data: { user: { id: mockUserId } } };
+        })
+      },
+      from: vi.fn().mockImplementation(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockImplementation(async () => {
+          // Simulate auth state changing during the database query
+          mockUserId = "user-B";
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new Event("cozyos:progress-updated"));
+          }
+          await Promise.resolve();
+          return { data: { state: null }, error: { code: "PGRST116" } };
+        }),
+        upsert: vi.fn().mockResolvedValue({ error: null })
+      }))
+    };
+
+    const newRepo = new SupabaseProgressRepository(mockSupabaseAuth as any);
+
+    // Call getState and expect it to reject due to auth change during operation
+    await expect(newRepo.getState()).rejects.toThrow("Auth state changed during getState");
+  });
+
+  it("should resolve isSleeping correctly on tie-breaks using > (preferring cloud state if interactions are equal)", async () => {
+    // Both cloud and local have the same latest interaction time (1000)
+    // Cloud: isSleeping = true
+    const cloudProgress = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 10, stage: 1, lastFedAt: 1000, happiness: 50, lastPlayedAt: 1000, isSleeping: true }
+    };
+    
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { state: cloudProgress },
+        error: null
+      }),
+      upsert: vi.fn().mockResolvedValue({ error: null })
+    }));
+
+    // Local: isSleeping = false, latest interaction = 1000
+    const localState = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 10, stage: 1, lastFedAt: 1000, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, state: localState }));
+
+    const state = await repo.getState();
+
+    // Since interaction times are equal, it should prefer the cloud state (isSleeping = true)
+    expect(state.pet.isSleeping).toBe(true);
+  });
+
+  it("should prefer local isSleeping if local interaction is strictly greater", async () => {
+    // Cloud: latest interaction = 999, isSleeping = true
+    const cloudProgress = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 10, stage: 1, lastFedAt: 999, happiness: 50, lastPlayedAt: 999, isSleeping: true }
+    };
+    
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: { state: cloudProgress },
+        error: null
+      }),
+      upsert: vi.fn().mockResolvedValue({ error: null })
+    }));
+
+    // Local: latest interaction = 1000, isSleeping = false
+    const localState = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 10, stage: 1, lastFedAt: 1000, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, state: localState }));
+
+    const state = await repo.getState();
+
+    // Since local interaction is strictly greater, it should prefer the local state (isSleeping = false)
+    expect(state.pet.isSleeping).toBe(false);
   });
 });

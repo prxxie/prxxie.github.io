@@ -8,6 +8,8 @@ import MatrixMenu from "./components/MatrixMenu";
 import StatsTelemetry from "./components/StatsTelemetry";
 import HomeDashboard from "./components/HomeDashboard";
 import MfeLoader from "./components/MfeLoader";
+import { supabase } from "./utils/supabase";
+import CloudSyncModal from "./components/CloudSyncModal";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +71,34 @@ export default function App(): React.ReactElement {
   const [isMobileHudOpen, setIsMobileHudOpen] = useState(false);
   const progressService = useProgressService();
 
+  const [cloudUser, setCloudUser] = useState<string | null>(null);
+  const [isCloudModalOpen, setIsCloudModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!supabase) return;
+    const client = supabase;
+
+    const checkUser = async () => {
+      try {
+        const { data: { user } } = await client.auth.getUser();
+        setCloudUser(user?.email || null);
+      } catch (err) {
+        console.error("Failed to retrieve user session:", err);
+      }
+    };
+    void checkUser();
+
+    const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
+      setCloudUser(session?.user?.email || null);
+    });
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
+  }, []);
+
   useEffect(() => {
     const handleFullscreenChange = (): void => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -117,6 +147,8 @@ export default function App(): React.ReactElement {
           currentTab={currentTab}
           setTab={navigate}
           onMobileHud={() => setIsMobileHudOpen(true)}
+          onCloudClick={() => setIsCloudModalOpen(true)}
+          cloudUser={cloudUser}
         >
           <div className="grid grid-cols-1 md:grid-cols-20 gap-6 items-start">
             <div
@@ -219,6 +251,10 @@ export default function App(): React.ReactElement {
             </div>
           </div>
         </ConsoleFrame>
+        <CloudSyncModal
+          isOpen={isCloudModalOpen}
+          onClose={() => setIsCloudModalOpen(false)}
+        />
       </div>
     </QueryClientProvider>
   );

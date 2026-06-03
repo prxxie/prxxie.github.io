@@ -24,12 +24,19 @@ export default function CloudSyncModal({ isOpen, onClose, cloudUser }: CloudSync
       setMessage(null);
       setLoading(false);
     }
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
   }, [isOpen]);
 
   useEffect(() => {
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
     };
   }, []);
@@ -52,7 +59,13 @@ export default function CloudSyncModal({ isOpen, onClose, cloudUser }: CloudSync
         const { error } = await client.auth.signInWithPassword({ email, password });
         if (error) throw error;
         setMessage("LOGIN SUCCESSFUL. CLOUD PROGRESS SYNCED.");
-        timeoutRef.current = setTimeout(onClose, 1500);
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        timeoutRef.current = setTimeout(() => {
+          timeoutRef.current = null;
+          onClose();
+        }, 1500);
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -70,7 +83,13 @@ export default function CloudSyncModal({ isOpen, onClose, cloudUser }: CloudSync
       const { error } = await client.auth.signOut();
       if (error) throw error;
       setMessage("LOGOUT SUCCESSFUL. LOCAL REPO REMAINS ACTIVE.");
-      timeoutRef.current = setTimeout(onClose, 1500);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        timeoutRef.current = null;
+        onClose();
+      }, 1500);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       setErrorMsg(errorMessage.toUpperCase() || "LOGOUT ERROR");

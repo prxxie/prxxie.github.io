@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import CloudSyncModal from "./CloudSyncModal";
 
@@ -154,5 +154,56 @@ describe("CloudSyncModal", () => {
       expect(mockSupabase.auth.signOut).toHaveBeenCalled();
       expect(screen.getByText("LOGOUT SUCCESSFUL. LOCAL REPO REMAINS ACTIVE.")).toBeInTheDocument();
     });
+  });
+
+  it("calls onClose after 1500ms when sign in succeeds", async () => {
+    vi.useFakeTimers();
+    mockSupabase.auth.signInWithPassword.mockResolvedValue({ data: { user: {} }, error: null });
+    const handleClose = vi.fn();
+    render(<CloudSyncModal isOpen={true} onClose={handleClose} cloudUser={null} />);
+
+    fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
+    fireEvent.change(screen.getByLabelText("ACCESS_KEY:"), { target: { value: "password123" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "SIGN IN" }));
+      // Flush promises/microtasks under fake timers
+      await vi.advanceTimersByTimeAsync(100);
+    });
+
+    expect(screen.getByText("LOGIN SUCCESSFUL. CLOUD PROGRESS SYNCED.")).toBeInTheDocument();
+    expect(handleClose).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(1400);
+    });
+
+    expect(handleClose).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  it("clears timeout on unmount or closing", async () => {
+    vi.useFakeTimers();
+    mockSupabase.auth.signInWithPassword.mockResolvedValue({ data: { user: {} }, error: null });
+    const handleClose = vi.fn();
+    const { unmount, rerender } = render(<CloudSyncModal isOpen={true} onClose={handleClose} cloudUser={null} />);
+
+    fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
+    fireEvent.change(screen.getByLabelText("ACCESS_KEY:"), { target: { value: "password123" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "SIGN IN" }));
+      // Flush promises/microtasks under fake timers
+      await vi.advanceTimersByTimeAsync(100);
+    });
+
+    expect(screen.getByText("LOGIN SUCCESSFUL. CLOUD PROGRESS SYNCED.")).toBeInTheDocument();
+
+    act(() => {
+      rerender(<CloudSyncModal isOpen={false} onClose={handleClose} cloudUser={null} />);
+      unmount();
+      vi.advanceTimersByTime(1400);
+    });
+
+    expect(handleClose).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

@@ -245,68 +245,73 @@ export class SupabaseProgressRepository implements ProgressRepository {
   }
 
   async saveState(state: ProgressState, skipLocalWrite = false): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      const runSave = async () => {
-        let finalState = state;
-        const userId = await this.getUserId();
-        
-        if (!userId) {
-          if (!skipLocalWrite) {
+    const previousQueueTail = this.saveQueue;
+
+    const currentSaveOperation = async () => {
+      try {
+        await previousQueueTail;
+      } catch {
+        // Suppress errors from previous queued actions to allow the current save to execute
+      }
+
+      let finalState = state;
+      const userId = await this.getUserId();
+
+      if (!userId) {
+        if (!skipLocalWrite) {
+          await this.localRepo.saveState(state);
+        }
+        return;
+      }
+
+      try {
+        const { data, error } = await this.supabase
+          .from("user_progress")
+          .select("state")
+          .eq("user_id", userId)
+          .single();
+
+        if (error) {
+          if (error.code !== "PGRST116") {
+            throw error;
+          }
+        } else if (data?.state) {
+          try {
+            const cloudState = this.sanitizeProgressState(data.state);
+            finalState = this.mergeStates(state, cloudState);
+          } catch (valErr) {
+            console.warn("Corrupt cloud state found during save. Overwriting with local state to repair:", valErr);
+          }
+        }
+
+        const changed = JSON.stringify(state) !== JSON.stringify(finalState);
+        if (changed || !skipLocalWrite) {
+          await this.localRepo.saveState(finalState);
+        }
+
+        const { error: upsertError } = await this.supabase
+          .from("user_progress")
+          .upsert({ user_id: userId, state: finalState });
+        if (upsertError) throw upsertError;
+      } catch (err) {
+        console.error("Failed to sync state to Supabase:", err);
+        if (!skipLocalWrite) {
+          try {
             await this.localRepo.saveState(state);
+          } catch (localErr) {
+            throw localErr instanceof Error ? localErr : new Error(String(localErr));
           }
-          resolve();
-          return;
         }
+        throw err instanceof Error ? err : new Error(String(err));
+      }
+    };
 
-        try {
-          const { data, error } = await this.supabase
-            .from("user_progress")
-            .select("state")
-            .eq("user_id", userId)
-            .single();
-
-          if (error) {
-            if (error.code !== "PGRST116") {
-              throw error;
-            }
-          } else if (data?.state) {
-            try {
-              const cloudState = this.sanitizeProgressState(data.state);
-              finalState = this.mergeStates(state, cloudState);
-            } catch (valErr) {
-              console.warn("Corrupt cloud state found during save. Overwriting with local state to repair:", valErr);
-            }
-          }
-
-          const changed = JSON.stringify(state) !== JSON.stringify(finalState);
-          if (changed || !skipLocalWrite) {
-            await this.localRepo.saveState(finalState);
-          }
-
-          const { error: upsertError } = await this.supabase
-            .from("user_progress")
-            .upsert({ user_id: userId, state: finalState });
-          if (upsertError) throw upsertError;
-          
-          resolve();
-        } catch (err) {
-          console.error("Failed to sync state to Supabase:", err);
-          if (!skipLocalWrite) {
-            try {
-              await this.localRepo.saveState(state);
-            } catch (localErr) {
-              reject(localErr instanceof Error ? localErr : new Error(String(localErr)));
-              return;
-            }
-          }
-          reject(err instanceof Error ? err : new Error(String(err)));
-        }
-      };
-
-      this.saveQueue = this.saveQueue.then(runSave).catch((err) => {
-        console.error("Error in serialized save queue chain:", err);
-      });
+    const savePromise = currentSaveOperation();
+    this.saveQueue = savePromise.catch((err) => {
+      console.error("Error in serialized save queue chain:", err);
     });
+
+    return savePromise;
   }
 
   async completeLevel(module: string, levelId: string): Promise<boolean> {

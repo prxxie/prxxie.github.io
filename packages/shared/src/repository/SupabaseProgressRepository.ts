@@ -5,6 +5,8 @@ import type { ProgressRepository } from "./ProgressRepository";
 import type { ProgressState } from "../progress/types";
 import { getEvolutionStage } from "../pet/evolution";
 
+const MOCK_TIMESTAMP_THRESHOLD = 10_000_000_000;
+
 export class SupabaseProgressRepository implements ProgressRepository {
   private localRepo = new LocalProgressRepository();
   private cachedUserId: string | null = null;
@@ -232,15 +234,16 @@ export class SupabaseProgressRepository implements ProgressRepository {
 
   private getUnscaledInteractionTime(lastFedAt: number, lastPlayedAt: number, isSleeping: boolean): number {
     const maxTime = Math.max(lastFedAt, lastPlayedAt);
-    const now = maxTime < 10000000000 ? maxTime : Date.now();
+    // Differentiate between mock timestamps in tests vs real wall-clock time
+    const now = maxTime < MOCK_TIMESTAMP_THRESHOLD ? maxTime : Date.now();
     
-    // Unscale hunger timestamp
+    // Unscale hunger timestamp (divisor 2 slows hunger decay by 2x during sleep)
     const hungerDivisor = isSleeping ? 2 : 1;
     const elapsedHunger = Math.max(0, now - lastFedAt);
     const unscaledElapsedHunger = elapsedHunger / hungerDivisor;
     const realLastFedAt = lastFedAt === 0 ? 0 : now - unscaledElapsedHunger;
 
-    // Unscale happiness timestamp
+    // Unscale happiness timestamp (divisor 4 slows happiness decay by 4x during sleep)
     const happinessDivisor = isSleeping ? 4 : 1;
     const elapsedHappiness = Math.max(0, now - lastPlayedAt);
     const unscaledElapsedHappiness = elapsedHappiness / happinessDivisor;

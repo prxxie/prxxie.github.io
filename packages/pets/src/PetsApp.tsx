@@ -92,8 +92,8 @@ export default function PetsApp({
 
   const canFeed = isHungry && foodAvailable > 0;
 
-  // Map 0-6 hunger level to 100% full down to 0%
-  const hungerPct = Math.max(0, 100 - Math.round((hungryLevel / 6) * 100));
+  // Map 0-5 hunger level to 100% full down to 0%
+  const hungerPct = Math.max(0, 100 - Math.round((hungryLevel / 5) * 100));
 
   // XP progress within current stage
   // EVOLUTION_THRESHOLDS[stage-1] = XP floor for current stage

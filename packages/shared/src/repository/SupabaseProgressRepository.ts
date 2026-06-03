@@ -244,19 +244,19 @@ export class SupabaseProgressRepository implements ProgressRepository {
   private getUnscaledInteractionTime(lastFedAt: number, lastPlayedAt: number, isSleeping: boolean): number {
     const maxTime = Math.max(lastFedAt, lastPlayedAt);
     // Differentiate between mock timestamps in tests vs real wall-clock time
-    const now = maxTime < MOCK_TIMESTAMP_THRESHOLD ? maxTime : Date.now();
+    const now = (maxTime > 0 && maxTime < MOCK_TIMESTAMP_THRESHOLD) ? maxTime : Date.now();
     
     // Unscale hunger timestamp (divisor 2 slows hunger decay by 2x during sleep)
     const hungerDivisor = isSleeping ? 2 : 1;
     const elapsedHunger = Math.max(0, now - lastFedAt);
     const unscaledElapsedHunger = elapsedHunger / hungerDivisor;
-    const realLastFedAt = lastFedAt === 0 ? 0 : now - unscaledElapsedHunger;
+    const realLastFedAt = now - unscaledElapsedHunger;
 
     // Unscale happiness timestamp (divisor 4 slows happiness decay by 4x during sleep)
     const happinessDivisor = isSleeping ? 4 : 1;
     const elapsedHappiness = Math.max(0, now - lastPlayedAt);
     const unscaledElapsedHappiness = elapsedHappiness / happinessDivisor;
-    const realLastPlayedAt = lastPlayedAt === 0 ? 0 : now - unscaledElapsedHappiness;
+    const realLastPlayedAt = now - unscaledElapsedHappiness;
 
     return Math.max(realLastFedAt, realLastPlayedAt);
   }

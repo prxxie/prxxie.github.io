@@ -784,6 +784,7 @@ describe("SupabaseProgressRepository", () => {
   });
 
   it("should merge changes with pre-existing local state on saveState query failure", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const mockSupabase = {
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } } }) },
       from: vi.fn().mockImplementation(() => ({
@@ -821,7 +822,28 @@ describe("SupabaseProgressRepository", () => {
       expect(finalLocal.pet.xp).toBe(15);
     } finally {
       newRepo.dispose();
+      consoleErrorSpy.mockRestore();
     }
+  });
+
+  it("should evaluate unscaled time relative to Date.now() when maxTime is 0, permitting correct merges", () => {
+    // Local pet is sleeping, cloud is awake, both never fed/played (timestamps = 0)
+    const localPet = { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: true };
+    const cloudPet = { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false };
+
+    const localRealTime = (repo as any).getUnscaledInteractionTime(localPet.lastFedAt, localPet.lastPlayedAt, localPet.isSleeping);
+    const cloudRealTime = (repo as any).getUnscaledInteractionTime(cloudPet.lastFedAt, cloudPet.lastPlayedAt, cloudPet.isSleeping);
+
+    // Sleeping divisor unscales elapsed time by 2/4.
+    // If Date.now() is evaluated: local (sleeping) should produce a non-zero timestamp representing unscaled interaction time,
+    // which is greater than cloud (awake = unscaled 0 because divisor is 1, yielding elapsed = now -> realLastFedAt = now - now = 0).
+    expect(localRealTime).toBeGreaterThan(cloudRealTime);
+
+    const merged = (repo as any).mergeStates(
+      { completedLevels: [], foodConsumed: 0, pet: localPet },
+      { completedLevels: [], foodConsumed: 0, pet: cloudPet }
+    );
+    expect(merged.pet.isSleeping).toBe(true);
   });
 });
 

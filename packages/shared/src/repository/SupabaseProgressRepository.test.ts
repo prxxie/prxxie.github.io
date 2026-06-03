@@ -534,4 +534,41 @@ describe("SupabaseProgressRepository", () => {
     
     expect(getUserCallCount).toBe(1);
   });
+
+  it("should cache null user ID on getUser failure and not retry repeatedly", async () => {
+    let getUserCallCount = 0;
+    const mockAuth = {
+      auth: {
+        getUser: vi.fn().mockImplementation(async () => {
+          getUserCallCount++;
+          await Promise.resolve();
+          throw new Error("Auth network failure");
+        })
+      },
+      from: vi.fn().mockImplementation(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: null, error: { code: "PGRST116" } })
+      }))
+    };
+    
+    const newRepo = new SupabaseProgressRepository(mockAuth as any);
+    
+    // First getState: triggers getUser, fails, and should cache null and set initialized to true
+    await newRepo.getState();
+    expect(getUserCallCount).toBe(1);
+    
+    // Second getState: should reuse the cached null ID and NOT trigger getUser again
+    await newRepo.getState();
+    expect(getUserCallCount).toBe(1);
+    
+    // Dispatch event to invalidate cache
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("cozyos:progress-updated"));
+    }
+    
+    // Third getState: cache was invalidated, should trigger getUser again
+    await newRepo.getState();
+    expect(getUserCallCount).toBe(2);
+  });
 });

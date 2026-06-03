@@ -47,6 +47,8 @@ export class SupabaseProgressRepository implements ProgressRepository {
         this.userIdInitialized = true;
         return this.cachedUserId;
       } catch {
+        this.cachedUserId = null;
+        this.userIdInitialized = true;
         return null;
       } finally {
         this.userIdPromise = null;

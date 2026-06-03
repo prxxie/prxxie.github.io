@@ -4,20 +4,20 @@ const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL || "") as string;
 const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || "") as string;
 
 let supabaseInstance: SupabaseClient | null = null;
-let isConfigured = false;
+let isSupabaseConfigured = false;
 
 if (supabaseUrl && supabaseAnonKey) {
   try {
     new URL(supabaseUrl);
     supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
-    isConfigured = true;
+    isSupabaseConfigured = true;
   } catch (err) {
     console.error("Supabase initialization failed (check VITE_SUPABASE_URL):", err);
     supabaseInstance = null;
-    isConfigured = false;
+    isSupabaseConfigured = false;
   }
 }
 
 export const supabase = supabaseInstance;
-export const isSupabaseConfigured = isConfigured;
+export { isSupabaseConfigured };
 

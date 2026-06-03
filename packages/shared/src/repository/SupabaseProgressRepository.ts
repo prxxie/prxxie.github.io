@@ -12,6 +12,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
   private authSubscription: { unsubscribe: () => void } | null = null;
   private saveQueue: Promise<void> = Promise.resolve();
   private activeGetState: Promise<ProgressState> | null = null;
+  private userIdPromise: Promise<string | null> | null = null;
 
   constructor(private supabase: SupabaseClient) {
     if (this.supabase.auth && typeof this.supabase.auth.onAuthStateChange === "function") {
@@ -19,6 +20,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
         this.cachedUserId = session?.user?.id || null;
         this.userIdInitialized = true;
         this.activeGetState = null;
+        this.userIdPromise = null;
       });
       if (data && data.subscription) {
         this.authSubscription = data.subscription;
@@ -40,14 +42,22 @@ export class SupabaseProgressRepository implements ProgressRepository {
     if (this.userIdInitialized) {
       return this.cachedUserId;
     }
-    try {
-      const { data: { user } } = await this.supabase.auth.getUser();
-      this.cachedUserId = user?.id || null;
-      this.userIdInitialized = true;
-      return this.cachedUserId;
-    } catch {
-      return null;
+    if (this.userIdPromise) {
+      return this.userIdPromise;
     }
+    this.userIdPromise = (async () => {
+      try {
+        const { data: { user } } = await this.supabase.auth.getUser();
+        this.cachedUserId = user?.id || null;
+        this.userIdInitialized = true;
+        return this.cachedUserId;
+      } catch {
+        return null;
+      } finally {
+        this.userIdPromise = null;
+      }
+    })();
+    return this.userIdPromise;
   }
 
   private sanitizeProgressState(state: any): ProgressState {

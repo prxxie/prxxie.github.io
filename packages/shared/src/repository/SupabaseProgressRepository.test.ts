@@ -498,4 +498,47 @@ describe("SupabaseProgressRepository", () => {
 
     consoleErrorSpy.mockRestore();
   });
+
+  it("should guard concurrent getUserId calls and call getUser exactly once", async () => {
+    let getUserCallCount = 0;
+    
+    const mockAuth = {
+      getUser: vi.fn().mockImplementation(async () => {
+        getUserCallCount++;
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        return { data: { user: { id: "test-user-concurrent" } } };
+      })
+    };
+    
+    // We need to also support onAuthStateChange if called in constructor
+    const mockSupabaseWithAuth = {
+      auth: {
+        ...mockAuth,
+        onAuthStateChange: vi.fn().mockReturnValue({
+          data: { subscription: { unsubscribe: vi.fn() } }
+        })
+      },
+      from: vi.fn().mockImplementation(() => ({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockResolvedValue({ data: null, error: { code: "PGRST116" } }),
+        upsert: vi.fn().mockResolvedValue({ error: null })
+      }))
+    };
+    
+    const newRepo = new SupabaseProgressRepository(mockSupabaseWithAuth as any);
+    
+    const state: ProgressState = {
+      completedLevels: [],
+      foodConsumed: 0,
+      pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
+    };
+    
+    const p1 = newRepo.getState();
+    const p2 = newRepo.saveState(state);
+    
+    await Promise.all([p1, p2]);
+    
+    expect(getUserCallCount).toBe(1);
+  });
 });

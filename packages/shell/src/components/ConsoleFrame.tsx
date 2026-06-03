@@ -8,7 +8,7 @@ interface ConsoleFrameProps {
   setTab: (tab: Tab) => void;
   onMobileHud?: () => void;
   onCloudClick?: () => void;
-  cloudUser: string | null;
+  cloudUser?: string | null;
 }
 
 export default function ConsoleFrame({

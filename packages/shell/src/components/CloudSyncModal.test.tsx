@@ -39,13 +39,13 @@ describe("CloudSyncModal", () => {
   });
 
   it("does not render when isOpen is false", () => {
-    render(<CloudSyncModal isOpen={false} onClose={() => {}} />);
+    render(<CloudSyncModal isOpen={false} onClose={() => {}} cloudUser={null} />);
     expect(screen.queryByText("SYS_AUTHENTICATOR.EXE")).not.toBeInTheDocument();
   });
 
   it("renders configuration error warning block when Supabase is not configured", () => {
     mockIsSupabaseConfigured = false;
-    render(<CloudSyncModal isOpen={true} onClose={() => {}} />);
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
 
     expect(screen.getByText("SYS_AUTHENTICATOR.EXE")).toBeInTheDocument();
     expect(screen.getByText("⚠ CONFIGURATION ERROR")).toBeInTheDocument();
@@ -53,9 +53,8 @@ describe("CloudSyncModal", () => {
     expect(screen.queryByLabelText("EMAIL_ADDR:")).not.toBeInTheDocument();
   });
 
-  it("renders auth form when Supabase is configured and user is logged out", async () => {
-    render(<CloudSyncModal isOpen={true} onClose={() => {}} />);
-    await waitFor(() => expect(mockSupabase.auth.getUser).toHaveBeenCalled());
+  it("renders auth form when Supabase is configured and user is logged out", () => {
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
 
     expect(screen.getByText("SYS_AUTHENTICATOR.EXE")).toBeInTheDocument();
     expect(screen.getByLabelText("EMAIL_ADDR:")).toBeInTheDocument();
@@ -63,9 +62,8 @@ describe("CloudSyncModal", () => {
     expect(screen.getByRole("button", { name: "SIGN IN" })).toBeInTheDocument();
   });
 
-  it("switches to registration form when register button is clicked", async () => {
-    render(<CloudSyncModal isOpen={true} onClose={() => {}} />);
-    await waitFor(() => expect(mockSupabase.auth.getUser).toHaveBeenCalled());
+  it("switches to registration form when register button is clicked", () => {
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
 
     const switchBtn = screen.getByRole("button", { name: "NEW TERMINAL ID? REGISTER HERE" });
     fireEvent.click(switchBtn);
@@ -76,8 +74,7 @@ describe("CloudSyncModal", () => {
 
   it("calls signUp on form submission when registering", async () => {
     mockSupabase.auth.signUp.mockResolvedValue({ data: { user: {} }, error: null });
-    render(<CloudSyncModal isOpen={true} onClose={() => {}} />);
-    await waitFor(() => expect(mockSupabase.auth.getUser).toHaveBeenCalled());
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
 
     // Switch to sign up
     fireEvent.click(screen.getByRole("button", { name: "NEW TERMINAL ID? REGISTER HERE" }));
@@ -101,8 +98,7 @@ describe("CloudSyncModal", () => {
   it("calls signInWithPassword on form submission when logging in", async () => {
     mockSupabase.auth.signInWithPassword.mockResolvedValue({ data: { user: {} }, error: null });
     const handleClose = vi.fn();
-    render(<CloudSyncModal isOpen={true} onClose={handleClose} />);
-    await waitFor(() => expect(mockSupabase.auth.getUser).toHaveBeenCalled());
+    render(<CloudSyncModal isOpen={true} onClose={handleClose} cloudUser={null} />);
 
     // Fill form
     fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
@@ -123,8 +119,7 @@ describe("CloudSyncModal", () => {
   it("displays error messages in red text when auth fails", async () => {
     const mockError = new Error("Invalid login credentials");
     mockSupabase.auth.signInWithPassword.mockResolvedValue({ data: { user: null }, error: mockError });
-    render(<CloudSyncModal isOpen={true} onClose={() => {}} />);
-    await waitFor(() => expect(mockSupabase.auth.getUser).toHaveBeenCalled());
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
 
     // Fill form
     fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
@@ -138,27 +133,19 @@ describe("CloudSyncModal", () => {
     });
   });
 
-  it("renders connected status and logout button when user is logged in", async () => {
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { email: "user@cozyos.net" } }, error: null });
+  it("renders connected status and logout button when user is logged in", () => {
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser="user@cozyos.net" />);
 
-    render(<CloudSyncModal isOpen={true} onClose={() => {}} />);
-
-    await waitFor(() => {
-      expect(screen.getByText("STATUS: CONNECTED")).toBeInTheDocument();
-      expect(screen.getByText("ACCOUNT: user@cozyos.net")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "LOG OUT" })).toBeInTheDocument();
-    });
+    expect(screen.getByText("STATUS: CONNECTED")).toBeInTheDocument();
+    expect(screen.getByText("ACCOUNT: user@cozyos.net")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "LOG OUT" })).toBeInTheDocument();
   });
 
   it("calls signOut when clicking log out", async () => {
-    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { email: "user@cozyos.net" } }, error: null });
     mockSupabase.auth.signOut.mockResolvedValue({ error: null });
     const handleClose = vi.fn();
 
-    render(<CloudSyncModal isOpen={true} onClose={handleClose} />);
-
-    // Wait for the user status to load and display CONNECTED
-    await screen.findByText("STATUS: CONNECTED");
+    render(<CloudSyncModal isOpen={true} onClose={handleClose} cloudUser="user@cozyos.net" />);
 
     // Click Log Out
     fireEvent.click(screen.getByRole("button", { name: "LOG OUT" }));

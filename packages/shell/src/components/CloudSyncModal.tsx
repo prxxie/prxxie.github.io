@@ -4,40 +4,20 @@ import { supabase, isSupabaseConfigured } from "../utils/supabase";
 interface CloudSyncModalProps {
   isOpen: boolean;
   onClose: () => void;
+  cloudUser: string | null;
 }
 
-export default function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps): React.ReactElement | null {
+export default function CloudSyncModal({ isOpen, onClose, cloudUser }: CloudSyncModalProps): React.ReactElement | null {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!supabase) return;
-    const client = supabase;
-
-    const checkUser = async () => {
-      try {
-        const { data: { user } } = await client.auth.getUser();
-        setUserEmail(user?.email || null);
-      } catch (err) {
-        console.error("Failed to retrieve user session:", err);
-      }
-    };
-    void checkUser();
-
-    const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
-      setUserEmail(session?.user?.email || null);
-    });
-
     return () => {
-      if (subscription) {
-        subscription.unsubscribe();
-      }
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -117,11 +97,11 @@ export default function CloudSyncModal({ isOpen, onClose }: CloudSyncModalProps)
                 VITE_SUPABASE_ANON_KEY=your_anon_key
               </pre>
             </div>
-          ) : userEmail ? (
+          ) : cloudUser ? (
             <div className="flex flex-col gap-4">
               <div className="border border-dashed border-cozy-border p-3 bg-black/40">
                 <p className="text-cozy-accent">STATUS: CONNECTED</p>
-                <p className="text-[8px] mt-1 text-cozy-text/70">ACCOUNT: {userEmail}</p>
+                <p className="text-[8px] mt-1 text-cozy-text/70">ACCOUNT: {cloudUser}</p>
                 <p className="text-[8px] mt-1 text-green-500">✔ SYNC: AUTOMATIC CLOUD SYNC ACTIVE</p>
               </div>
 

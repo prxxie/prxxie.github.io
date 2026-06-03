@@ -90,6 +90,7 @@ export default function App(): React.ReactElement {
 
     const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
       setCloudUser(session?.user?.email || null);
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
     });
 
     return () => {
@@ -254,6 +255,7 @@ export default function App(): React.ReactElement {
         <CloudSyncModal
           isOpen={isCloudModalOpen}
           onClose={() => setIsCloudModalOpen(false)}
+          cloudUser={cloudUser}
         />
       </div>
     </QueryClientProvider>

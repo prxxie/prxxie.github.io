@@ -42,19 +42,8 @@ export function useProgressService() {
     const handler = () => { void refresh(); };
     window.addEventListener("cozyos:progress-updated", handler);
 
-    let subscription: { unsubscribe: () => void } | undefined;
-    if (supabase) {
-      const { data: { subscription: sub } } = supabase.auth.onAuthStateChange(() => {
-        void refresh();
-      });
-      subscription = sub;
-    }
-
     return () => {
       window.removeEventListener("cozyos:progress-updated", handler);
-      if (subscription) {
-        subscription.unsubscribe();
-      }
     };
   }, [refresh]);
 

@@ -1,9 +1,21 @@
-import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from "react";
+import { useState, useEffect, useCallback, createContext, useContext, useMemo, ReactNode } from "react";
 import { ProgressService, LocalProgressRepository, SupabaseProgressRepository } from "shared";
 import type { ProgressState } from "shared";
 import { supabase, isSupabaseConfigured } from "../utils/supabase";
 
-export const ProgressServiceContext = createContext<ProgressService | null>(null);
+export interface ProgressServiceContextType {
+  state: ProgressState;
+  isHungry: boolean;
+  foodAvailable: number;
+  hungryLevel: number;
+  happiness: number;
+  isSleeping: boolean;
+  feedPet: () => Promise<void>;
+  playWithPet: () => Promise<void>;
+  toggleSleep: () => Promise<void>;
+}
+
+export const ProgressServiceContext = createContext<ProgressServiceContextType | null>(null);
 
 const EMPTY_STATE: ProgressState = {
   completedLevels: [],
@@ -28,19 +40,6 @@ export function ProgressServiceProvider({ children }: ProgressServiceProviderPro
       progressService.dispose();
     };
   }, [progressService]);
-
-  return (
-    <ProgressServiceContext.Provider value={progressService}>
-      {children}
-    </ProgressServiceContext.Provider>
-  );
-}
-
-export function useProgressService() {
-  const progressService = useContext(ProgressServiceContext);
-  if (!progressService) {
-    throw new Error("useProgressService must be used within a ProgressServiceProvider");
-  }
 
   const [state, setState] = useState<ProgressState>(EMPTY_STATE);
   const [isHungry, setIsHungry] = useState(false);
@@ -85,7 +84,7 @@ export function useProgressService() {
     await progressService.toggleSleep();
   }, [progressService]);
 
-  return {
+  const contextValue = useMemo<ProgressServiceContextType>(() => ({
     state,
     isHungry,
     foodAvailable,
@@ -95,5 +94,19 @@ export function useProgressService() {
     feedPet,
     playWithPet,
     toggleSleep,
-  };
+  }), [state, isHungry, foodAvailable, hungryLevel, happiness, feedPet, playWithPet, toggleSleep]);
+
+  return (
+    <ProgressServiceContext.Provider value={contextValue}>
+      {children}
+    </ProgressServiceContext.Provider>
+  );
+}
+
+export function useProgressService() {
+  const context = useContext(ProgressServiceContext);
+  if (!context) {
+    throw new Error("useProgressService must be used within a ProgressServiceProvider");
+  }
+  return context;
 }

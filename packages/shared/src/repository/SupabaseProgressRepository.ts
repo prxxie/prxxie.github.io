@@ -11,12 +11,14 @@ export class SupabaseProgressRepository implements ProgressRepository {
   private userIdInitialized = false;
   private authSubscription: { unsubscribe: () => void } | null = null;
   private saveQueue: Promise<void> = Promise.resolve();
+  private activeGetState: Promise<ProgressState> | null = null;
 
   constructor(private supabase: SupabaseClient) {
     if (this.supabase.auth && typeof this.supabase.auth.onAuthStateChange === "function") {
       const { data } = this.supabase.auth.onAuthStateChange((event, session) => {
         this.cachedUserId = session?.user?.id || null;
         this.userIdInitialized = true;
+        this.activeGetState = null;
       });
       if (data && data.subscription) {
         this.authSubscription = data.subscription;
@@ -182,52 +184,64 @@ export class SupabaseProgressRepository implements ProgressRepository {
   }
 
   async getState(): Promise<ProgressState> {
-    const userId = await this.getUserId();
-    const localState = await this.localRepo.getState();
-
-    if (!userId) {
-      return localState;
+    if (this.activeGetState !== null) {
+      return this.activeGetState;
     }
 
-    try {
-      const { data, error } = await this.supabase
-        .from("user_progress")
-        .select("state")
-        .eq("user_id", userId)
-        .single();
+    this.activeGetState = (async () => {
+      try {
+        const userId = await this.getUserId();
+        const localState = await this.localRepo.getState();
 
-      if (error) {
-        if (error.code === "PGRST116") {
+        if (!userId) {
+          return localState;
+        }
+
+        try {
+          const { data, error } = await this.supabase
+            .from("user_progress")
+            .select("state")
+            .eq("user_id", userId)
+            .single();
+
+          if (error) {
+            if (error.code === "PGRST116") {
+              const { error: upsertError } = await this.supabase.from("user_progress").upsert({
+                user_id: userId,
+                state: localState,
+              });
+              if (upsertError) throw upsertError;
+              return localState;
+            } else {
+              throw error;
+            }
+          }
+
+          if (!data) {
+            throw new Error("No data returned from user_progress query");
+          }
+
+          const cloudState = this.sanitizeProgressState(data.state);
+          const mergedState = this.mergeStates(localState, cloudState);
+          
+          await this.localRepo.saveState(mergedState);
           const { error: upsertError } = await this.supabase.from("user_progress").upsert({
             user_id: userId,
-            state: localState,
+            state: mergedState,
           });
           if (upsertError) throw upsertError;
+
+          return mergedState;
+        } catch (err) {
+          console.error("Supabase load error, using local fallback:", err);
           return localState;
-        } else {
-          throw error;
         }
+      } finally {
+        this.activeGetState = null;
       }
+    })();
 
-      if (!data) {
-        throw new Error("No data returned from user_progress query");
-      }
-
-      const cloudState = this.sanitizeProgressState(data.state);
-      const mergedState = this.mergeStates(localState, cloudState);
-      
-      await this.localRepo.saveState(mergedState);
-      const { error: upsertError } = await this.supabase.from("user_progress").upsert({
-        user_id: userId,
-        state: mergedState,
-      });
-      if (upsertError) throw upsertError;
-
-      return mergedState;
-    } catch (err) {
-      console.error("Supabase load error, using local fallback:", err);
-      return localState;
-    }
+    return this.activeGetState;
   }
 
   async saveState(state: ProgressState, skipLocalWrite = false): Promise<void> {

@@ -48,18 +48,22 @@ export function ProgressServiceProvider({ children }: ProgressServiceProviderPro
   const [happiness, setHappiness] = useState(50);
 
   const refresh = useCallback(async () => {
-    const [s, hungry, food, level, happy] = await Promise.all([
-      progressService.getState(),
-      progressService.isPetHungry(),
-      progressService.getFoodAvailable(),
-      progressService.getHungryLevel(),
-      progressService.getHappiness(),
-    ]);
-    setState(s);
-    setIsHungry(hungry);
-    setFoodAvailable(food);
-    setHungryLevel(level);
-    setHappiness(happy);
+    try {
+      const s = await progressService.getState();
+      const [hungry, food, level, happy] = await Promise.all([
+        progressService.isPetHungry(),
+        progressService.getFoodAvailable(),
+        progressService.getHungryLevel(),
+        progressService.getHappiness(),
+      ]);
+      setState(s);
+      setIsHungry(hungry);
+      setFoodAvailable(food);
+      setHungryLevel(level);
+      setHappiness(happy);
+    } catch (err) {
+      console.error("Failed to refresh progress service state:", err);
+    }
   }, [progressService]);
 
   useEffect(() => {

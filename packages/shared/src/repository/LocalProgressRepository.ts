@@ -27,12 +27,14 @@ function initialState(): ProgressState {
 export class LocalProgressRepository implements ProgressRepository {
   private cachedState: ProgressState | null = null;
   private storageListener: ((event: StorageEvent) => void) | null = null;
+  private activeGetState: Promise<ProgressState> | null = null;
 
   constructor() {
     if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
       this.storageListener = (event) => {
         if (event.key === STORAGE_KEY) {
           this.cachedState = null;
+          this.activeGetState = null;
         }
       };
       window.addEventListener("storage", this.storageListener);
@@ -50,34 +52,43 @@ export class LocalProgressRepository implements ProgressRepository {
     if (this.cachedState !== null) {
       return this.cachedState;
     }
-
-    await Promise.resolve();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) {
-        this.cachedState = initialState();
-        return this.cachedState;
-      }
-      const data = JSON.parse(raw) as StoredData;
-      if (data.version !== 1) {
-        this.cachedState = initialState();
-        return this.cachedState;
-      }
-      
-      // Fill defaults for backward compatibility
-      const state = data.state;
-      if (state.pet.happiness === undefined) state.pet.happiness = 50;
-      if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = Date.now();
-      if (state.pet.isSleeping === undefined) state.pet.isSleeping = false;
-      // Always recompute stage from XP — guards against stale stored stage
-      state.pet.stage = getEvolutionStage(state.pet.xp);
-      
-      this.cachedState = state;
-      return this.cachedState;
-    } catch {
-      this.cachedState = initialState();
-      return this.cachedState;
+    if (this.activeGetState !== null) {
+      return this.activeGetState;
     }
+
+    this.activeGetState = (async () => {
+      try {
+        await Promise.resolve();
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          this.cachedState = initialState();
+          return this.cachedState;
+        }
+        const data = JSON.parse(raw) as StoredData;
+        if (data.version !== 1) {
+          this.cachedState = initialState();
+          return this.cachedState;
+        }
+        
+        // Fill defaults for backward compatibility
+        const state = data.state;
+        if (state.pet.happiness === undefined) state.pet.happiness = 50;
+        if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = Date.now();
+        if (state.pet.isSleeping === undefined) state.pet.isSleeping = false;
+        // Always recompute stage from XP — guards against stale stored stage
+        state.pet.stage = getEvolutionStage(state.pet.xp);
+        
+        this.cachedState = state;
+        return this.cachedState;
+      } catch {
+        this.cachedState = initialState();
+        return this.cachedState;
+      } finally {
+        this.activeGetState = null;
+      }
+    })();
+
+    return this.activeGetState;
   }
 
   async saveState(state: ProgressState): Promise<void> {

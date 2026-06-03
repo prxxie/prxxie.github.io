@@ -54,11 +54,39 @@ describe("useProgressService", () => {
       expect(result.current.isHungry).toBe(true);
     });
 
-    // Let's dispatch the event and act
+    // Update localStorage directly under the key "cozyos.progress.v1" with a recently fed pet state
+    localStorage.setItem(
+      "cozyos.progress.v1",
+      JSON.stringify({
+        version: 1,
+        state: {
+          completedLevels: [],
+          foodConsumed: 0,
+          pet: {
+            xp: 0,
+            stage: 1,
+            lastFedAt: Date.now(),
+            happiness: 100,
+            lastPlayedAt: Date.now(),
+            isSleeping: false,
+          },
+        },
+      })
+    );
+
+    // Trigger storage event to clear the repository's cache
+    act(() => {
+      window.dispatchEvent(new StorageEvent("storage", { key: "cozyos.progress.v1" }));
+    });
+
+    // Dispatch the cozyos:progress-updated event
     act(() => {
       window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
     });
 
-    expect(result.current.isHungry).toBe(true);
+    // Verify using waitFor that isHungry updates to false
+    await waitFor(() => {
+      expect(result.current.isHungry).toBe(false);
+    });
   });
 });

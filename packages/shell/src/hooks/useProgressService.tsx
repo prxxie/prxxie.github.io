@@ -77,15 +77,30 @@ export function ProgressServiceProvider({ children }: ProgressServiceProviderPro
   }, [refresh]);
 
   const feedPet = useCallback(async () => {
-    await progressService.feedPet();
+    try {
+      await progressService.feedPet();
+    } catch (err) {
+      console.error("ProgressService: feedPet failed:", err);
+      throw err;
+    }
   }, [progressService]);
 
   const playWithPet = useCallback(async () => {
-    await progressService.playWithPet();
+    try {
+      await progressService.playWithPet();
+    } catch (err) {
+      console.error("ProgressService: playWithPet failed:", err);
+      throw err;
+    }
   }, [progressService]);
 
   const toggleSleep = useCallback(async () => {
-    await progressService.toggleSleep();
+    try {
+      await progressService.toggleSleep();
+    } catch (err) {
+      console.error("ProgressService: toggleSleep failed:", err);
+      throw err;
+    }
   }, [progressService]);
 
   const contextValue = useMemo<ProgressServiceContextType>(() => ({

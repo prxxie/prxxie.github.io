@@ -17,10 +17,14 @@ export default function PetWidget(): React.ReactElement {
   }, []);
 
   const handleFeed = useCallback(async () => {
-    await feedPet();
-    setSpriteStatus("eating");
-    if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
+    try {
+      await feedPet();
+      setSpriteStatus("eating");
+      if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
+    } catch {
+      // Error is logged by useProgressService, we ignore it here to prevent crash
+    }
   }, [feedPet]);
 
   const canFeed = isHungry && foodAvailable > 0 && !isSleeping;

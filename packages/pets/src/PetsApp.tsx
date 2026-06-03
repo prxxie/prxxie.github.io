@@ -83,14 +83,18 @@ export default function PetsApp({
     return () => clearInterval(timer);
   }, []);
 
-  const handleFeed = async () => {
-    if (!hasProgress) return;
-    await progressState.feedPet();
-    setSpriteStatus("eating");
-    setTimeout(() => setSpriteStatus("idle"), 2000);
-  };
-
   const canFeed = isHungry && foodAvailable > 0;
+
+  const handleFeed = async () => {
+    if (!hasProgress || !canFeed) return;
+    try {
+      await progressState.feedPet();
+      setSpriteStatus("eating");
+      setTimeout(() => setSpriteStatus("idle"), 2000);
+    } catch {
+      // Error is logged by progressState, we ignore it here
+    }
+  };
 
   // Map 0-5 hunger level to 100% full down to 0%
   const hungerPct = Math.max(0, 100 - Math.round((hungryLevel / 5) * 100));

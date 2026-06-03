@@ -186,6 +186,36 @@ describe("SupabaseProgressRepository", () => {
     expect(upsertSpy).toHaveBeenCalled();
   });
 
+  it("should propagate the upsert error when first-time sync upsert fails in getState (Issue 1)", async () => {
+    // Mock no rows found error
+    const dbError = { code: "PGRST116", message: "No rows found" };
+    const upsertError = { code: "some-upsert-error", message: "Upsert failed" };
+    const upsertSpy = vi.fn().mockResolvedValue({ error: upsertError });
+
+    mockSupabase.from = vi.fn().mockImplementation(() => ({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: dbError
+      }),
+      upsert: upsertSpy
+    }));
+
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const state = await repo.getState();
+
+    // Verify it still fell back to local state and returned it
+    expect(state.foodConsumed).toBe(0);
+    // Verify upsert was called
+    expect(upsertSpy).toHaveBeenCalled();
+    // Verify that the error was caught and logged by the fallback block
+    expect(consoleErrorSpy).toHaveBeenCalledWith("Supabase load error, using local fallback:", upsertError);
+
+    consoleErrorSpy.mockRestore();
+  });
+
   it("should guard pet state when cloud pet is missing or has missing fields (Issue 7)", async () => {
     mockSupabase.from = vi.fn().mockImplementation(() => ({
       select: vi.fn().mockReturnThis(),

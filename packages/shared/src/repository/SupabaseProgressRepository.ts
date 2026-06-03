@@ -197,10 +197,11 @@ export class SupabaseProgressRepository implements ProgressRepository {
 
       if (error) {
         if (error.code === "PGRST116") {
-          await this.supabase.from("user_progress").upsert({
+          const { error: upsertError } = await this.supabase.from("user_progress").upsert({
             user_id: userId,
             state: localState,
           });
+          if (upsertError) throw upsertError;
           return localState;
         } else {
           throw error;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import ConsoleFrame from "./components/ConsoleFrame";
 import { PixelBookIcon, PixelPawIcon } from "./components/Icons";
-import { useProgressService } from "./hooks/useProgressService";
+import { useProgressService, ProgressServiceProvider } from "./hooks/useProgressService";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHashRouter } from "./hooks/useHashRouter";
 import MatrixMenu from "./components/MatrixMenu";
@@ -64,7 +64,7 @@ function Fallback({ name }: { name: string }): React.ReactElement {
   );
 }
 
-export default function App(): React.ReactElement {
+function AppContent(): React.ReactElement {
   const { currentTab, navigate } = useHashRouter();
   const windowRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -257,5 +257,13 @@ export default function App(): React.ReactElement {
         />
       </div>
     </QueryClientProvider>
+  );
+}
+
+export default function App(): React.ReactElement {
+  return (
+    <ProgressServiceProvider>
+      <AppContent />
+    </ProgressServiceProvider>
   );
 }

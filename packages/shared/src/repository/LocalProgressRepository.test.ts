@@ -236,5 +236,33 @@ describe("LocalProgressRepository", () => {
 
       getItemSpy.mockRestore();
     });
+
+    it("clears cachedState on storage event for STORAGE_KEY, and stops listening after dispose", async () => {
+      const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+      
+      // Load initial state to cache it
+      await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+      // Trigger storage event with a different key
+      window.dispatchEvent(new StorageEvent("storage", { key: "some-other-key" }));
+      await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(1); // Still cached
+
+      // Trigger storage event with STORAGE_KEY
+      window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
+      await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(2); // Read again because cache was cleared
+
+      // Call dispose
+      repo.dispose();
+
+      // Trigger storage event with STORAGE_KEY again
+      window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
+      await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(2); // Still 2, meaning it was not cleared
+
+      getItemSpy.mockRestore();
+    });
   });
 });

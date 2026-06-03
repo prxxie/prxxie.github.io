@@ -8,4 +8,5 @@ export interface ProgressRepository {
   playWithPet(happiness: number): Promise<void>;
   toggleSleep(lastFedAt?: number, lastPlayedAt?: number): Promise<void>;
   saveState(state: ProgressState): Promise<void>;
+  dispose?(): void;
 }

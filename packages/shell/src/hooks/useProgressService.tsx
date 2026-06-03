@@ -1,13 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from "react";
 import { ProgressService, LocalProgressRepository, SupabaseProgressRepository } from "shared";
 import type { ProgressState } from "shared";
 import { supabase, isSupabaseConfigured } from "../utils/supabase";
 
-const repo = isSupabaseConfigured && supabase
-  ? new SupabaseProgressRepository(supabase)
-  : new LocalProgressRepository();
-
-const progressService = new ProgressService(repo);
+export const ProgressServiceContext = createContext<ProgressService | null>(null);
 
 const EMPTY_STATE: ProgressState = {
   completedLevels: [],
@@ -15,7 +11,37 @@ const EMPTY_STATE: ProgressState = {
   pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false },
 };
 
+export interface ProgressServiceProviderProps {
+  children: ReactNode;
+}
+
+export function ProgressServiceProvider({ children }: ProgressServiceProviderProps) {
+  const [progressService] = useState(() => {
+    const repo = isSupabaseConfigured && supabase
+      ? new SupabaseProgressRepository(supabase)
+      : new LocalProgressRepository();
+    return new ProgressService(repo);
+  });
+
+  useEffect(() => {
+    return () => {
+      progressService.dispose();
+    };
+  }, [progressService]);
+
+  return (
+    <ProgressServiceContext.Provider value={progressService}>
+      {children}
+    </ProgressServiceContext.Provider>
+  );
+}
+
 export function useProgressService() {
+  const progressService = useContext(ProgressServiceContext);
+  if (!progressService) {
+    throw new Error("useProgressService must be used within a ProgressServiceProvider");
+  }
+
   const [state, setState] = useState<ProgressState>(EMPTY_STATE);
   const [isHungry, setIsHungry] = useState(false);
   const [foodAvailable, setFoodAvailable] = useState(0);
@@ -35,7 +61,7 @@ export function useProgressService() {
     setFoodAvailable(food);
     setHungryLevel(level);
     setHappiness(happy);
-  }, []);
+  }, [progressService]);
 
   useEffect(() => {
     void refresh();
@@ -49,15 +75,15 @@ export function useProgressService() {
 
   const feedPet = useCallback(async () => {
     await progressService.feedPet();
-  }, []);
+  }, [progressService]);
 
   const playWithPet = useCallback(async () => {
     await progressService.playWithPet();
-  }, []);
+  }, [progressService]);
 
   const toggleSleep = useCallback(async () => {
     await progressService.toggleSleep();
-  }, []);
+  }, [progressService]);
 
   return {
     state,

@@ -26,14 +26,23 @@ function initialState(): ProgressState {
 
 export class LocalProgressRepository implements ProgressRepository {
   private cachedState: ProgressState | null = null;
+  private storageListener: ((event: StorageEvent) => void) | null = null;
 
   constructor() {
     if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
-      window.addEventListener("storage", (event) => {
+      this.storageListener = (event) => {
         if (event.key === STORAGE_KEY) {
           this.cachedState = null;
         }
-      });
+      };
+      window.addEventListener("storage", this.storageListener);
+    }
+  }
+
+  dispose(): void {
+    if (typeof window !== "undefined" && typeof window.removeEventListener === "function" && this.storageListener) {
+      window.removeEventListener("storage", this.storageListener);
+      this.storageListener = null;
     }
   }
 

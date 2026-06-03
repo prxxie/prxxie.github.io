@@ -31,6 +31,7 @@ export class SupabaseProgressRepository implements ProgressRepository {
       this.authSubscription.unsubscribe();
       this.authSubscription = null;
     }
+    this.localRepo.dispose();
   }
 
   private async getUserId(): Promise<string | null> {

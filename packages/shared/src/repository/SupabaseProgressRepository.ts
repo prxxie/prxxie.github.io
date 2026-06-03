@@ -9,31 +9,26 @@ export class SupabaseProgressRepository implements ProgressRepository {
   private localRepo = new LocalProgressRepository();
   private cachedUserId: string | null = null;
   private userIdInitialized = false;
-  private authSubscription: { unsubscribe: () => void } | null = null;
+  private progressUpdatedListener: (() => void) | null = null;
   private saveQueue: Promise<void> = Promise.resolve();
   private activeGetState: Promise<ProgressState> | null = null;
   private userIdPromise: Promise<string | null> | null = null;
 
   constructor(private supabase: SupabaseClient) {
-    if (this.supabase.auth && typeof this.supabase.auth.onAuthStateChange === "function") {
-      const { data } = this.supabase.auth.onAuthStateChange((event, session) => {
-        this.cachedUserId = session?.user?.id || null;
-        this.userIdInitialized = true;
+    if (typeof window !== "undefined") {
+      this.progressUpdatedListener = () => {
+        this.cachedUserId = null;
+        this.userIdInitialized = false;
         this.activeGetState = null;
         this.userIdPromise = null;
-      });
-      if (data && data.subscription) {
-        this.authSubscription = data.subscription;
-      } else if ((data as any)?.unsubscribe) {
-        this.authSubscription = data as any;
-      }
+      };
+      window.addEventListener("cozyos:progress-updated", this.progressUpdatedListener);
     }
   }
 
   dispose(): void {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-      this.authSubscription = null;
+    if (typeof window !== "undefined" && this.progressUpdatedListener) {
+      window.removeEventListener("cozyos:progress-updated", this.progressUpdatedListener);
     }
     this.localRepo.dispose();
   }

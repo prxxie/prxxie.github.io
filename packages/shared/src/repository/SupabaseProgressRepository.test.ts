@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { SupabaseProgressRepository } from "./SupabaseProgressRepository";
 import { STORAGE_KEY } from "./LocalProgressRepository";
 import type { ProgressState } from "../progress/types";
@@ -55,6 +55,10 @@ describe("SupabaseProgressRepository", () => {
     };
 
     repo = new SupabaseProgressRepository(mockSupabase);
+  });
+
+  afterEach(() => {
+    repo.dispose();
   });
 
   it("should get combined state from LocalStorage and Cloud (merge on login)", async () => {
@@ -275,15 +279,10 @@ describe("SupabaseProgressRepository", () => {
     expect(lastCallArg.state.foodConsumed).toBe(5);
   });
 
-  it("should cache userId via auth listener and not call auth.getUser repeatedly (Issue 5)", async () => {
-    let listenerCallback: any = null;
-    const mockAuthListener = {
+  it("should cache userId and invalidate it on cozyos:progress-updated event", async () => {
+    const mockAuth = {
       auth: {
         getUser: vi.fn().mockResolvedValue({ data: { user: { id: "test-user-uuid" } } }),
-        onAuthStateChange: vi.fn().mockImplementation((cb) => {
-          listenerCallback = cb;
-          return { data: { subscription: { unsubscribe: vi.fn() } } };
-        })
       },
       from: vi.fn().mockImplementation(() => ({
         select: vi.fn().mockReturnThis(),
@@ -293,22 +292,30 @@ describe("SupabaseProgressRepository", () => {
       }))
     };
 
-    const newRepo = new SupabaseProgressRepository(mockAuthListener as any);
-    expect(mockAuthListener.auth.onAuthStateChange).toHaveBeenCalled();
+    const newRepo = new SupabaseProgressRepository(mockAuth as any);
 
-    // Fire the listener callback to cache the user ID
-    listenerCallback("SIGNED_IN", { user: { id: "cached-user-uuid" } });
-
-    // Call saveState which calls getUserId internally
     const state: ProgressState = {
       completedLevels: [],
       foodConsumed: 0,
       pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 1000, isSleeping: false }
     };
-    await newRepo.saveState(state);
 
-    // Verify getUser was not called at all since the ID was cached via onAuthStateChange callback
-    expect(mockAuthListener.auth.getUser).not.toHaveBeenCalled();
+    // First saveState call: fetches user and caches it
+    await newRepo.saveState(state);
+    expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(1);
+
+    // Second saveState call: uses cached userId
+    await newRepo.saveState(state);
+    expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(1);
+
+    // Dispatch the cozyos:progress-updated event on window to invalidate cache
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("cozyos:progress-updated"));
+    }
+
+    // Third saveState call: fetches user again because cache was invalidated
+    await newRepo.saveState(state);
+    expect(mockAuth.auth.getUser).toHaveBeenCalledTimes(2);
   });
 
   it("should merge pet state properties individually based on latest timestamps (Review 1)", async () => {
@@ -462,20 +469,6 @@ describe("SupabaseProgressRepository", () => {
       "select-end",
       "upsert"
     ]);
-  });
-
-  it("should unsubscribe from auth listener on dispose (Review 4)", () => {
-    const unsubscribeSpy = vi.fn();
-    const mockAuthListener = {
-      auth: {
-        onAuthStateChange: vi.fn().mockReturnValue({
-          data: { subscription: { unsubscribe: unsubscribeSpy } }
-        })
-      }
-    };
-    const newRepo = new SupabaseProgressRepository(mockAuthListener as any);
-    newRepo.dispose();
-    expect(unsubscribeSpy).toHaveBeenCalled();
   });
 
   it("should reject when Supabase call fails during saveState", async () => {

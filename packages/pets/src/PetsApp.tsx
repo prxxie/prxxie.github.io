@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { PixelChickenIcon } from "./Icons";
 import PetSprite from "../../shell/src/components/PetSprite";
 import type { PetStatus } from "../../shell/src/types";
@@ -20,6 +20,7 @@ interface ProgressState {
   foodAvailable: number;
   hungryLevel: number;
   happiness: number;
+  isSleeping: boolean;
   feedPet: () => Promise<void>;
 }
 
@@ -75,6 +76,8 @@ export default function PetsApp({
 
   const [spriteStatus, setSpriteStatus] = useState<PetStatus>("idle");
   const [animationFrame, setAnimationFrame] = useState(0);
+  const [isFeeding, setIsFeeding] = useState(false);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -83,17 +86,35 @@ export default function PetsApp({
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current !== null) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
+
+  const canFeed = isHungry && foodAvailable > 0 && !(progressState?.isSleeping ?? false) && !isFeeding;
+
   const handleFeed = async () => {
-    if (!hasProgress) return;
-    await progressState.feedPet();
-    setSpriteStatus("eating");
-    setTimeout(() => setSpriteStatus("idle"), 2000);
+    if (!hasProgress || !canFeed || isFeeding) return;
+    setIsFeeding(true);
+    try {
+      await progressState.feedPet();
+      setSpriteStatus("eating");
+      if (resetTimerRef.current !== null) {
+        clearTimeout(resetTimerRef.current);
+      }
+      resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
+    } catch {
+      // Error is logged by progressState, we ignore it here
+    } finally {
+      setIsFeeding(false);
+    }
   };
 
-  const canFeed = isHungry && foodAvailable > 0;
-
-  // Map 0-6 hunger level to 100% full down to 0%
-  const hungerPct = Math.max(0, 100 - Math.round((hungryLevel / 6) * 100));
+  // Map 0-5 hunger level to 100% full down to 0%
+  const hungerPct = Math.max(0, 100 - Math.round((hungryLevel / 5) * 100));
 
   // XP progress within current stage
   // EVOLUTION_THRESHOLDS[stage-1] = XP floor for current stage
@@ -128,7 +149,7 @@ export default function PetsApp({
               size={120}
               stage={petState.stage}
               status={spriteStatus}
-              isSleeping={false}
+              isSleeping={progressState?.isSleeping ?? false}
               isHungry={isHungry}
               animationFrame={animationFrame}
             />

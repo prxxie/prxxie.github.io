@@ -25,26 +25,70 @@ function initialState(): ProgressState {
 }
 
 export class LocalProgressRepository implements ProgressRepository {
-  async getState(): Promise<ProgressState> {
-    await Promise.resolve();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return initialState();
-      const data = JSON.parse(raw) as StoredData;
-      if (data.version !== 1) return initialState();
-      
-      // Fill defaults for backward compatibility
-      const state = data.state;
-      if (state.pet.happiness === undefined) state.pet.happiness = 50;
-      if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = Date.now();
-      if (state.pet.isSleeping === undefined) state.pet.isSleeping = false;
-      // Always recompute stage from XP — guards against stale stored stage
-      state.pet.stage = getEvolutionStage(state.pet.xp);
-      
-      return state;
-    } catch {
-      return initialState();
+  private cachedState: ProgressState | null = null;
+  private storageListener: ((event: StorageEvent) => void) | null = null;
+  private activeGetState: Promise<ProgressState> | null = null;
+
+  constructor() {
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      this.storageListener = (event) => {
+        if (event.key === STORAGE_KEY) {
+          this.cachedState = null;
+          this.activeGetState = null;
+        }
+      };
+      window.addEventListener("storage", this.storageListener);
     }
+  }
+
+  dispose(): void {
+    if (typeof window !== "undefined" && typeof window.removeEventListener === "function" && this.storageListener) {
+      window.removeEventListener("storage", this.storageListener);
+      this.storageListener = null;
+    }
+  }
+
+  async getState(): Promise<ProgressState> {
+    if (this.cachedState !== null) {
+      return this.cachedState;
+    }
+    if (this.activeGetState !== null) {
+      return this.activeGetState;
+    }
+
+    this.activeGetState = (async () => {
+      try {
+        await Promise.resolve();
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          this.cachedState = initialState();
+          return this.cachedState;
+        }
+        const data = JSON.parse(raw) as StoredData;
+        if (data.version !== 1) {
+          this.cachedState = initialState();
+          return this.cachedState;
+        }
+        
+        // Fill defaults for backward compatibility
+        const state = data.state;
+        if (state.pet.happiness === undefined) state.pet.happiness = 50;
+        if (state.pet.lastPlayedAt === undefined) state.pet.lastPlayedAt = Date.now();
+        if (state.pet.isSleeping === undefined) state.pet.isSleeping = false;
+        // Always recompute stage from XP — guards against stale stored stage
+        state.pet.stage = getEvolutionStage(state.pet.xp);
+        
+        this.cachedState = state;
+        return this.cachedState;
+      } catch {
+        this.cachedState = initialState();
+        return this.cachedState;
+      } finally {
+        this.activeGetState = null;
+      }
+    })();
+
+    return this.activeGetState;
   }
 
   async saveState(state: ProgressState): Promise<void> {
@@ -52,6 +96,7 @@ export class LocalProgressRepository implements ProgressRepository {
     const data: StoredData = { version: 1, state };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      this.cachedState = state;
     } catch (err) {
       throw new Error(`Failed to save progress: ${String(err)}`);
     }

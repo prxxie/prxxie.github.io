@@ -6,6 +6,7 @@ import type { PetStatus } from "../types";
 export default function PetWidget(): React.ReactElement {
   const { state, isHungry, foodAvailable, feedPet, isSleeping } = useProgressService();
   const [spriteStatus, setSpriteStatus] = useState<PetStatus>("idle");
+  const [isFeeding, setIsFeeding] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -17,13 +18,20 @@ export default function PetWidget(): React.ReactElement {
   }, []);
 
   const handleFeed = useCallback(async () => {
-    await feedPet();
-    setSpriteStatus("eating");
-    if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
+    setIsFeeding(true);
+    try {
+      await feedPet();
+      setSpriteStatus("eating");
+      if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
+    } catch {
+      // Error is logged by useProgressService, we ignore it here to prevent crash
+    } finally {
+      setIsFeeding(false);
+    }
   }, [feedPet]);
 
-  const canFeed = isHungry && foodAvailable > 0 && !isSleeping;
+  const canFeed = isHungry && foodAvailable > 0 && !isSleeping && !isFeeding;
 
   // Get evolution stage name
   const getStageName = (stage: number) => {

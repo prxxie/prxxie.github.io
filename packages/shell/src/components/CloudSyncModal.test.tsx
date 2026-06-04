@@ -1,0 +1,209 @@
+import React from "react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import CloudSyncModal from "./CloudSyncModal";
+
+// We will mock '../utils/supabase' so we can control configuration and mock supabase client functions
+const mockSupabase = {
+  auth: {
+    getUser: vi.fn(),
+    onAuthStateChange: vi.fn(),
+    signUp: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signOut: vi.fn(),
+  },
+};
+
+let mockIsSupabaseConfigured = true;
+
+vi.mock("../utils/supabase", () => {
+  return {
+    get isSupabaseConfigured() {
+      return mockIsSupabaseConfigured;
+    },
+    get supabase() {
+      return mockIsSupabaseConfigured ? mockSupabase : null;
+    },
+  };
+});
+
+describe("CloudSyncModal", () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockIsSupabaseConfigured = true;
+    mockSupabase.auth.getUser.mockResolvedValue({ data: { user: null }, error: null });
+    mockSupabase.auth.onAuthStateChange.mockReturnValue({
+      data: { subscription: { unsubscribe: vi.fn() } },
+    });
+  });
+
+  it("does not render when isOpen is false", () => {
+    render(<CloudSyncModal isOpen={false} onClose={() => {}} cloudUser={null} />);
+    expect(screen.queryByText("SYS_AUTHENTICATOR.EXE")).not.toBeInTheDocument();
+  });
+
+  it("renders configuration error warning block when Supabase is not configured", () => {
+    mockIsSupabaseConfigured = false;
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
+
+    expect(screen.getByText("SYS_AUTHENTICATOR.EXE")).toBeInTheDocument();
+    expect(screen.getByText("⚠ CONFIGURATION ERROR")).toBeInTheDocument();
+    expect(screen.getByText(/LOCAL STORAGE FALLBACK IS IN EFFECT/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText("EMAIL_ADDR:")).not.toBeInTheDocument();
+  });
+
+  it("renders auth form when Supabase is configured and user is logged out", () => {
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
+
+    expect(screen.getByText("SYS_AUTHENTICATOR.EXE")).toBeInTheDocument();
+    expect(screen.getByLabelText("EMAIL_ADDR:")).toBeInTheDocument();
+    expect(screen.getByLabelText("ACCESS_KEY:")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "SIGN IN" })).toBeInTheDocument();
+  });
+
+  it("switches to registration form when register button is clicked", () => {
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
+
+    const switchBtn = screen.getByRole("button", { name: "NEW TERMINAL ID? REGISTER HERE" });
+    fireEvent.click(switchBtn);
+
+    expect(screen.getByRole("button", { name: "REGISTER ACCOUNT" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "ALREADY INSTALLED? LOG IN" })).toBeInTheDocument();
+  });
+
+  it("calls signUp on form submission when registering", async () => {
+    mockSupabase.auth.signUp.mockResolvedValue({ data: { user: {} }, error: null });
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
+
+    // Switch to sign up
+    fireEvent.click(screen.getByRole("button", { name: "NEW TERMINAL ID? REGISTER HERE" }));
+
+    // Fill form
+    fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
+    fireEvent.change(screen.getByLabelText("ACCESS_KEY:"), { target: { value: "password123" } });
+
+    // Submit
+    fireEvent.click(screen.getByRole("button", { name: "REGISTER ACCOUNT" }));
+
+    await waitFor(() => {
+      expect(mockSupabase.auth.signUp).toHaveBeenCalledWith({
+        email: "test@example.com",
+        password: "password123",
+      });
+      expect(screen.getByText("REGISTRATION SUCCESS. VERIFY EMAIL IF REQUIRED.")).toBeInTheDocument();
+    });
+  });
+
+  it("calls signInWithPassword on form submission when logging in", async () => {
+    mockSupabase.auth.signInWithPassword.mockResolvedValue({ data: { user: {} }, error: null });
+    const handleClose = vi.fn();
+    render(<CloudSyncModal isOpen={true} onClose={handleClose} cloudUser={null} />);
+
+    // Fill form
+    fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
+    fireEvent.change(screen.getByLabelText("ACCESS_KEY:"), { target: { value: "password123" } });
+
+    // Submit
+    fireEvent.click(screen.getByRole("button", { name: "SIGN IN" }));
+
+    await waitFor(() => {
+      expect(mockSupabase.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: "test@example.com",
+        password: "password123",
+      });
+      expect(screen.getByText("LOGIN SUCCESSFUL. CLOUD PROGRESS SYNCED.")).toBeInTheDocument();
+    });
+  });
+
+  it("displays error messages in red text when auth fails", async () => {
+    const mockError = new Error("Invalid login credentials");
+    mockSupabase.auth.signInWithPassword.mockResolvedValue({ data: { user: null }, error: mockError });
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser={null} />);
+
+    // Fill form
+    fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
+    fireEvent.change(screen.getByLabelText("ACCESS_KEY:"), { target: { value: "password123" } });
+
+    // Submit
+    fireEvent.click(screen.getByRole("button", { name: "SIGN IN" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("ERROR: INVALID LOGIN CREDENTIALS")).toBeInTheDocument();
+    });
+  });
+
+  it("renders connected status and logout button when user is logged in", () => {
+    render(<CloudSyncModal isOpen={true} onClose={() => {}} cloudUser="user@cozyos.net" />);
+
+    expect(screen.getByText("STATUS: CONNECTED")).toBeInTheDocument();
+    expect(screen.getByText("ACCOUNT: user@cozyos.net")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "LOG OUT" })).toBeInTheDocument();
+  });
+
+  it("calls signOut when clicking log out", async () => {
+    mockSupabase.auth.signOut.mockResolvedValue({ error: null });
+    const handleClose = vi.fn();
+
+    render(<CloudSyncModal isOpen={true} onClose={handleClose} cloudUser="user@cozyos.net" />);
+
+    // Click Log Out
+    fireEvent.click(screen.getByRole("button", { name: "LOG OUT" }));
+
+    await waitFor(() => {
+      expect(mockSupabase.auth.signOut).toHaveBeenCalled();
+      expect(screen.getByText("LOGOUT SUCCESSFUL. LOCAL REPO REMAINS ACTIVE.")).toBeInTheDocument();
+    });
+  });
+
+  it("calls onClose after 1500ms when sign in succeeds", async () => {
+    vi.useFakeTimers();
+    mockSupabase.auth.signInWithPassword.mockResolvedValue({ data: { user: {} }, error: null });
+    const handleClose = vi.fn();
+    render(<CloudSyncModal isOpen={true} onClose={handleClose} cloudUser={null} />);
+
+    fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
+    fireEvent.change(screen.getByLabelText("ACCESS_KEY:"), { target: { value: "password123" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "SIGN IN" }));
+      // Flush promises/microtasks under fake timers
+      await vi.advanceTimersByTimeAsync(100);
+    });
+
+    expect(screen.getByText("LOGIN SUCCESSFUL. CLOUD PROGRESS SYNCED.")).toBeInTheDocument();
+    expect(handleClose).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(1400);
+    });
+
+    expect(handleClose).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  it("clears timeout on unmount or closing", async () => {
+    vi.useFakeTimers();
+    mockSupabase.auth.signInWithPassword.mockResolvedValue({ data: { user: {} }, error: null });
+    const handleClose = vi.fn();
+    const { unmount, rerender } = render(<CloudSyncModal isOpen={true} onClose={handleClose} cloudUser={null} />);
+
+    fireEvent.change(screen.getByLabelText("EMAIL_ADDR:"), { target: { value: "test@example.com" } });
+    fireEvent.change(screen.getByLabelText("ACCESS_KEY:"), { target: { value: "password123" } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "SIGN IN" }));
+      // Flush promises/microtasks under fake timers
+      await vi.advanceTimersByTimeAsync(100);
+    });
+
+    expect(screen.getByText("LOGIN SUCCESSFUL. CLOUD PROGRESS SYNCED.")).toBeInTheDocument();
+
+    act(() => {
+      rerender(<CloudSyncModal isOpen={false} onClose={handleClose} cloudUser={null} />);
+      unmount();
+      vi.advanceTimersByTime(1400);
+    });
+
+    expect(handleClose).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+});

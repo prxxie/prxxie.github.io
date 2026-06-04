@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
 import ConsoleFrame from "./components/ConsoleFrame";
 import { PixelBookIcon, PixelPawIcon } from "./components/Icons";
-import { useProgressService } from "./hooks/useProgressService";
+import { useProgressService, ProgressServiceProvider } from "./hooks/useProgressService";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHashRouter } from "./hooks/useHashRouter";
 import MatrixMenu from "./components/MatrixMenu";
 import StatsTelemetry from "./components/StatsTelemetry";
 import HomeDashboard from "./components/HomeDashboard";
 import MfeLoader from "./components/MfeLoader";
+import { supabase } from "./utils/supabase";
+import CloudSyncModal from "./components/CloudSyncModal";
 
 const queryClient = new QueryClient();
 
@@ -62,12 +64,41 @@ function Fallback({ name }: { name: string }): React.ReactElement {
   );
 }
 
-export default function App(): React.ReactElement {
+function AppContent(): React.ReactElement {
   const { currentTab, navigate } = useHashRouter();
   const windowRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobileHudOpen, setIsMobileHudOpen] = useState(false);
   const progressService = useProgressService();
+
+  const [cloudUser, setCloudUser] = useState<string | null>(null);
+  const [isCloudModalOpen, setIsCloudModalOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!supabase) return;
+    const client = supabase;
+
+    const checkUser = async () => {
+      try {
+        const { data: { user } } = await client.auth.getUser();
+        setCloudUser(user?.email || null);
+      } catch (err) {
+        console.error("Failed to retrieve user session:", err);
+      }
+    };
+    void checkUser();
+
+    const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
+      setCloudUser(session?.user?.email || null);
+      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
+    });
+
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const handleFullscreenChange = (): void => {
@@ -114,9 +145,9 @@ export default function App(): React.ReactElement {
     <QueryClientProvider client={queryClient}>
       <div className="w-full flex justify-center min-h-screen">
         <ConsoleFrame
-          currentTab={currentTab}
-          setTab={navigate}
           onMobileHud={() => setIsMobileHudOpen(true)}
+          onCloudClick={() => setIsCloudModalOpen(true)}
+          cloudUser={cloudUser}
         >
           <div className="grid grid-cols-1 md:grid-cols-20 gap-6 items-start">
             <div
@@ -219,7 +250,20 @@ export default function App(): React.ReactElement {
             </div>
           </div>
         </ConsoleFrame>
+        <CloudSyncModal
+          isOpen={isCloudModalOpen}
+          onClose={() => setIsCloudModalOpen(false)}
+          cloudUser={cloudUser}
+        />
       </div>
     </QueryClientProvider>
+  );
+}
+
+export default function App(): React.ReactElement {
+  return (
+    <ProgressServiceProvider>
+      <AppContent />
+    </ProgressServiceProvider>
   );
 }

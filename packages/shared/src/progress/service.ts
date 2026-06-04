@@ -7,6 +7,10 @@ export const HAPPINESS_COOLDOWN = 10 * 60 * 1000;
 export class ProgressService {
   constructor(private readonly repo: ProgressRepository) {}
 
+  dispose(): void {
+    this.repo.dispose?.();
+  }
+
   async getState(): Promise<ProgressState> {
     return this.repo.getState();
   }

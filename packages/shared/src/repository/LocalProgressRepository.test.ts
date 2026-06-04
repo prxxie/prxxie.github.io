@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { LocalProgressRepository, STORAGE_KEY } from "./LocalProgressRepository";
 
 describe("LocalProgressRepository", () => {
@@ -200,6 +200,69 @@ describe("LocalProgressRepository", () => {
       await repo.toggleSleep();
       const state3 = await repo.getState();
       expect(state3.pet.isSleeping).toBe(false);
+    });
+  });
+
+  describe("caching behavior", () => {
+    it("caches the state and avoids repeated localStorage reads", async () => {
+      const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+      
+      // First read: reads from localStorage
+      const state1 = await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+      // Second read: should use cache, not call localStorage again
+      const state2 = await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(1);
+      expect(state2).toBe(state1);
+      
+      getItemSpy.mockRestore();
+    });
+
+    it("updates cache on saveState and subsequent getState avoids localStorage read", async () => {
+      const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+      const saved = {
+        completedLevels: [],
+        foodConsumed: 5,
+        pet: { xp: 5, stage: 1, lastFedAt: 100, happiness: 50, lastPlayedAt: 100, isSleeping: false },
+      };
+
+      await repo.saveState(saved);
+      
+      // subsequent getState should return the cached value directly without reading localStorage
+      const loaded = await repo.getState();
+      expect(loaded).toEqual(saved);
+      expect(getItemSpy).not.toHaveBeenCalled();
+
+      getItemSpy.mockRestore();
+    });
+
+    it("clears cachedState on storage event for STORAGE_KEY, and stops listening after dispose", async () => {
+      const getItemSpy = vi.spyOn(Storage.prototype, "getItem");
+      
+      // Load initial state to cache it
+      await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(1);
+
+      // Trigger storage event with a different key
+      window.dispatchEvent(new StorageEvent("storage", { key: "some-other-key" }));
+      await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(1); // Still cached
+
+      // Trigger storage event with STORAGE_KEY
+      window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
+      await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(2); // Read again because cache was cleared
+
+      // Call dispose
+      repo.dispose();
+
+      // Trigger storage event with STORAGE_KEY again
+      window.dispatchEvent(new StorageEvent("storage", { key: STORAGE_KEY }));
+      await repo.getState();
+      expect(getItemSpy).toHaveBeenCalledTimes(2); // Still 2, meaning it was not cleared
+
+      getItemSpy.mockRestore();
     });
   });
 });

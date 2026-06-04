@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import type { Tab } from "../types";
 import { getAudioMuted, setAudioMuted, playBeepSound } from "../utils/audio";
 
 interface ConsoleFrameProps {
   children: React.ReactNode;
-  currentTab: Tab;
-  setTab: (tab: Tab) => void;
   onMobileHud?: () => void;
+  onCloudClick?: () => void;
+  cloudUser?: string | null;
 }
 
 export default function ConsoleFrame({
   children,
   onMobileHud,
+  onCloudClick,
+  cloudUser,
 }: ConsoleFrameProps): React.ReactElement {
   const [muted, setMuted] = useState<boolean>(getAudioMuted);
 
@@ -48,6 +49,16 @@ export default function ConsoleFrame({
           </div>
 
           <div className="flex items-center gap-3">
+            {onCloudClick && (
+              <button
+                onClick={onCloudClick}
+                className="pixel-btn text-[9px] px-3 py-1"
+                aria-label="Cloud sync menu"
+              >
+                {cloudUser ? "[CLOUD: SYNCED]" : "[CLOUD: CONNECT]"}
+              </button>
+            )}
+
             <button
               onClick={handleAudioToggle}
               className={`pixel-btn text-[9px] px-3 py-1 ${

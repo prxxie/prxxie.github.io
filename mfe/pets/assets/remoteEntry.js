@@ -3,7 +3,7 @@ const currentImports = {};
       let moduleMap = {
 "./PetsApp":()=>{
       dynamicLoadingCss(["style-CWsk-3vF.css"], false, './PetsApp');
-      return __federation_import('/mfe/pets/assets/__federation_expose_PetsApp-e-124Qbn.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      return __federation_import('/mfe/pets/assets/__federation_expose_PetsApp-Bav3naln.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
         const metaUrl = import.meta.url;

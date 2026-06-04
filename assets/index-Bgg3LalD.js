@@ -199,12 +199,14 @@ function playBeepSound(frequency = 440, duration = 0.08) {
   }
 }
 
-const {useState: useState$5} = await importShared('react');
+const {useState: useState$6} = await importShared('react');
 function ConsoleFrame({
   children,
-  onMobileHud
+  onMobileHud,
+  onCloudClick,
+  cloudUser
 }) {
-  const [muted, setMuted] = useState$5(getAudioMuted);
+  const [muted, setMuted] = useState$6(getAudioMuted);
   const handleAudioToggle = () => {
     const nextMuted = !muted;
     setAudioMuted(nextMuted);
@@ -236,6 +238,15 @@ function ConsoleFrame({
         /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-press text-xs font-bold text-cozy-accent uppercase", children: "PRXXIE_OS v4.7" })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        onCloudClick && /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: onCloudClick,
+            className: "pixel-btn text-[9px] px-3 py-1",
+            "aria-label": "Cloud sync menu",
+            children: cloudUser ? "[CLOUD: SYNCED]" : "[CLOUD: CONNECT]"
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "button",
           {
@@ -309,28 +320,68 @@ function initialState() {
   };
 }
 class LocalProgressRepository {
-  async getState() {
-    await Promise.resolve();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return initialState();
-      const data = JSON.parse(raw);
-      if (data.version !== 1) return initialState();
-      const state = data.state;
-      if (state.pet.happiness === void 0) state.pet.happiness = 50;
-      if (state.pet.lastPlayedAt === void 0) state.pet.lastPlayedAt = Date.now();
-      if (state.pet.isSleeping === void 0) state.pet.isSleeping = false;
-      state.pet.stage = getEvolutionStage(state.pet.xp);
-      return state;
-    } catch {
-      return initialState();
+  cachedState = null;
+  storageListener = null;
+  activeGetState = null;
+  constructor() {
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      this.storageListener = (event) => {
+        if (event.key === STORAGE_KEY) {
+          this.cachedState = null;
+          this.activeGetState = null;
+        }
+      };
+      window.addEventListener("storage", this.storageListener);
     }
+  }
+  dispose() {
+    if (typeof window !== "undefined" && typeof window.removeEventListener === "function" && this.storageListener) {
+      window.removeEventListener("storage", this.storageListener);
+      this.storageListener = null;
+    }
+  }
+  async getState() {
+    if (this.cachedState !== null) {
+      return this.cachedState;
+    }
+    if (this.activeGetState !== null) {
+      return this.activeGetState;
+    }
+    this.activeGetState = (async () => {
+      try {
+        await Promise.resolve();
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          this.cachedState = initialState();
+          return this.cachedState;
+        }
+        const data = JSON.parse(raw);
+        if (data.version !== 1) {
+          this.cachedState = initialState();
+          return this.cachedState;
+        }
+        const state = data.state;
+        if (state.pet.happiness === void 0) state.pet.happiness = 50;
+        if (state.pet.lastPlayedAt === void 0) state.pet.lastPlayedAt = Date.now();
+        if (state.pet.isSleeping === void 0) state.pet.isSleeping = false;
+        state.pet.stage = getEvolutionStage(state.pet.xp);
+        this.cachedState = state;
+        return this.cachedState;
+      } catch {
+        this.cachedState = initialState();
+        return this.cachedState;
+      } finally {
+        this.activeGetState = null;
+      }
+    })();
+    return this.activeGetState;
   }
   async saveState(state) {
     await Promise.resolve();
     const data = { version: 1, state };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      this.cachedState = state;
     } catch (err) {
       throw new Error(`Failed to save progress: ${String(err)}`);
     }
@@ -409,6 +460,9 @@ const HAPPINESS_COOLDOWN = 10 * 60 * 1e3;
 class ProgressService {
   constructor(repo) {
     this.repo = repo;
+  }
+  dispose() {
+    this.repo.dispose?.();
   }
   async getState() {
     return this.repo.getState();
@@ -507,51 +561,81 @@ class ProgressService {
   }
 }
 
-const {useState: useState$4,useEffect: useEffect$5,useCallback: useCallback$1} = await importShared('react');
-const progressService = new ProgressService(new LocalProgressRepository());
+const {useState: useState$5,useEffect: useEffect$6,useCallback: useCallback$1,createContext,useContext,useMemo} = await importShared('react');
+const ProgressServiceContext = createContext(null);
 const EMPTY_STATE = {
   completedLevels: [],
   foodConsumed: 0,
   pet: { xp: 0, stage: 1, lastFedAt: 0, happiness: 50, lastPlayedAt: 0, isSleeping: false }
 };
-function useProgressService() {
-  const [state, setState] = useState$4(EMPTY_STATE);
-  const [isHungry, setIsHungry] = useState$4(false);
-  const [foodAvailable, setFoodAvailable] = useState$4(0);
-  const [hungryLevel, setHungryLevel] = useState$4(0);
-  const [happiness, setHappiness] = useState$4(50);
+function ProgressServiceProvider({ children }) {
+  const [progressService] = useState$5(() => {
+    const repo = new LocalProgressRepository();
+    return new ProgressService(repo);
+  });
+  useEffect$6(() => {
+    return () => {
+      progressService.dispose();
+    };
+  }, [progressService]);
+  const [state, setState] = useState$5(EMPTY_STATE);
+  const [isHungry, setIsHungry] = useState$5(false);
+  const [foodAvailable, setFoodAvailable] = useState$5(0);
+  const [hungryLevel, setHungryLevel] = useState$5(0);
+  const [happiness, setHappiness] = useState$5(50);
   const refresh = useCallback$1(async () => {
-    const [s, hungry, food, level, happy] = await Promise.all([
-      progressService.getState(),
-      progressService.isPetHungry(),
-      progressService.getFoodAvailable(),
-      progressService.getHungryLevel(),
-      progressService.getHappiness()
-    ]);
-    setState(s);
-    setIsHungry(hungry);
-    setFoodAvailable(food);
-    setHungryLevel(level);
-    setHappiness(happy);
-  }, []);
-  useEffect$5(() => {
+    try {
+      const [s, hungry, food, level, happy] = await Promise.all([
+        progressService.getState(),
+        progressService.isPetHungry(),
+        progressService.getFoodAvailable(),
+        progressService.getHungryLevel(),
+        progressService.getHappiness()
+      ]);
+      setState(s);
+      setIsHungry(hungry);
+      setFoodAvailable(food);
+      setHungryLevel(level);
+      setHappiness(happy);
+    } catch (err) {
+      console.error("Failed to refresh progress service state:", err);
+    }
+  }, [progressService]);
+  useEffect$6(() => {
     void refresh();
     const handler = () => {
       void refresh();
     };
     window.addEventListener("cozyos:progress-updated", handler);
-    return () => window.removeEventListener("cozyos:progress-updated", handler);
+    return () => {
+      window.removeEventListener("cozyos:progress-updated", handler);
+    };
   }, [refresh]);
   const feedPet = useCallback$1(async () => {
-    await progressService.feedPet();
-  }, []);
+    try {
+      await progressService.feedPet();
+    } catch (err) {
+      console.error("ProgressService: feedPet failed:", err);
+      throw err;
+    }
+  }, [progressService]);
   const playWithPet = useCallback$1(async () => {
-    await progressService.playWithPet();
-  }, []);
+    try {
+      await progressService.playWithPet();
+    } catch (err) {
+      console.error("ProgressService: playWithPet failed:", err);
+      throw err;
+    }
+  }, [progressService]);
   const toggleSleep = useCallback$1(async () => {
-    await progressService.toggleSleep();
-  }, []);
-  return {
+    try {
+      await progressService.toggleSleep();
+    } catch (err) {
+      console.error("ProgressService: toggleSleep failed:", err);
+      throw err;
+    }
+  }, [progressService]);
+  const contextValue = useMemo(() => ({
     state,
     isHungry,
     foodAvailable,
@@ -561,10 +645,18 @@ function useProgressService() {
     feedPet,
     playWithPet,
     toggleSleep
-  };
+  }), [state, isHungry, foodAvailable, hungryLevel, happiness, feedPet, playWithPet, toggleSleep]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressServiceContext.Provider, { value: contextValue, children });
+}
+function useProgressService() {
+  const context = useContext(ProgressServiceContext);
+  if (!context) {
+    throw new Error("useProgressService must be used within a ProgressServiceProvider");
+  }
+  return context;
 }
 
-const {useState: useState$3,useEffect: useEffect$4,useCallback} = await importShared('react');
+const {useState: useState$4,useEffect: useEffect$5,useCallback} = await importShared('react');
 
 const VALID_TABS = ["home", "about", "posts", "shikaku", "sokoban", "slitherlink"];
 function getTabFromHash() {
@@ -576,8 +668,8 @@ function getTabFromHash() {
   return "home";
 }
 function useHashRouter() {
-  const [currentTab, setCurrentTab] = useState$3(getTabFromHash);
-  useEffect$4(() => {
+  const [currentTab, setCurrentTab] = useState$4(getTabFromHash);
+  useEffect$5(() => {
     const handleHashChange = () => {
       setCurrentTab(getTabFromHash());
     };
@@ -626,7 +718,7 @@ function MatrixMenu({
   ] });
 }
 
-const {useEffect: useEffect$3,useState: useState$2} = await importShared('react');
+const {useEffect: useEffect$4,useState: useState$3} = await importShared('react');
 
 const PROGRESS_KEY = "cozyos.progress.v1";
 const STATIC_POSTS = [
@@ -634,10 +726,10 @@ const STATIC_POSTS = [
   { date: "2026-05-29", title: "Building Sokoban micro-frontend puzzle game" }
 ];
 function StatsTelemetry() {
-  const [shikakuSolved, setShikakuSolved] = useState$2(0);
-  const [sokobanSolved, setSokobanSolved] = useState$2(0);
-  const [sokobanMaxLevel, setSokobanMaxLevel] = useState$2(-1);
-  useEffect$3(() => {
+  const [shikakuSolved, setShikakuSolved] = useState$3(0);
+  const [sokobanSolved, setSokobanSolved] = useState$3(0);
+  const [sokobanMaxLevel, setSokobanMaxLevel] = useState$3(-1);
+  useEffect$4(() => {
     try {
       const savedShikaku = localStorage.getItem("cozy_os_shikaku_save");
       if (savedShikaku) {
@@ -703,13 +795,13 @@ function StatsTelemetry() {
   ] });
 }
 
-const {useEffect: useEffect$2,useRef: useRef$1} = await importShared('react');
+const {useEffect: useEffect$3,useRef: useRef$2} = await importShared('react');
 
 function HomeDashboard() {
-  const planetCanvasRef = useRef$1(null);
-  const waterfallRef = useRef$1(null);
-  const oscilloscopeRef = useRef$1(null);
-  useEffect$2(() => {
+  const planetCanvasRef = useRef$2(null);
+  const waterfallRef = useRef$2(null);
+  const oscilloscopeRef = useRef$2(null);
+  useEffect$3(() => {
     const canvas = planetCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -760,7 +852,7 @@ function HomeDashboard() {
     draw();
     return () => cancelAnimationFrame(animId);
   }, []);
-  useEffect$2(() => {
+  useEffect$3(() => {
     const osc = oscilloscopeRef.current;
     const wf = waterfallRef.current;
     if (!osc || !wf) return;
@@ -1039,7 +1131,7 @@ function PetSprite({
   );
 }
 
-const {useEffect: useEffect$1,useState: useState$1} = await importShared('react');
+const {useEffect: useEffect$2,useState: useState$2} = await importShared('react');
 const MESSAGES = [
   "LOADING...",
   "PET IS WARMING UP...",
@@ -1049,22 +1141,22 @@ const MESSAGES = [
   "PET IS EXCITED!"
 ];
 function MfeLoader({ petStage = 1 }) {
-  const [msgIdx, setMsgIdx] = useState$1(0);
-  const [dots, setDots] = useState$1("");
-  const [frame, setFrame] = useState$1(0);
-  useEffect$1(() => {
+  const [msgIdx, setMsgIdx] = useState$2(0);
+  const [dots, setDots] = useState$2("");
+  const [frame, setFrame] = useState$2(0);
+  useEffect$2(() => {
     const t = setInterval(() => {
       setMsgIdx((i) => (i + 1) % MESSAGES.length);
     }, 1200);
     return () => clearInterval(t);
   }, []);
-  useEffect$1(() => {
+  useEffect$2(() => {
     const t = setInterval(() => {
       setDots((d) => d.length >= 3 ? "" : d + ".");
     }, 400);
     return () => clearInterval(t);
   }, []);
-  useEffect$1(() => {
+  useEffect$2(() => {
     const t = setInterval(() => {
       setFrame((f) => (f + 1) % 2);
     }, 500);
@@ -1139,6 +1231,70 @@ function MfeLoader({ petStage = 1 }) {
   ] });
 }
 
+const {useState: useState$1,useEffect: useEffect$1,useRef: useRef$1} = await importShared('react');
+function CloudSyncModal({ isOpen, onClose, cloudUser }) {
+  const [email, setEmail] = useState$1("");
+  const [password, setPassword] = useState$1("");
+  const [isSignUp, setIsSignUp] = useState$1(false);
+  const [loading, setLoading] = useState$1(false);
+  const [message, setMessage] = useState$1(null);
+  const [errorMsg, setErrorMsg] = useState$1(null);
+  const timeoutRef = useRef$1(null);
+  useEffect$1(() => {
+    if (isOpen) {
+      setEmail("");
+      setPassword("");
+      setErrorMsg(null);
+      setMessage(null);
+      setLoading(false);
+    }
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [isOpen]);
+  useEffect$1(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, []);
+  if (!isOpen) return null;
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full max-w-md retro-window max-h-[90vh] overflow-y-auto", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "window-header-accent font-press", children: "SYS_AUTHENTICATOR.EXE" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          onClick: onClose,
+          className: "text-cozy-accent hover:underline bg-transparent border-none cursor-pointer font-press text-[9px]",
+          "aria-label": "Close Cloud Sync Modal",
+          children: "[X]"
+        }
+      )
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-body p-6 flex flex-col gap-4 font-press text-[10px] text-cozy-text leading-relaxed", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-3 text-red-500", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[11px] font-bold", children: "⚠ CONFIGURATION ERROR" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-[8px] leading-4 text-cozy-text", children: "LOCAL STORAGE FALLBACK IS IN EFFECT. CLOUD SYNC IS DISABLED. TO ENABLE CLOUD SYNC, PLEASE ADD THESE KEYS TO YOUR .env FILE:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("pre", { className: "p-3 bg-black/60 border border-dashed border-red-900 text-[7px] text-red-400 overflow-x-auto whitespace-pre-wrap select-all", children: [
+          "VITE_SUPABASE_URL=your_project_url",
+          "\n",
+          "VITE_SUPABASE_ANON_KEY=your_anon_key"
+        ] })
+      ] }) ,
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-dashed border-cozy-border pt-3 mt-1 flex justify-between items-center text-[7px] text-cozy-text/40", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "SYS.VER: 4.7-SECURE" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "animate-pulse", children: "_BLINK" })
+      ] })
+    ] })
+  ] }) });
+}
+
 const {useState,useEffect,useRef,lazy,Suspense} = await importShared('react');
 const {QueryClient,QueryClientProvider} = await importShared('@tanstack/react-query');
 const queryClient = new QueryClient();
@@ -1182,12 +1338,17 @@ function Fallback({ name }) {
     ] })
   ] });
 }
-function App() {
+function AppContent() {
   const { currentTab, navigate } = useHashRouter();
   const windowRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobileHudOpen, setIsMobileHudOpen] = useState(false);
   const progressService = useProgressService();
+  const [cloudUser, setCloudUser] = useState(null);
+  const [isCloudModalOpen, setIsCloudModalOpen] = useState(false);
+  useEffect(() => {
+    return;
+  }, []);
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -1226,112 +1387,125 @@ function App() {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(HomeDashboard, {});
     }
   };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full flex justify-center min-h-screen", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    ConsoleFrame,
-    {
-      currentTab,
-      setTab: navigate,
-      onMobileHud: () => setIsMobileHudOpen(true),
-      children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-20 gap-6 items-start", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(QueryClientProvider, { client: queryClient, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex justify-center min-h-screen", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      ConsoleFrame,
+      {
+        onMobileHud: () => setIsMobileHudOpen(true),
+        onCloudClick: () => setIsCloudModalOpen(true),
+        cloudUser,
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-20 gap-6 items-start", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                ref: windowRef,
+                className: "col-span-1 md:col-span-13 retro-window",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBookIcon, { className: "w-3.5 h-3.5" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "window-header-accent", children: [
+                        currentTab.toUpperCase(),
+                        "_VIEW"
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 items-center", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "button",
+                        {
+                          onClick: toggleFullscreen,
+                          className: "text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]",
+                          "aria-label": "Toggle Fullscreen",
+                          children: isFullscreen ? "[🗗]" : "[⛶]"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Suspense,
+                    {
+                      fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }),
+                      children: renderMainContent()
+                    }
+                  ) })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden md:flex md:col-span-7 flex-col gap-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(MatrixMenu, { currentTab, navigate }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "retro-window", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "window-header-accent", children: "PET_HUD" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[-]" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { progressState: progressService }) }) })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
+            ] })
+          ] }),
+          isMobileHudOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "div",
+            {
+              className: "fixed inset-0 bg-black/75 z-45 md:hidden",
+              onClick: () => setIsMobileHudOpen(false)
+            }
+          ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "div",
             {
-              ref: windowRef,
-              className: "col-span-1 md:col-span-13 retro-window",
+              className: `fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${isMobileHudOpen ? "translate-x-0" : "translate-x-full"}`,
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBookIcon, { className: "w-3.5 h-3.5" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "window-header-accent", children: [
-                      currentTab.toUpperCase(),
-                      "_VIEW"
-                    ] })
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b border-dashed border-cozy-border pb-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[9px] text-cozy-text flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
+                    " MOBILE_HUD"
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 items-center", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      "button",
-                      {
-                        onClick: toggleFullscreen,
-                        className: "text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]",
-                        "aria-label": "Toggle Fullscreen",
-                        children: isFullscreen ? "[🗗]" : "[⛶]"
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[X]" })
-                  ] })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body min-h-[350px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Suspense,
-                  {
-                    fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }),
-                    children: renderMainContent()
-                  }
-                ) })
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "hidden md:flex md:col-span-7 flex-col gap-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(MatrixMenu, { currentTab, navigate }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "retro-window", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "window-header", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center gap-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "window-header-accent", children: "PET_HUD" })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-accent font-bold cursor-pointer", children: "[-]" })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "window-body p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { progressState: progressService }) }) })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
-          ] })
-        ] }),
-        isMobileHudOpen && /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: "fixed inset-0 bg-black/75 z-45 md:hidden",
-            onClick: () => setIsMobileHudOpen(false)
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          "div",
-          {
-            className: `fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${isMobileHudOpen ? "translate-x-0" : "translate-x-full"}`,
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center border-b border-dashed border-cozy-border pb-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-press text-[9px] text-cozy-text flex items-center gap-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(PixelPawIcon, { className: "w-3.5 h-3.5" }),
-                  " MOBILE_HUD"
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "button",
+                    {
+                      onClick: () => setIsMobileHudOpen(false),
+                      className: "text-cozy-text font-bold cursor-pointer font-press text-[9px] bg-transparent border-none",
+                      children: "[X]"
+                    }
+                  )
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "button",
+                  MatrixMenu,
                   {
-                    onClick: () => setIsMobileHudOpen(false),
-                    className: "text-cozy-text font-bold cursor-pointer font-press text-[9px] bg-transparent border-none",
-                    children: "[X]"
+                    currentTab,
+                    navigate: (tab) => {
+                      navigate(tab);
+                      setIsMobileHudOpen(false);
+                    }
                   }
-                )
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                MatrixMenu,
-                {
-                  currentTab,
-                  navigate: (tab) => {
-                    navigate(tab);
-                    setIsMobileHudOpen(false);
-                  }
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 overflow-y-auto flex flex-col gap-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { progressState: progressService }) }) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
-              ] })
-            ]
-          }
-        )
-      ]
-    }
-  ) }) });
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 overflow-y-auto flex flex-col gap-4", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border border-cozy-border", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Suspense, { fallback: /* @__PURE__ */ jsxRuntimeExports.jsx(MfeLoader, { petStage: progressService.state.pet.stage }), children: /* @__PURE__ */ jsxRuntimeExports.jsx(PetsApp, { progressState: progressService }) }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(StatsTelemetry, {})
+                ] })
+              ]
+            }
+          )
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      CloudSyncModal,
+      {
+        isOpen: isCloudModalOpen,
+        onClose: () => setIsCloudModalOpen(false),
+        cloudUser
+      }
+    )
+  ] }) });
+}
+function App() {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(ProgressServiceProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(AppContent, {}) });
 }
 
 const React = await importShared('react');

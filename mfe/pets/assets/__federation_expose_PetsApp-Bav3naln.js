@@ -180,7 +180,7 @@ function PetSprite({
 
 const EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100];
 
-const {useEffect,useState} = await importShared('react');
+const {useEffect,useState,useRef} = await importShared('react');
 const getAsciiBar = (value) => {
   const totalSegments = 12;
   const filledSegments = Math.round(value / 100 * totalSegments);
@@ -233,20 +233,38 @@ function PetsApp({
   const happiness = progressState?.happiness ?? 50;
   const [spriteStatus, setSpriteStatus] = useState("idle");
   const [animationFrame, setAnimationFrame] = useState(0);
+  const [isFeeding, setIsFeeding] = useState(false);
+  const resetTimerRef = useRef(null);
   useEffect(() => {
     const timer = setInterval(() => {
       setAnimationFrame((f) => (f + 1) % 2);
     }, 1e3);
     return () => clearInterval(timer);
   }, []);
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current !== null) {
+        clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
+  const canFeed = isHungry && foodAvailable > 0 && !(progressState?.isSleeping ?? false) && !isFeeding;
   const handleFeed = async () => {
-    if (!hasProgress) return;
-    await progressState.feedPet();
-    setSpriteStatus("eating");
-    setTimeout(() => setSpriteStatus("idle"), 2e3);
+    if (!hasProgress || !canFeed || isFeeding) return;
+    setIsFeeding(true);
+    try {
+      await progressState.feedPet();
+      setSpriteStatus("eating");
+      if (resetTimerRef.current !== null) {
+        clearTimeout(resetTimerRef.current);
+      }
+      resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2e3);
+    } catch {
+    } finally {
+      setIsFeeding(false);
+    }
   };
-  const canFeed = isHungry && foodAvailable > 0;
-  const hungerPct = Math.max(0, 100 - Math.round(hungryLevel / 6 * 100));
+  const hungerPct = Math.max(0, 100 - Math.round(hungryLevel / 5 * 100));
   const currentStageXpFloor = EVOLUTION_THRESHOLDS[petState.stage - 1] ?? 0;
   const nextStageXp = getXpToNextStage(petState.stage);
   const xpRange = nextStageXp - currentStageXpFloor;
@@ -269,7 +287,7 @@ function PetsApp({
               size: 120,
               stage: petState.stage,
               status: spriteStatus,
-              isSleeping: false,
+              isSleeping: progressState?.isSleeping ?? false,
               isHungry,
               animationFrame
             }

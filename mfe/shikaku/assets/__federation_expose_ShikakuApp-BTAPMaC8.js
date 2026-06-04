@@ -48,28 +48,68 @@ function initialState() {
   };
 }
 class LocalProgressRepository {
-  async getState() {
-    await Promise.resolve();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return initialState();
-      const data = JSON.parse(raw);
-      if (data.version !== 1) return initialState();
-      const state = data.state;
-      if (state.pet.happiness === void 0) state.pet.happiness = 50;
-      if (state.pet.lastPlayedAt === void 0) state.pet.lastPlayedAt = Date.now();
-      if (state.pet.isSleeping === void 0) state.pet.isSleeping = false;
-      state.pet.stage = getEvolutionStage(state.pet.xp);
-      return state;
-    } catch {
-      return initialState();
+  constructor() {
+    this.cachedState = null;
+    this.storageListener = null;
+    this.activeGetState = null;
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+      this.storageListener = (event) => {
+        if (event.key === STORAGE_KEY) {
+          this.cachedState = null;
+          this.activeGetState = null;
+        }
+      };
+      window.addEventListener("storage", this.storageListener);
     }
+  }
+  dispose() {
+    if (typeof window !== "undefined" && typeof window.removeEventListener === "function" && this.storageListener) {
+      window.removeEventListener("storage", this.storageListener);
+      this.storageListener = null;
+    }
+  }
+  async getState() {
+    if (this.cachedState !== null) {
+      return this.cachedState;
+    }
+    if (this.activeGetState !== null) {
+      return this.activeGetState;
+    }
+    this.activeGetState = (async () => {
+      try {
+        await Promise.resolve();
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          this.cachedState = initialState();
+          return this.cachedState;
+        }
+        const data = JSON.parse(raw);
+        if (data.version !== 1) {
+          this.cachedState = initialState();
+          return this.cachedState;
+        }
+        const state = data.state;
+        if (state.pet.happiness === void 0) state.pet.happiness = 50;
+        if (state.pet.lastPlayedAt === void 0) state.pet.lastPlayedAt = Date.now();
+        if (state.pet.isSleeping === void 0) state.pet.isSleeping = false;
+        state.pet.stage = getEvolutionStage(state.pet.xp);
+        this.cachedState = state;
+        return this.cachedState;
+      } catch {
+        this.cachedState = initialState();
+        return this.cachedState;
+      } finally {
+        this.activeGetState = null;
+      }
+    })();
+    return this.activeGetState;
   }
   async saveState(state) {
     await Promise.resolve();
     const data = { version: 1, state };
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      this.cachedState = state;
     } catch (err) {
       throw new Error(`Failed to save progress: ${String(err)}`);
     }
@@ -148,6 +188,9 @@ const HAPPINESS_COOLDOWN = 10 * 60 * 1e3;
 class ProgressService {
   constructor(repo) {
     this.repo = repo;
+  }
+  dispose() {
+    this.repo.dispose?.();
   }
   async getState() {
     return this.repo.getState();
@@ -585,378 +628,5334 @@ const useShikakuStore = create()((set, get) => ({
 
 const SHIKAKU_LEVELS = [
   {
-    id: "easy-1",
-    difficulty: "Easy",
-    width: 4,
-    height: 4,
-    clues: [
-      { x: 0, y: 0, value: 4 },
-      { x: 2, y: 0, value: 4 },
-      { x: 0, y: 2, value: 4 },
-      { x: 2, y: 2, value: 4 }
+    "id": "easy-1",
+    "difficulty": "Easy",
+    "width": 4,
+    "height": 4,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "value": 6
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 4
+      }
     ],
-    targets: { threeStars: 10, twoStars: 20, oneStar: 40 }
+    "targets": {
+      "threeStars": 10,
+      "twoStars": 20,
+      "oneStar": 40
+    }
   },
   {
-    id: "easy-2",
-    difficulty: "Easy",
-    width: 5,
-    height: 5,
-    clues: [
-      { x: 0, y: 0, value: 5 },
-      { x: 1, y: 1, value: 5 },
-      { x: 2, y: 2, value: 5 },
-      { x: 3, y: 3, value: 5 },
-      { x: 4, y: 4, value: 5 }
+    "id": "easy-2",
+    "difficulty": "Easy",
+    "width": 4,
+    "height": 4,
+    "clues": [
+      {
+        "x": 0,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 12
+      }
     ],
-    targets: { threeStars: 15, twoStars: 30, oneStar: 60 }
+    "targets": {
+      "threeStars": 10,
+      "twoStars": 20,
+      "oneStar": 40
+    }
   },
   {
-    id: "easy-3",
-    difficulty: "Easy",
-    width: 6,
-    height: 6,
-    clues: [
-      { x: 1, y: 1, value: 9 },
-      { x: 4, y: 1, value: 9 },
-      { x: 1, y: 4, value: 9 },
-      { x: 4, y: 4, value: 9 }
+    "id": "easy-3",
+    "difficulty": "Easy",
+    "width": 4,
+    "height": 4,
+    "clues": [
+      {
+        "x": 1,
+        "y": 2,
+        "value": 12
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 4
+      }
     ],
-    targets: { threeStars: 20, twoStars: 40, oneStar: 80 }
+    "targets": {
+      "threeStars": 10,
+      "twoStars": 20,
+      "oneStar": 40
+    }
   },
   {
-    id: "easy-4",
-    difficulty: "Easy",
-    width: 6,
-    height: 6,
-    clues: [
-      { x: 0, y: 0, value: 6 },
-      { x: 3, y: 0, value: 6 },
-      { x: 5, y: 0, value: 6 },
-      { x: 0, y: 5, value: 6 },
-      { x: 3, y: 5, value: 6 },
-      { x: 5, y: 5, value: 6 }
+    "id": "easy-4",
+    "difficulty": "Easy",
+    "width": 5,
+    "height": 5,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 5
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 2
+      }
     ],
-    targets: { threeStars: 20, twoStars: 40, oneStar: 80 }
+    "targets": {
+      "threeStars": 15,
+      "twoStars": 30,
+      "oneStar": 60
+    }
   },
   {
-    id: "easy-5",
-    difficulty: "Easy",
-    width: 6,
-    height: 6,
-    clues: [
-      { x: 0, y: 0, value: 4 },
-      { x: 3, y: 1, value: 8 },
-      { x: 5, y: 2, value: 12 },
-      { x: 0, y: 2, value: 4 },
-      { x: 2, y: 5, value: 8 }
+    "id": "easy-5",
+    "difficulty": "Easy",
+    "width": 5,
+    "height": 5,
+    "clues": [
+      {
+        "x": 1,
+        "y": 1,
+        "value": 10
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 9
+      }
     ],
-    targets: { threeStars: 25, twoStars: 50, oneStar: 100 }
+    "targets": {
+      "threeStars": 15,
+      "twoStars": 30,
+      "oneStar": 60
+    }
   },
   {
-    id: "easy-6",
-    difficulty: "Easy",
-    width: 6,
-    height: 6,
-    clues: [
-      { x: 0, y: 0, value: 4 },
-      { x: 0, y: 4, value: 2 },
-      { x: 1, y: 2, value: 6 },
-      { x: 3, y: 2, value: 6 },
-      { x: 5, y: 0, value: 4 },
-      { x: 5, y: 4, value: 2 },
-      { x: 2, y: 5, value: 6 },
-      { x: 4, y: 5, value: 6 }
+    "id": "easy-6",
+    "difficulty": "Easy",
+    "width": 5,
+    "height": 5,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 10
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 10
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 5
+      }
     ],
-    targets: { threeStars: 25, twoStars: 50, oneStar: 100 }
+    "targets": {
+      "threeStars": 15,
+      "twoStars": 30,
+      "oneStar": 60
+    }
   },
   {
-    id: "medium-1",
-    difficulty: "Medium",
-    width: 8,
-    height: 8,
-    clues: [
-      { x: 0, y: 1, value: 8 },
-      { x: 3, y: 2, value: 8 },
-      { x: 5, y: 1, value: 8 },
-      { x: 6, y: 3, value: 8 },
-      { x: 1, y: 5, value: 8 },
-      { x: 0, y: 6, value: 4 },
-      { x: 3, y: 7, value: 4 },
-      { x: 4, y: 5, value: 8 },
-      { x: 6, y: 4, value: 4 },
-      { x: 7, y: 7, value: 4 }
+    "id": "easy-7",
+    "difficulty": "Easy",
+    "width": 6,
+    "height": 6,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 12
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 3
+      }
     ],
-    targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
+    "targets": {
+      "threeStars": 20,
+      "twoStars": 40,
+      "oneStar": 80
+    }
   },
   {
-    id: "medium-2",
-    difficulty: "Medium",
-    width: 8,
-    height: 8,
-    clues: [
-      { x: 0, y: 3, value: 8 },
-      { x: 7, y: 4, value: 8 },
-      { x: 3, y: 0, value: 12 },
-      { x: 2, y: 3, value: 8 },
-      { x: 4, y: 4, value: 8 },
-      { x: 5, y: 2, value: 8 },
-      { x: 2, y: 7, value: 12 }
+    "id": "easy-8",
+    "difficulty": "Easy",
+    "width": 6,
+    "height": 6,
+    "clues": [
+      {
+        "x": 0,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 5
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 6
+      }
     ],
-    targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
+    "targets": {
+      "threeStars": 20,
+      "twoStars": 40,
+      "oneStar": 80
+    }
   },
   {
-    id: "medium-3",
-    difficulty: "Medium",
-    width: 8,
-    height: 8,
-    clues: [
-      { x: 1, y: 1, value: 9 },
-      { x: 5, y: 2, value: 15 },
-      { x: 2, y: 5, value: 15 },
-      { x: 3, y: 4, value: 5 },
-      { x: 5, y: 3, value: 4 },
-      { x: 4, y: 5, value: 4 },
-      { x: 7, y: 4, value: 4 },
-      { x: 5, y: 6, value: 4 },
-      { x: 6, y: 7, value: 4 }
+    "id": "easy-9",
+    "difficulty": "Easy",
+    "width": 6,
+    "height": 6,
+    "clues": [
+      {
+        "x": 0,
+        "y": 3,
+        "value": 6
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 12
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 12
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 6
+      }
     ],
-    targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
+    "targets": {
+      "threeStars": 20,
+      "twoStars": 40,
+      "oneStar": 80
+    }
   },
   {
-    id: "medium-4",
-    difficulty: "Medium",
-    width: 8,
-    height: 8,
-    clues: [
-      { x: 4, y: 0, value: 8 },
-      { x: 0, y: 3, value: 7 },
-      { x: 5, y: 7, value: 7 },
-      { x: 7, y: 2, value: 6 },
-      { x: 2, y: 1, value: 6 },
-      { x: 5, y: 2, value: 6 },
-      { x: 1, y: 5, value: 8 },
-      { x: 4, y: 3, value: 8 },
-      { x: 6, y: 6, value: 8 }
+    "id": "easy-10",
+    "difficulty": "Easy",
+    "width": 6,
+    "height": 6,
+    "clues": [
+      {
+        "x": 5,
+        "y": 1,
+        "value": 12
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 6
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "value": 6
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 6
+      }
     ],
-    targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
+    "targets": {
+      "threeStars": 20,
+      "twoStars": 40,
+      "oneStar": 80
+    }
   },
   {
-    id: "medium-5",
-    difficulty: "Medium",
-    width: 8,
-    height: 8,
-    clues: [
-      { x: 1, y: 1, value: 8 },
-      { x: 0, y: 6, value: 8 },
-      { x: 3, y: 1, value: 6 },
-      { x: 6, y: 0, value: 6 },
-      { x: 2, y: 4, value: 8 },
-      { x: 5, y: 3, value: 8 },
-      { x: 6, y: 4, value: 8 },
-      { x: 4, y: 6, value: 6 },
-      { x: 5, y: 7, value: 6 }
+    "id": "easy-11",
+    "difficulty": "Easy",
+    "width": 7,
+    "height": 7,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 7
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "value": 10
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 5
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 5
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "value": 3
+      }
     ],
-    targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
+    "targets": {
+      "threeStars": 30,
+      "twoStars": 60,
+      "oneStar": 120
+    }
   },
   {
-    id: "medium-6",
-    difficulty: "Medium",
-    width: 8,
-    height: 8,
-    clues: [
-      { x: 2, y: 0, value: 8 },
-      { x: 5, y: 1, value: 8 },
-      { x: 1, y: 3, value: 8 },
-      { x: 6, y: 4, value: 8 },
-      { x: 2, y: 2, value: 4 },
-      { x: 5, y: 3, value: 4 },
-      { x: 3, y: 4, value: 4 },
-      { x: 4, y: 5, value: 4 },
-      { x: 1, y: 7, value: 8 },
-      { x: 6, y: 6, value: 8 }
+    "id": "easy-12",
+    "difficulty": "Easy",
+    "width": 7,
+    "height": 7,
+    "clues": [
+      {
+        "x": 1,
+        "y": 0,
+        "value": 7
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 10
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 6
+      }
     ],
-    targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
+    "targets": {
+      "threeStars": 30,
+      "twoStars": 60,
+      "oneStar": 120
+    }
   },
   {
-    id: "medium-7",
-    difficulty: "Medium",
-    width: 8,
-    height: 8,
-    clues: [
-      { x: 0, y: 0, value: 9 },
-      { x: 4, y: 1, value: 15 },
-      { x: 1, y: 4, value: 15 },
-      { x: 4, y: 3, value: 5 },
-      { x: 3, y: 6, value: 4 },
-      { x: 6, y: 5, value: 8 },
-      { x: 5, y: 7, value: 4 },
-      { x: 7, y: 6, value: 4 }
+    "id": "easy-13",
+    "difficulty": "Easy",
+    "width": 7,
+    "height": 7,
+    "clues": [
+      {
+        "x": 0,
+        "y": 4,
+        "value": 7
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 5
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 12
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 6
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 9
+      }
     ],
-    targets: { threeStars: 45, twoStars: 90, oneStar: 180 }
+    "targets": {
+      "threeStars": 30,
+      "twoStars": 60,
+      "oneStar": 120
+    }
   },
   {
-    id: "hard-1",
-    difficulty: "Hard",
-    width: 10,
-    height: 10,
-    clues: [
-      { x: 1, y: 0, value: 5 },
-      { x: 0, y: 2, value: 4 },
-      { x: 2, y: 1, value: 4 },
-      { x: 3, y: 2, value: 4 },
-      { x: 1, y: 4, value: 4 },
-      { x: 4, y: 3, value: 4 },
-      { x: 7, y: 3, value: 25 },
-      { x: 2, y: 7, value: 25 },
-      { x: 6, y: 5, value: 5 },
-      { x: 5, y: 8, value: 4 },
-      { x: 7, y: 6, value: 4 },
-      { x: 8, y: 7, value: 4 },
-      { x: 6, y: 9, value: 4 },
-      { x: 9, y: 8, value: 4 }
+    "id": "easy-14",
+    "difficulty": "Easy",
+    "width": 7,
+    "height": 7,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 6
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 7
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "value": 3
+      }
     ],
-    targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
+    "targets": {
+      "threeStars": 30,
+      "twoStars": 60,
+      "oneStar": 120
+    }
   },
   {
-    id: "hard-2",
-    difficulty: "Hard",
-    width: 10,
-    height: 10,
-    clues: [
-      { x: 5, y: 0, value: 10 },
-      { x: 4, y: 9, value: 10 },
-      { x: 0, y: 4, value: 8 },
-      { x: 9, y: 5, value: 8 },
-      { x: 1, y: 3, value: 8 },
-      { x: 4, y: 2, value: 8 },
-      { x: 6, y: 1, value: 8 },
-      { x: 7, y: 4, value: 8 },
-      { x: 2, y: 6, value: 8 },
-      { x: 3, y: 7, value: 8 },
-      { x: 5, y: 8, value: 8 },
-      { x: 8, y: 7, value: 8 }
+    "id": "easy-15",
+    "difficulty": "Easy",
+    "width": 7,
+    "height": 7,
+    "clues": [
+      {
+        "x": 0,
+        "y": 3,
+        "value": 7
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 9
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 3
+      }
     ],
-    targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
+    "targets": {
+      "threeStars": 30,
+      "twoStars": 60,
+      "oneStar": 120
+    }
   },
   {
-    id: "hard-3",
-    difficulty: "Hard",
-    width: 10,
-    height: 10,
-    clues: [
-      { x: 0, y: 0, value: 10 },
-      { x: 9, y: 5, value: 9 },
-      { x: 4, y: 9, value: 9 },
-      { x: 0, y: 7, value: 8 },
-      { x: 2, y: 1, value: 8 },
-      { x: 7, y: 2, value: 8 },
-      { x: 1, y: 4, value: 8 },
-      { x: 8, y: 5, value: 8 },
-      { x: 3, y: 3, value: 4 },
-      { x: 6, y: 4, value: 4 },
-      { x: 4, y: 5, value: 4 },
-      { x: 5, y: 6, value: 4 },
-      { x: 3, y: 8, value: 8 },
-      { x: 6, y: 7, value: 8 }
+    "id": "medium-1",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 6
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 6
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 6
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 8
+      }
     ],
-    targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
   },
   {
-    id: "hard-4",
-    difficulty: "Hard",
-    width: 10,
-    height: 10,
-    clues: [
-      { x: 2, y: 1, value: 10 },
-      { x: 7, y: 0, value: 10 },
-      { x: 0, y: 4, value: 8 },
-      { x: 1, y: 8, value: 8 },
-      { x: 9, y: 3, value: 8 },
-      { x: 8, y: 7, value: 8 },
-      { x: 3, y: 2, value: 6 },
-      { x: 6, y: 3, value: 6 },
-      { x: 2, y: 5, value: 8 },
-      { x: 5, y: 6, value: 8 },
-      { x: 7, y: 4, value: 8 },
-      { x: 4, y: 9, value: 6 },
-      { x: 5, y: 8, value: 6 }
+    "id": "medium-2",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 0,
+        "y": 4,
+        "value": 7
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 5
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 6
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "value": 2
+      }
     ],
-    targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
   },
   {
-    id: "hard-5",
-    difficulty: "Hard",
-    width: 10,
-    height: 10,
-    clues: [
-      { x: 1, y: 1, value: 9 },
-      { x: 8, y: 2, value: 9 },
-      { x: 2, y: 8, value: 9 },
-      { x: 7, y: 7, value: 9 },
-      { x: 4, y: 3, value: 4 },
-      { x: 3, y: 5, value: 3 },
-      { x: 5, y: 5, value: 9 },
-      { x: 5, y: 0, value: 4 },
-      { x: 3, y: 2, value: 4 },
-      { x: 6, y: 1, value: 4 },
-      { x: 4, y: 9, value: 4 },
-      { x: 4, y: 8, value: 4 },
-      { x: 5, y: 7, value: 4 },
-      { x: 0, y: 4, value: 4 },
-      { x: 1, y: 3, value: 4 },
-      { x: 2, y: 6, value: 4 },
-      { x: 9, y: 5, value: 4 },
-      { x: 8, y: 4, value: 4 },
-      { x: 7, y: 6, value: 4 }
+    "id": "medium-3",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 1,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "value": 12
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 6
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 7
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 7
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 3
+      }
     ],
-    targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
   },
   {
-    id: "hard-6",
-    difficulty: "Hard",
-    width: 10,
-    height: 10,
-    clues: [
-      { x: 4, y: 0, value: 10 },
-      { x: 6, y: 1, value: 10 },
-      { x: 3, y: 8, value: 10 },
-      { x: 5, y: 9, value: 10 },
-      { x: 0, y: 4, value: 6 },
-      { x: 9, y: 3, value: 6 },
-      { x: 2, y: 3, value: 6 },
-      { x: 3, y: 2, value: 6 },
-      { x: 6, y: 2, value: 4 },
-      { x: 7, y: 4, value: 8 },
-      { x: 2, y: 5, value: 8 },
-      { x: 3, y: 7, value: 4 },
-      { x: 6, y: 6, value: 6 },
-      { x: 8, y: 5, value: 6 }
+    "id": "medium-4",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 5,
+        "y": 0,
+        "value": 12
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 8
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 5
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 5
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 7
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "value": 8
+      }
     ],
-    targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
   },
   {
-    id: "hard-7",
-    difficulty: "Hard",
-    width: 10,
-    height: 10,
-    clues: [
-      { x: 1, y: 2, value: 16 },
-      { x: 5, y: 0, value: 6 },
-      { x: 8, y: 1, value: 6 },
-      { x: 4, y: 3, value: 6 },
-      { x: 9, y: 2, value: 6 },
-      { x: 0, y: 6, value: 6 },
-      { x: 1, y: 7, value: 6 },
-      { x: 3, y: 5, value: 6 },
-      { x: 2, y: 8, value: 6 },
-      { x: 5, y: 4, value: 6 },
-      { x: 7, y: 5, value: 6 },
-      { x: 4, y: 7, value: 8 },
-      { x: 8, y: 6, value: 8 },
-      { x: 7, y: 9, value: 8 }
+    "id": "medium-5",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 7,
+        "y": 0,
+        "value": 8
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "value": 1
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 8
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "value": 1
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 2
+      }
     ],
-    targets: { threeStars: 90, twoStars: 180, oneStar: 360 }
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
+  },
+  {
+    "id": "medium-6",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 8
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 6
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "value": 12
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 2
+      }
+    ],
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
+  },
+  {
+    "id": "medium-7",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 8
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 9
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 10
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 4
+      }
+    ],
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
+  },
+  {
+    "id": "medium-8",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 6
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 6
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 1
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "value": 8
+      }
+    ],
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
+  },
+  {
+    "id": "medium-9",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 0,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 12
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "value": 1
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 8
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 3
+      }
+    ],
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
+  },
+  {
+    "id": "medium-10",
+    "difficulty": "Medium",
+    "width": 8,
+    "height": 8,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 5
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 5
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 3
+      }
+    ],
+    "targets": {
+      "threeStars": 45,
+      "twoStars": 90,
+      "oneStar": 180
+    }
+  },
+  {
+    "id": "medium-11",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 8
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 9
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 5
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "value": 9
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 7,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 8,
+        "value": 1
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-12",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 2,
+        "y": 0,
+        "value": 9
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 8
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 10
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "value": 5
+      },
+      {
+        "x": 6,
+        "y": 8,
+        "value": 12
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-13",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 0,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 7
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 12
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "value": 9
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-14",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 12
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "value": 9
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 10
+      },
+      {
+        "x": 7,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "value": 4
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-15",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 7
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "value": 5
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 6
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 7,
+        "value": 3
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-16",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 1,
+        "y": 0,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 8
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "value": 9
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "value": 10
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 12
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-17",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 0,
+        "y": 7,
+        "value": 9
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 6
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 8,
+        "value": 7
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-18",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "value": 12
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 12
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 5
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "value": 9
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 8,
+        "value": 4
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-19",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 2,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 6
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "value": 12
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 7
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 8,
+        "value": 9
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "medium-20",
+    "difficulty": "Medium",
+    "width": 9,
+    "height": 9,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 8
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 5
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 6
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 8
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 8,
+        "value": 3
+      }
+    ],
+    "targets": {
+      "threeStars": 60,
+      "twoStars": 120,
+      "oneStar": 240
+    }
+  },
+  {
+    "id": "hard-1",
+    "difficulty": "Hard",
+    "width": 10,
+    "height": 10,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 7
+      },
+      {
+        "x": 0,
+        "y": 9,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "value": 7
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 9
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "value": 6
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 6
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 12
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "value": 8
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "value": 9
+      },
+      {
+        "x": 1,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 9,
+        "value": 1
+      },
+      {
+        "x": 6,
+        "y": 9,
+        "value": 4
+      }
+    ],
+    "targets": {
+      "threeStars": 90,
+      "twoStars": 180,
+      "oneStar": 360
+    }
+  },
+  {
+    "id": "hard-2",
+    "difficulty": "Hard",
+    "width": 10,
+    "height": 10,
+    "clues": [
+      {
+        "x": 1,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 5
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 6
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 9
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 0,
+        "value": 7
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 9,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 7,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 5
+      },
+      {
+        "x": 9,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 9,
+        "value": 9
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "value": 1
+      }
+    ],
+    "targets": {
+      "threeStars": 90,
+      "twoStars": 180,
+      "oneStar": 360
+    }
+  },
+  {
+    "id": "hard-3",
+    "difficulty": "Hard",
+    "width": 10,
+    "height": 10,
+    "clues": [
+      {
+        "x": 2,
+        "y": 3,
+        "value": 12
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 5
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 10
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 9,
+        "value": 1
+      },
+      {
+        "x": 9,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 9,
+        "value": 6
+      },
+      {
+        "x": 9,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "value": 2
+      }
+    ],
+    "targets": {
+      "threeStars": 90,
+      "twoStars": 180,
+      "oneStar": 360
+    }
+  },
+  {
+    "id": "hard-4",
+    "difficulty": "Hard",
+    "width": 10,
+    "height": 10,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 6
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "value": 12
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "value": 6
+      },
+      {
+        "x": 6,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 9,
+        "value": 2
+      },
+      {
+        "x": 9,
+        "y": 3,
+        "value": 10
+      }
+    ],
+    "targets": {
+      "threeStars": 90,
+      "twoStars": 180,
+      "oneStar": 360
+    }
+  },
+  {
+    "id": "hard-5",
+    "difficulty": "Hard",
+    "width": 10,
+    "height": 10,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 0,
+        "value": 8
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 10
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 5
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 9,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "value": 8
+      },
+      {
+        "x": 2,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "value": 3
+      }
+    ],
+    "targets": {
+      "threeStars": 90,
+      "twoStars": 180,
+      "oneStar": 360
+    }
+  },
+  {
+    "id": "hard-6",
+    "difficulty": "Hard",
+    "width": 11,
+    "height": 11,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "value": 12
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 5
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 10
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 9,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "value": 1
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 9,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 9,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 10,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 8
+      },
+      {
+        "x": 9,
+        "y": 8,
+        "value": 12
+      }
+    ],
+    "targets": {
+      "threeStars": 120,
+      "twoStars": 240,
+      "oneStar": 480
+    }
+  },
+  {
+    "id": "hard-7",
+    "difficulty": "Hard",
+    "width": 11,
+    "height": 11,
+    "clues": [
+      {
+        "x": 1,
+        "y": 0,
+        "value": 11
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "value": 7
+      },
+      {
+        "x": 3,
+        "y": 2,
+        "value": 7
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 7
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 7
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 1
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "value": 5
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 5,
+        "value": 1
+      },
+      {
+        "x": 10,
+        "y": 1,
+        "value": 1
+      },
+      {
+        "x": 10,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 8
+      },
+      {
+        "x": 3,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 10,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 10,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 10,
+        "value": 1
+      },
+      {
+        "x": 10,
+        "y": 7,
+        "value": 10
+      },
+      {
+        "x": 6,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 10,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 6,
+        "y": 9,
+        "value": 2
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 10,
+        "value": 5
+      }
+    ],
+    "targets": {
+      "threeStars": 120,
+      "twoStars": 240,
+      "oneStar": 480
+    }
+  },
+  {
+    "id": "hard-8",
+    "difficulty": "Hard",
+    "width": 11,
+    "height": 11,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 10,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 11
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 9,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 11
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 5
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 10,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 12
+      },
+      {
+        "x": 2,
+        "y": 7,
+        "value": 6
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 10,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 10
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 9,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 9,
+        "value": 1
+      },
+      {
+        "x": 8,
+        "y": 10,
+        "value": 1
+      },
+      {
+        "x": 9,
+        "y": 5,
+        "value": 12
+      }
+    ],
+    "targets": {
+      "threeStars": 120,
+      "twoStars": 240,
+      "oneStar": 480
+    }
+  },
+  {
+    "id": "hard-9",
+    "difficulty": "Hard",
+    "width": 11,
+    "height": 11,
+    "clues": [
+      {
+        "x": 0,
+        "y": 9,
+        "value": 11
+      },
+      {
+        "x": 10,
+        "y": 0,
+        "value": 10
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 1
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 10,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 6
+      },
+      {
+        "x": 2,
+        "y": 10,
+        "value": 1
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 10,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 7
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 10,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "value": 12
+      },
+      {
+        "x": 6,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "value": 1
+      },
+      {
+        "x": 10,
+        "y": 9,
+        "value": 1
+      },
+      {
+        "x": 7,
+        "y": 10,
+        "value": 3
+      },
+      {
+        "x": 10,
+        "y": 10,
+        "value": 3
+      }
+    ],
+    "targets": {
+      "threeStars": 120,
+      "twoStars": 240,
+      "oneStar": 480
+    }
+  },
+  {
+    "id": "hard-10",
+    "difficulty": "Hard",
+    "width": 11,
+    "height": 11,
+    "clues": [
+      {
+        "x": 1,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 7
+      },
+      {
+        "x": 9,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 6
+      },
+      {
+        "x": 0,
+        "y": 2,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 10,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 9,
+        "y": 3,
+        "value": 8
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 5
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 9
+      },
+      {
+        "x": 1,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "value": 7
+      },
+      {
+        "x": 1,
+        "y": 8,
+        "value": 9
+      },
+      {
+        "x": 10,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 9,
+        "value": 11
+      },
+      {
+        "x": 8,
+        "y": 10,
+        "value": 11
+      }
+    ],
+    "targets": {
+      "threeStars": 120,
+      "twoStars": 240,
+      "oneStar": 480
+    }
+  },
+  {
+    "id": "hard-11",
+    "difficulty": "Hard",
+    "width": 12,
+    "height": 12,
+    "clues": [
+      {
+        "x": 1,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 3,
+        "value": 6
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 1,
+        "value": 7
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "value": 7
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "value": 1
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 5
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 9,
+        "y": 6,
+        "value": 5
+      },
+      {
+        "x": 9,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 10,
+        "y": 3,
+        "value": 9
+      },
+      {
+        "x": 11,
+        "y": 2,
+        "value": 5
+      },
+      {
+        "x": 11,
+        "y": 5,
+        "value": 1
+      },
+      {
+        "x": 11,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 11,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 9,
+        "value": 1
+      },
+      {
+        "x": 3,
+        "y": 9,
+        "value": 11
+      },
+      {
+        "x": 11,
+        "y": 10,
+        "value": 12
+      },
+      {
+        "x": 0,
+        "y": 11,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 11,
+        "value": 5
+      },
+      {
+        "x": 10,
+        "y": 11,
+        "value": 4
+      },
+      {
+        "x": 11,
+        "y": 11,
+        "value": 1
+      }
+    ],
+    "targets": {
+      "threeStars": 150,
+      "twoStars": 300,
+      "oneStar": 600
+    }
+  },
+  {
+    "id": "hard-12",
+    "difficulty": "Hard",
+    "width": 12,
+    "height": 12,
+    "clues": [
+      {
+        "x": 0,
+        "y": 2,
+        "value": 7
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 1,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 2,
+        "value": 7
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 10
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 11,
+        "value": 1
+      },
+      {
+        "x": 4,
+        "y": 0,
+        "value": 5
+      },
+      {
+        "x": 10,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 10,
+        "y": 1,
+        "value": 8
+      },
+      {
+        "x": 5,
+        "y": 2,
+        "value": 7
+      },
+      {
+        "x": 10,
+        "y": 2,
+        "value": 1
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 3,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 12
+      },
+      {
+        "x": 11,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 11,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 9,
+        "value": 10
+      },
+      {
+        "x": 3,
+        "y": 11,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "value": 2
+      },
+      {
+        "x": 10,
+        "y": 6,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 3
+      },
+      {
+        "x": 11,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 8,
+        "value": 7
+      },
+      {
+        "x": 5,
+        "y": 9,
+        "value": 1
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 11,
+        "y": 9,
+        "value": 2
+      },
+      {
+        "x": 10,
+        "y": 10,
+        "value": 7
+      },
+      {
+        "x": 6,
+        "y": 11,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 11,
+        "value": 3
+      }
+    ],
+    "targets": {
+      "threeStars": 150,
+      "twoStars": 300,
+      "oneStar": 600
+    }
+  },
+  {
+    "id": "hard-13",
+    "difficulty": "Hard",
+    "width": 12,
+    "height": 12,
+    "clues": [
+      {
+        "x": 0,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 0,
+        "value": 3
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "value": 11
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "value": 11
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 10,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 4,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 4,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 4,
+        "value": 7
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 8,
+        "value": 8
+      },
+      {
+        "x": 5,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 10,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 11,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 11,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "value": 5
+      },
+      {
+        "x": 8,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 11,
+        "value": 1
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "value": 6
+      },
+      {
+        "x": 9,
+        "y": 2,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 10,
+        "y": 4,
+        "value": 6
+      },
+      {
+        "x": 10,
+        "y": 8,
+        "value": 1
+      },
+      {
+        "x": 11,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 11,
+        "y": 4,
+        "value": 1
+      },
+      {
+        "x": 11,
+        "y": 6,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 10,
+        "value": 3
+      },
+      {
+        "x": 10,
+        "y": 9,
+        "value": 6
+      }
+    ],
+    "targets": {
+      "threeStars": 150,
+      "twoStars": 300,
+      "oneStar": 600
+    }
+  },
+  {
+    "id": "hard-14",
+    "difficulty": "Hard",
+    "width": 12,
+    "height": 12,
+    "clues": [
+      {
+        "x": 1,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 2
+      },
+      {
+        "x": 1,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 1,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 0,
+        "value": 2
+      },
+      {
+        "x": 10,
+        "y": 0,
+        "value": 4
+      },
+      {
+        "x": 10,
+        "y": 1,
+        "value": 10
+      },
+      {
+        "x": 11,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 3,
+        "value": 12
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "value": 12
+      },
+      {
+        "x": 3,
+        "y": 4,
+        "value": 2
+      },
+      {
+        "x": 6,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 11,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 5,
+        "value": 2
+      },
+      {
+        "x": 5,
+        "y": 5,
+        "value": 1
+      },
+      {
+        "x": 6,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 11,
+        "y": 5,
+        "value": 3
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "value": 1
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "value": 8
+      },
+      {
+        "x": 10,
+        "y": 7,
+        "value": 9
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 2,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 11,
+        "y": 8,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 7,
+        "y": 9,
+        "value": 5
+      },
+      {
+        "x": 10,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 10,
+        "value": 4
+      },
+      {
+        "x": 5,
+        "y": 10,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 10,
+        "value": 2
+      },
+      {
+        "x": 11,
+        "y": 10,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 11,
+        "value": 6
+      },
+      {
+        "x": 10,
+        "y": 11,
+        "value": 4
+      }
+    ],
+    "targets": {
+      "threeStars": 150,
+      "twoStars": 300,
+      "oneStar": 600
+    }
+  },
+  {
+    "id": "hard-15",
+    "difficulty": "Hard",
+    "width": 12,
+    "height": 12,
+    "clues": [
+      {
+        "x": 0,
+        "y": 1,
+        "value": 10
+      },
+      {
+        "x": 2,
+        "y": 0,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 4,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 3,
+        "y": 3,
+        "value": 3
+      },
+      {
+        "x": 4,
+        "y": 4,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 0,
+        "value": 10
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "value": 9
+      },
+      {
+        "x": 8,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 9,
+        "y": 2,
+        "value": 3
+      },
+      {
+        "x": 11,
+        "y": 1,
+        "value": 4
+      },
+      {
+        "x": 11,
+        "y": 2,
+        "value": 2
+      },
+      {
+        "x": 10,
+        "y": 4,
+        "value": 4
+      },
+      {
+        "x": 0,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 5,
+        "value": 4
+      },
+      {
+        "x": 8,
+        "y": 6,
+        "value": 12
+      },
+      {
+        "x": 0,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "value": 4
+      },
+      {
+        "x": 7,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 8,
+        "y": 7,
+        "value": 1
+      },
+      {
+        "x": 9,
+        "y": 7,
+        "value": 1
+      },
+      {
+        "x": 11,
+        "y": 7,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 8,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 8,
+        "value": 3
+      },
+      {
+        "x": 5,
+        "y": 9,
+        "value": 3
+      },
+      {
+        "x": 6,
+        "y": 8,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 9,
+        "value": 4
+      },
+      {
+        "x": 9,
+        "y": 9,
+        "value": 6
+      },
+      {
+        "x": 3,
+        "y": 10,
+        "value": 7
+      },
+      {
+        "x": 8,
+        "y": 10,
+        "value": 3
+      },
+      {
+        "x": 10,
+        "y": 10,
+        "value": 2
+      },
+      {
+        "x": 0,
+        "y": 11,
+        "value": 1
+      },
+      {
+        "x": 2,
+        "y": 11,
+        "value": 4
+      },
+      {
+        "x": 6,
+        "y": 11,
+        "value": 2
+      },
+      {
+        "x": 7,
+        "y": 11,
+        "value": 2
+      },
+      {
+        "x": 9,
+        "y": 11,
+        "value": 3
+      }
+    ],
+    "targets": {
+      "threeStars": 150,
+      "twoStars": 300,
+      "oneStar": 600
+    }
   }
 ];
 
@@ -11114,7 +16113,7 @@ function LevelSelect({
   }, [loadSave]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full flex flex-col gap-6 text-cozy-text font-press", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-[12px] text-center border-b border-cozy-border pb-3", children: "SELECT LEVEL" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-3", children: SHIKAKU_LEVELS.map((lvl, index) => {
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[300px] overflow-y-auto pr-1 retro-scrollbar", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-5 gap-2", children: SHIKAKU_LEVELS.map((lvl, index) => {
       const save = completedLevels[lvl.id];
       const stars = save ? save.stars : 0;
       return /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -11124,7 +16123,7 @@ function LevelSelect({
             synth.playClick();
             onSelect(index);
           },
-          className: "border border-cozy-border bg-black text-cozy-text p-3 flex flex-col items-center justify-center cursor-pointer active:translate-y-0.5 hover:bg-cozy-text hover:text-black transition-colors",
+          className: "border border-cozy-border bg-black text-cozy-text p-2 flex flex-col items-center justify-center cursor-pointer active:translate-y-0.5 hover:bg-cozy-text hover:text-black transition-colors",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[10px]", children: index + 1 }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-[6px] mt-1 text-cozy-muted font-sans", children: [
@@ -11132,7 +16131,7 @@ function LevelSelect({
               "x",
               lvl.height
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[8px] mt-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-[7px] mt-1.5 leading-none", children: [
               "★".repeat(stars),
               "☆".repeat(3 - stars)
             ] })
@@ -11140,7 +16139,7 @@ function LevelSelect({
         },
         lvl.id
       );
-    }) })
+    }) }) })
   ] });
 }
 

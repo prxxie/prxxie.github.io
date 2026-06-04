@@ -10,6 +10,7 @@
       --tw-skew-x: initial;
       --tw-skew-y: initial;
       --tw-border-style: solid;
+      --tw-leading: initial;
       --tw-font-weight: initial;
       --tw-ease: initial;
       --tw-blur: initial;
@@ -368,8 +369,8 @@
     margin-top: calc(var(--spacing) * 1);
   }
 
-  .mt-2 {
-    margin-top: calc(var(--spacing) * 2);
+  .mt-1\.5 {
+    margin-top: calc(var(--spacing) * 1.5);
   }
 
   .contents {
@@ -396,6 +397,10 @@
     height: 100%;
   }
 
+  .max-h-\[300px\] {
+    max-height: 300px;
+  }
+
   .w-full {
     width: 100%;
   }
@@ -420,8 +425,8 @@
     touch-action: none;
   }
 
-  .grid-cols-3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .flex-col {
@@ -444,10 +449,6 @@
     gap: calc(var(--spacing) * 2);
   }
 
-  .gap-3 {
-    gap: calc(var(--spacing) * 3);
-  }
-
   .gap-4 {
     gap: calc(var(--spacing) * 4);
   }
@@ -462,6 +463,10 @@
 
   .overflow-hidden {
     overflow: hidden;
+  }
+
+  .overflow-y-auto {
+    overflow-y: auto;
   }
 
   .border {
@@ -506,8 +511,8 @@
     background-color: var(--color-slate-900);
   }
 
-  .p-3 {
-    padding: calc(var(--spacing) * 3);
+  .p-2 {
+    padding: calc(var(--spacing) * 2);
   }
 
   .p-6 {
@@ -528,6 +533,10 @@
 
   .py-1 {
     padding-block: calc(var(--spacing) * 1);
+  }
+
+  .pr-1 {
+    padding-right: calc(var(--spacing) * 1);
   }
 
   .pb-3 {
@@ -563,6 +572,10 @@
     font-size: 6px;
   }
 
+  .text-\[7px\] {
+    font-size: 7px;
+  }
+
   .text-\[8px\] {
     font-size: 8px;
   }
@@ -577,6 +590,11 @@
 
   .text-\[12px\] {
     font-size: 12px;
+  }
+
+  .leading-none {
+    --tw-leading: 1;
+    line-height: 1;
   }
 
   .font-bold {
@@ -926,6 +944,10 @@ button:focus-visible, [role="button"]:focus-visible, .pixel-btn:focus-visible {
   syntax: "*";
   inherits: false;
   initial-value: solid;
+}
+@property --tw-leading {
+  syntax: "*";
+  inherits: false
 }
 @property --tw-font-weight {
   syntax: "*";

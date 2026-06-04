@@ -27,6 +27,7 @@ function initialState(): ProgressState {
 export class LocalProgressRepository implements ProgressRepository {
   private cachedState: ProgressState | null = null;
   private storageListener: ((event: StorageEvent) => void) | null = null;
+  private progressUpdatedListener: (() => void) | null = null;
   private activeGetState: Promise<ProgressState> | null = null;
 
   constructor() {
@@ -38,13 +39,25 @@ export class LocalProgressRepository implements ProgressRepository {
         }
       };
       window.addEventListener("storage", this.storageListener);
+
+      this.progressUpdatedListener = () => {
+        this.cachedState = null;
+        this.activeGetState = null;
+      };
+      window.addEventListener("cozyos:progress-updated", this.progressUpdatedListener);
     }
   }
 
   dispose(): void {
-    if (typeof window !== "undefined" && typeof window.removeEventListener === "function" && this.storageListener) {
-      window.removeEventListener("storage", this.storageListener);
-      this.storageListener = null;
+    if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+      if (this.storageListener) {
+        window.removeEventListener("storage", this.storageListener);
+        this.storageListener = null;
+      }
+      if (this.progressUpdatedListener) {
+        window.removeEventListener("cozyos:progress-updated", this.progressUpdatedListener);
+        this.progressUpdatedListener = null;
+      }
     }
   }
 

@@ -322,6 +322,7 @@ function initialState() {
 class LocalProgressRepository {
   cachedState = null;
   storageListener = null;
+  progressUpdatedListener = null;
   activeGetState = null;
   constructor() {
     if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
@@ -332,12 +333,23 @@ class LocalProgressRepository {
         }
       };
       window.addEventListener("storage", this.storageListener);
+      this.progressUpdatedListener = () => {
+        this.cachedState = null;
+        this.activeGetState = null;
+      };
+      window.addEventListener("cozyos:progress-updated", this.progressUpdatedListener);
     }
   }
   dispose() {
-    if (typeof window !== "undefined" && typeof window.removeEventListener === "function" && this.storageListener) {
-      window.removeEventListener("storage", this.storageListener);
-      this.storageListener = null;
+    if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+      if (this.storageListener) {
+        window.removeEventListener("storage", this.storageListener);
+        this.storageListener = null;
+      }
+      if (this.progressUpdatedListener) {
+        window.removeEventListener("cozyos:progress-updated", this.progressUpdatedListener);
+        this.progressUpdatedListener = null;
+      }
     }
   }
   async getState() {

@@ -737,6 +737,19 @@ button:focus-visible, [role="button"]:focus-visible, .pixel-btn:focus-visible {
     transform: scale(.9);
   }
 }
+.retro-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.retro-scrollbar::-webkit-scrollbar-track {
+  background: none;
+}
+.retro-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--color-cozy-muted);
+  border: 1px solid var(--color-cozy-border);
+}
+.retro-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-cozy-border);
+}
 @property --tw-border-style {
   syntax: "*";
   inherits: false;

@@ -1,5 +1,5 @@
-import { importShared } from '../__federation_fn_import-0f6vq-VT.js';
-import { j as jsxRuntimeExports } from '../jsx-runtime-CsM3lTE3.js';
+import { i as importShared } from '../_virtual___federation_fn_import-Bhvr9fyf.js';
+import { j as jsxRuntimeExports } from '../jsx-runtime-CyoIsdjr.js';
 
 // src/subscribable.ts
 var Subscribable = class {
@@ -232,7 +232,21 @@ function partialMatchKey(a, b) {
     return false;
   }
   if (a && b && typeof a === "object" && typeof b === "object") {
-    return Object.keys(b).every((key) => partialMatchKey(a[key], b[key]));
+    if (Array.isArray(a) && Array.isArray(b)) {
+      for (let i = 0; i < b.length; i++) {
+        if (!partialMatchKey(a[i], b[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+    const bKeys = Object.keys(b);
+    for (const key of bKeys) {
+      if (!partialMatchKey(a[key], b[key])) {
+        return false;
+      }
+    }
+    return true;
   }
   return false;
 }
@@ -544,6 +558,7 @@ function hydrate(client, dehydratedState, options) {
             // previous successful fetches, we make sure we only do this for pending queries.
             ...state.status === "pending" && data !== void 0 && {
               status: "success",
+              dataUpdatedAt: dehydratedAt ?? Date.now(),
               // Preserve existing fetchStatus if the existing query is actively fetching.
               ...!existingQueryIsFetching && {
                 fetchStatus: "idle"
@@ -570,7 +585,10 @@ function hydrate(client, dehydratedState, options) {
             fetchStatus: "idle",
             // Like above, if the query was pending at the moment of dehydration but has data,
             // we can assume it should be hydrated as successful.
-            status: state.status === "pending" && data !== void 0 ? "success" : state.status
+            status: state.status === "pending" && data !== void 0 ? "success" : state.status,
+            ...state.status === "pending" && data !== void 0 && {
+              dataUpdatedAt: dehydratedAt ?? Date.now()
+            }
           }
         );
       }

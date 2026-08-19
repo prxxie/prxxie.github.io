@@ -43,47 +43,47 @@ function AboutApp() {
     { name: "Zustand / Redux", level: 7 },
     { name: "GitHub Actions", level: 6 }
   ];
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-2 overflow-y-auto", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "font-press text-[12px] border-b border-dashed border-cozy-border pb-1 flex items-center gap-1", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBioIcon, { className: "w-4 h-4 text-cozy-accent" }),
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-6 overflow-y-auto", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("h2", { className: "font-display text-sm text-ink border-b border-hairline pb-2 flex items-center gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBioIcon, { className: "w-4 h-4 text-accent-amber" }),
       " BIO DIRECTORY"
     ] }),
-    openFolder === null ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2 pt-2 text-cozy-text", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "div",
+    openFolder === null ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-3 pt-2 text-ink", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
         {
           onClick: () => setOpenFolder("bio"),
-          className: "border border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-4 h-4 mr-2" }),
+          className: "card bg-surface-card hover:bg-surface-dark hover:text-on-dark cursor-pointer transition-colors text-left",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-4 h-4" }),
             " [BIO] - Who is prxxie?"
-          ]
+          ] })
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "div",
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
         {
           onClick: () => setOpenFolder("skills"),
-          className: "border border-cozy-border p-2 bg-black cursor-pointer hover:bg-cozy-accent hover:text-black transition-colors",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-4 h-4 mr-2" }),
+          className: "card bg-surface-card hover:bg-surface-dark hover:text-on-dark cursor-pointer transition-colors text-left",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(PixelFolderIcon, { className: "w-4 h-4" }),
             " [SKILLS] - Character Stats"
-          ]
+          ] })
         }
       )
-    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
           onClick: () => setOpenFolder(null),
-          className: "pixel-btn text-[8px] py-1 px-2 mb-2",
+          className: "btn btn-primary btn-sm h-10 px-5 w-fit",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBackIcon, { className: "w-3.5 h-3.5 mr-1" }),
             " BACK"
           ]
         }
       ),
-      openFolder === "bio" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-cozy-border p-3 bg-black text-cozy-text text-sm leading-relaxed", children: [
+      openFolder === "bio" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "card bg-surface-dark text-on-dark p-6 text-sm leading-relaxed", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mb-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "NAME:" }),
           " prxxie"
@@ -94,9 +94,9 @@ function AboutApp() {
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Hello! I build highly interactive websites. I love combining clean engineering practices (like micro frontends) with rich visual game designs." })
       ] }),
-      openFolder === "skills" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-cozy-border p-3 bg-black text-cozy-text text-sm", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold mb-2", children: "CHARACTER LEVELS:" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-2", children: skills.map((skill) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      openFolder === "skills" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "card bg-surface-dark text-on-dark p-6 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-bold mb-3", children: "CHARACTER LEVELS:" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-3", children: skills.map((skill) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between font-bold text-xs mb-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: skill.name }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
@@ -104,10 +104,10 @@ function AboutApp() {
               skill.level
             ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 border border-cozy-border bg-[#201500] relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 border border-hairline bg-surface-dark-elevated relative", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             "div",
             {
-              className: "h-full bg-cozy-accent",
+              className: "h-full bg-accent-amber transition-all duration-500",
               style: { width: `${skill.level * 10}%` }
             }
           ) })

@@ -1,4 +1,4 @@
-import { importShared } from './__federation_fn_import-0f6vq-VT.js';
+import { importShared } from './__federation_fn_import-DH8e5ArM.js';
 import { j as jsxRuntimeExports } from './jsx-runtime-CsM3lTE3.js';
 import { c as commonjsGlobal, g as getDefaultExportFromCjs } from './index-BxRxKft-.js';
 
@@ -4955,23 +4955,23 @@ function PostsApp() {
     },
     enabled: !!selectedPost
   });
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-2 overflow-y-auto", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-mono text-xs text-cozy-muted mb-2", children: [
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-4 overflow-y-auto", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-muted", children: [
       "guest@prxxie:~$ ",
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-cozy-text", children: "ls -l blog/posts/" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-ink", children: "ls -l blog/posts/" })
     ] }),
     selectedPost === null ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-2 pt-2", children: postsList.map((post) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      "div",
+      "button",
       {
         onClick: () => setSelectedPost(post.id),
-        className: "group font-mono text-sm py-1 cursor-pointer flex justify-between items-center text-cozy-text hover:text-white",
+        className: "text-left text-sm py-1 flex justify-between items-center text-ink hover:text-primary",
         children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex items-center group-hover:blink-cursor", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
             "> ",
             post.title.toUpperCase().replace(/[\s,]+/g, "_").replace(/[!]+/g, ""),
             ".MD"
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-cozy-muted font-mono ml-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-muted ml-4", children: [
             "[",
             post.date,
             "]"
@@ -4984,18 +4984,18 @@ function PostsApp() {
         "button",
         {
           onClick: () => setSelectedPost(null),
-          className: "pixel-btn text-[8px] py-1 px-2 mb-2",
+          className: "btn btn-primary btn-sm h-10 px-5 mb-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBackIcon, { className: "w-3.5 h-3.5 mr-1" }),
             " BACK"
           ]
         }
       ),
-      isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-press text-[8px] pt-4 text-center", children: "LOADING POST CONTENT..." }),
-      isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-red-500 text-sm", children: "Failed to load post." }),
-      postContent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-[#050505] border border-cozy-border p-6 min-h-[300px] font-mono text-cozy-text relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold border-b border-cozy-border pb-2 mb-2 text-md text-cozy-text uppercase", children: postContent.title }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-[10px] text-cozy-muted mb-4 font-mono", children: [
+      isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs pt-4 text-center", children: "LOADING POST CONTENT..." }),
+      isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-error text-sm", children: "Failed to load post." }),
+      postContent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "card bg-surface-dark text-on-dark p-6 min-h-[300px]", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold border-b border-hairline pb-2 mb-2 text-md uppercase", children: postContent.title }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-on-dark-soft mb-4", children: [
           "DATE: ",
           postContent.date,
           " | AUTHOR: ",
@@ -5004,7 +5004,7 @@ function PostsApp() {
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           "div",
           {
-            className: "markdown-body text-sm leading-relaxed",
+            className: "text-sm leading-relaxed font-body",
             dangerouslySetInnerHTML: {
               __html: postContent.htmlContent
             }

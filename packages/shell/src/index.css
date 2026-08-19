@@ -1,5 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
+@import "daisyui/daisyui.css";
+
+:root {
+  --color-primary: #cc785c;
+  --color-primary-active: #a9583e;
+  --color-primary-disabled: #e6dfd8;
+  --color-canvas: #faf9f5;
+  --color-surface-card: #efe9de;
+  --color-surface-dark: #181715;
+  --color-surface-dark-elevated: #252320;
+  --color-ink: #141413;
+  --color-body: #3d3d3a;
+  --color-muted: #6c6a64;
+  --color-on-dark: #faf9f5;
+  --color-on-dark-soft: #a09d96;
+  --color-accent-teal: #5db8a6;
+  --color-accent-amber: #e8a55a;
+  --color-success: #5db872;
+  --color-warning: #d4a017;
+  --color-error: #c64545;
+  --color-hairline: #e6dfd8;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 9999px;
+  --font-display: "Copernicus", "Tiempos Headline", "Cormorant Garamond", serif;
+  --font-body: "StyreneB", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-code: "JetBrains Mono", ui-monospace, monospace;
+}
 
 @theme {
   --font-mono: "Geist Mono", ui-monospace, monospace;
@@ -88,8 +119,8 @@ body {
   color: var(--color-cozy-text);
 }
 
-.markdown-body h1, 
-.markdown-body h2, 
+.markdown-body h1,
+.markdown-body h2,
 .markdown-body h3 {
   font-family: var(--font-pixel);
   color: var(--color-cozy-text);
@@ -143,7 +174,7 @@ body {
   font-size: 13px;
 }
 
-.markdown-body th, 
+.markdown-body th,
 .markdown-body td {
   border: 1px solid var(--color-cozy-border);
   padding: 6px 8px;
@@ -312,8 +343,8 @@ button:focus-visible,
   background: transparent;
 }
 .retro-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-cozy-muted);
-  border: 1px solid var(--color-cozy-border);
+  background-color: var(--color-cozy-border);
+  border-radius: 3px;
 }
 .retro-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-cozy-border);

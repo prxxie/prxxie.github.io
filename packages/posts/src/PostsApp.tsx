@@ -51,54 +51,54 @@ export default function PostsApp(): React.ReactElement {
   });
 
   return (
-    <div className="flex flex-col h-full gap-2 overflow-y-auto">
-      <div className="font-mono text-xs text-cozy-muted mb-2">
-        guest@prxxie:~$ <span className="text-cozy-text">ls -l blog/posts/</span>
+    <div className="flex flex-col h-full gap-4 overflow-y-auto">
+      <div className="text-sm text-muted">
+        guest@prxxie:~$ <span className="text-ink">ls -l blog/posts/</span>
       </div>
 
       {selectedPost === null ? (
         <div className="flex flex-col gap-2 pt-2">
           {postsList.map((post) => (
-            <div
+            <button
               key={post.id}
               onClick={() => setSelectedPost(post.id)}
-              className="group font-mono text-sm py-1 cursor-pointer flex justify-between items-center text-cozy-text hover:text-white"
+              className="text-left text-sm py-1 flex justify-between items-center text-ink hover:text-primary"
             >
-              <span className="flex items-center group-hover:blink-cursor">
+              <span>
                 &gt; {post.title.toUpperCase().replace(/[\s,]+/g, "_").replace(/[!]+/g, "")}.MD
               </span>
-              <span className="text-xs text-cozy-muted font-mono ml-4">
+              <span className="text-xs text-muted ml-4">
                 [{post.date}]
               </span>
-            </div>
+            </button>
           ))}
         </div>
       ) : (
         <div>
           <button
             onClick={() => setSelectedPost(null)}
-            className="pixel-btn text-[8px] py-1 px-2 mb-2"
+            className="btn btn-primary btn-sm h-10 px-5 mb-2"
           >
             <PixelBackIcon className="w-3.5 h-3.5 mr-1" /> BACK
           </button>
           {isLoading && (
-            <div className="font-press text-[8px] pt-4 text-center">
+            <div className="text-xs pt-4 text-center">
               LOADING POST CONTENT...
             </div>
           )}
           {isError && (
-            <div className="text-red-500 text-sm">Failed to load post.</div>
+            <div className="text-error text-sm">Failed to load post.</div>
           )}
           {postContent && (
-            <div className="bg-[#050505] border border-cozy-border p-6 min-h-[300px] font-mono text-cozy-text relative">
-              <h3 className="font-bold border-b border-cozy-border pb-2 mb-2 text-md text-cozy-text uppercase">
+            <div className="card bg-surface-dark text-on-dark p-6 min-h-[300px]">
+              <h3 className="font-bold border-b border-hairline pb-2 mb-2 text-md uppercase">
                 {postContent.title}
               </h3>
-              <p className="text-[10px] text-cozy-muted mb-4 font-mono">
+              <p className="text-xs text-on-dark-soft mb-4">
                 DATE: {postContent.date} | AUTHOR: {postContent.author?.toUpperCase() || "PRXXIE"}
               </p>
               <div
-                className="markdown-body text-sm leading-relaxed"
+                className="text-sm leading-relaxed font-body"
                 dangerouslySetInnerHTML={{
                   __html: postContent.htmlContent,
                 }}

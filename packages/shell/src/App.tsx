@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
-import ConsoleFrame from "./components/ConsoleFrame";
-import { PixelBookIcon, PixelPawIcon } from "./components/Icons";
-import { useProgressService, ProgressServiceProvider } from "./hooks/useProgressService";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHashRouter } from "./hooks/useHashRouter";
+import ConsoleFrame from "./components/ConsoleFrame";
 import MatrixMenu from "./components/MatrixMenu";
 import StatsTelemetry from "./components/StatsTelemetry";
 import HomeDashboard from "./components/HomeDashboard";
 import MfeLoader from "./components/MfeLoader";
+import { useProgressService, ProgressServiceProvider } from "./hooks/useProgressService";
 import { supabase } from "./utils/supabase";
 import CloudSyncModal from "./components/CloudSyncModal";
 
@@ -142,21 +141,20 @@ function AppContent(): React.ReactElement {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="w-full flex justify-center min-h-screen">
+    <div className="w-full flex justify-center min-h-screen">
+      <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
         <ConsoleFrame
           onMobileHud={() => setIsMobileHudOpen(true)}
           onCloudClick={() => setIsCloudModalOpen(true)}
           cloudUser={cloudUser}
         >
-          <div className="grid grid-cols-1 md:grid-cols-20 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
             <div
               ref={windowRef}
-              className="col-span-1 md:col-span-13 retro-window"
+              className="lg:col-span-3 retro-window"
             >
               <div className="window-header">
                 <span className="flex items-center gap-1">
-                  <PixelBookIcon className="w-3.5 h-3.5" />
                   <span className="window-header-accent">
                     {currentTab.toUpperCase()}_VIEW
                   </span>
@@ -185,13 +183,12 @@ function AppContent(): React.ReactElement {
               </div>
             </div>
 
-            <div className="hidden md:flex md:col-span-7 flex-col gap-4">
+            <div className="hidden lg:flex lg:col-span-1 flex-col gap-4">
               <MatrixMenu currentTab={currentTab} navigate={navigate} />
 
               <div className="retro-window">
                 <div className="window-header">
                   <span className="flex items-center gap-1">
-                    <PixelPawIcon className="w-3.5 h-3.5" />
                     <span className="window-header-accent">PET_HUD</span>
                   </span>
                   <span className="text-cozy-accent font-bold cursor-pointer">
@@ -208,20 +205,21 @@ function AppContent(): React.ReactElement {
               <StatsTelemetry />
             </div>
           </div>
+
           {isMobileHudOpen && (
             <div
-              className="fixed inset-0 bg-black/75 z-45 md:hidden"
+              className="fixed inset-0 bg-black/75 z-45 lg:hidden"
               onClick={() => setIsMobileHudOpen(false)}
             />
           )}
           <div
-            className={`fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 md:hidden ${
+            className={`fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 lg:hidden ${
               isMobileHudOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
             <div className="flex justify-between items-center border-b border-dashed border-cozy-border pb-2">
               <span className="font-press text-[9px] text-cozy-text flex items-center gap-1">
-                <PixelPawIcon className="w-3.5 h-3.5" /> MOBILE_HUD
+                MOBILE_HUD
               </span>
               <button
                 onClick={() => setIsMobileHudOpen(false)}
@@ -256,14 +254,16 @@ function AppContent(): React.ReactElement {
           cloudUser={cloudUser}
         />
       </div>
-    </QueryClientProvider>
+    </div>
   );
 }
 
 export default function App(): React.ReactElement {
   return (
     <ProgressServiceProvider>
-      <AppContent />
+      <QueryClientProvider client={queryClient}>
+        <AppContent />
+      </QueryClientProvider>
     </ProgressServiceProvider>
   );
 }

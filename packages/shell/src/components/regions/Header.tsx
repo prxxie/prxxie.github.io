@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { NavLink } from "react-router";
 import { NAV_ITEMS } from "./navItems";
 import { playBeepSound, getAudioMuted, setAudioMuted } from "../../utils/audio";
+import Button from "../primitives/Button";
 
 interface HeaderProps {
   onMobileHud?: () => void;
@@ -20,12 +21,12 @@ export default function Header({ onMobileHud }: HeaderProps): React.ReactElement
 
   return (
     <header className="w-full border-b border-hairline bg-canvas">
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3">
+      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
         <NavLink to="/" end className="font-code text-xs font-bold uppercase tracking-wide text-ink no-underline">
           prxxie<span className="text-muted">.dev</span>
         </NavLink>
 
-        <nav aria-label="Sections" className="flex items-center gap-1">
+        <nav aria-label="Sections" className="flex flex-wrap items-center gap-1">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
@@ -33,7 +34,7 @@ export default function Header({ onMobileHud }: HeaderProps): React.ReactElement
               end={item.end}
               onClick={() => playBeepSound(440, 0.06)}
               className={({ isActive }) =>
-                `rounded-sm px-3 py-1 font-body text-[13px] no-underline ${
+                `whitespace-nowrap rounded-sm px-3 py-1 font-body text-[13px] no-underline ${
                   isActive ? "bg-primary text-canvas" : "text-muted hover:text-ink"
                 }`
               }
@@ -43,19 +44,18 @@ export default function Header({ onMobileHud }: HeaderProps): React.ReactElement
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={toggleAudio} className="btn text-[10px] px-2 py-1" aria-pressed={!muted}>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button onClick={toggleAudio} className="px-2 py-[2px] text-[12px]" aria-pressed={!muted}>
             Sound {muted ? "off" : "on"}
-          </button>
+          </Button>
           {onMobileHud && (
-            <button
-              type="button"
+            <Button
               onClick={onMobileHud}
-              className="btn text-[10px] px-2 py-1 lg:hidden"
+              className="px-2 py-[2px] text-[12px] lg:hidden"
               aria-label="Open the pet and progress panel"
             >
               Panel
-            </button>
+            </Button>
           )}
         </div>
       </div>

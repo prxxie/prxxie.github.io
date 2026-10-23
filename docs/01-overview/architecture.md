@@ -109,9 +109,10 @@ in-component.
 ```
 packages/
   shell/          host: main.tsx (mount), App.tsx (providers + browser router), routes.tsx (the route table),
-                  AppShell.tsx (chrome), screens/ (one component per route), components/, hooks/
-                  (useProgressService), store/ (petStore, uiStore), index.css (design tokens),
-                  types/remotes.d.ts (remote typings)
+                  AppShell.tsx (chrome), screens/ (one component per route), components/primitives/
+                  (Button, Card, StarRating, Tag, PetWidgetFrame), components/regions/ (Header, Footer,
+                  SkipLink, ErrorBoundary), hooks/ (useProgressService), store/ (petStore, uiStore),
+                  index.css (design tokens), fonts.ts (self-hosted families), types/remotes.d.ts
   about/          one exposed component plus its own Tailwind entry
   posts/          PostsApp plus utils/markdown.ts
   pets/           PetsApp, display-only, takes the progress context as a prop

@@ -2,7 +2,7 @@
 id: US-DS-003
 title: Rebuild the chrome and the shared primitives
 epic: EPIC-01-design-system
-status: ready
+status: done
 priority: P1
 size: L
 depends_on: [US-DS-001, US-DS-002]
@@ -66,3 +66,24 @@ Component tests for each primitive's states and accessible names; manual keyboar
 ## 9. Open questions
 
 None.
+
+## 9. Outcome
+
+Shipped on `feat/US-DS-003-chrome-primitives`. The primitives live in `packages/shell/src/components/primitives/` —
+`Button` (primary/secondary), `Card` (light/dark), `StarRating`, `Tag`, `PetWidgetFrame` — on top of the `.btn` and
+`.panel` recipes, and `Header` now renders its two switches with `Button`.
+
+- AC1: `:focus-visible` paints `2px solid var(--color-primary)` with `outline-offset: 2px`; `.panel` no longer hides its
+  overflow and `body` uses `overflow-x: clip` instead of `hidden`, so a ring inside a card or at the page edge is not cut.
+- AC2: the header row, the nav and the switch group all wrap, nav labels and button labels are `nowrap`, and the container
+  stops at `max-w-5xl` — no sideways scroll at 360px, no clipped control at 1920px.
+- AC3: already true from US-SITE-002 — `banner` landmark, skip link first in the tab order.
+- AC4: the recipe now has its pressed state (`.btn:active`, `.btn-primary:active`) and its disabled pair (`background:
+  --color-primary-disabled`, `cursor: not-allowed`) beside hover and focus.
+- AC5: the reduced-motion block removes `animation` and `transition` on `*, *::before, *::after` and drops the two
+  transform keyframes entirely.
+- AC6: `StarRating` renders the glyphs inside `aria-hidden` and publishes "2 of 3 stars" once, plus a visible `2/3`.
+
+`tests/chrome.test.ts` (5 tests) holds AC1, AC2, AC4 and AC5 to the stylesheet, and
+`components/primitives/primitives.test.tsx` (8 tests) covers the five components. The environment-dependent halves of AC2
+(360px and 1920px paint) are re-checked by the Playwright gate in US-FND-006 and by US-LAUNCH-004.

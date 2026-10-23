@@ -75,11 +75,11 @@ host renders its `Fallback` naming that remote as offline.
 |---------|---------|----------------------|
 | Unit and component tests | `pnpm test` → `vitest run` | 37 files, 301 tests, all passing |
 | Lint | `pnpm lint` → `eslint .` | green: 0 errors, 0 warnings |
-| Type check | `pnpm typecheck` → `tsc --noEmit` | fails: one error, `packages/pets/src/PetsApp.tsx(91,20): error TS2769` |
+| Type check | `pnpm typecheck` → `tsc --noEmit` | green: 0 errors |
 | Single test file | `pnpm exec vitest run packages/shared/src/pet/evolution.test.ts` | passes |
 
-The type-check gate is the baseline the rework has to turn green: the site's claim is that its engineering is
-checkable (NFR-18), so a red gate is a product defect, not a chore. The remotes are aliased to
+All three gates are green on `main`: the site's claim is that its engineering is checkable (NFR-18), so a red gate
+is a product defect, not a chore. The remotes are aliased to
 `packages/shell/src/components/MockMfe.tsx` under test (`vitest.config.ts:12-35`), which is why the whole suite runs
 without a browser or a running federation host.
 

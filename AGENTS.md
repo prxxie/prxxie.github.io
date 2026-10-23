@@ -22,7 +22,7 @@
 | Run | `pnpm dev` | verified: host on `:3000` plus a watch build per remote, `:3001`–`:3006` |
 | Test | `pnpm test` → `vitest run` | 37 files, 301 tests, green |
 | Lint | `pnpm run lint` → `eslint .` | green: 0 errors, 0 warnings |
-| Type check | `pnpm run typecheck` → `tsc --noEmit` | red: 1 error, `packages/pets/src/PetsApp.tsx(91,20)` |
+| Type check | `pnpm run typecheck` → `tsc --noEmit` | green: 0 errors |
 | Build | `pnpm run build:static` | verified: assembles `dist/` from all six remotes plus the host |
 
 **Layout**

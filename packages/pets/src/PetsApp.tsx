@@ -88,7 +88,7 @@ export default function PetsApp({
 
   useEffect(() => {
     return () => {
-      clearTimeout(resetTimerRef.current);
+      if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
     };
   }, []);
 

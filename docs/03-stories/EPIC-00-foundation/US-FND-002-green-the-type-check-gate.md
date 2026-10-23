@@ -2,7 +2,7 @@
 id: US-FND-002
 title: Green the type-check gate
 epic: EPIC-00-foundation
-status: ready
+status: done
 priority: P0
 size: M
 depends_on: [US-FND-001]
@@ -47,6 +47,9 @@ The timer type is `ReturnType<typeof setTimeout> | null`; no DOM/Node `Timeout` 
 
 - A real fix beats a suppression: if a type is wrong, correct the shape in `packages/shared/src/progress/types.ts`.
 - Keep `strict`, `noUnusedLocals` and `noUnusedParameters` on.
+
+**Shipped.** Only the `clearTimeout` overload survived US-FND-001; it now narrows the ref before clearing, and
+`tests/type-gate.test.ts` fails the suite if a `@ts-*` suppression or an `any` cast ever reappears in `packages/*/src`.
 
 ## 6. Implementation notes
 

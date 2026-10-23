@@ -169,7 +169,7 @@ function PetSprite({
       style: { width: size, height: size, ...wiggleStyle },
       children: [
         renderStageSprite(),
-        isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { className: "animate-pulse", style: { fill: "var(--color-cozy-border)", opacity: 0.8 }, children: [
+        isSleeping && /* @__PURE__ */ jsxRuntimeExports.jsxs("g", { className: "animate-pulse", style: { fill: "var(--color-hairline)", opacity: 0.8 }, children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: "11", y: "4", style: { fontSize: "4px", fontFamily: "monospace" }, children: "Z" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("text", { x: "13", y: "2", style: { fontSize: "3px", fontFamily: "monospace" }, children: "z" })
         ] })
@@ -243,7 +243,7 @@ function PetsApp({
   }, []);
   useEffect(() => {
     return () => {
-      clearTimeout(resetTimerRef.current);
+      if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
     };
   }, []);
   const canFeed = isHungry && foodAvailable > 0 && !(progressState?.isSleeping ?? false) && !isFeeding;

@@ -4,6 +4,77 @@ import { c as commonjsGlobal, g as getDefaultExportFromCjs } from './index-BxRxK
 
 const PixelBackIcon = ({ className = "w-3 h-3 inline-block" }) => /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className, viewBox: "0 0 8 8", fill: "currentColor", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M4 1L1 4l3 3V5h3V3H4V1z" }) });
 
+const __vite_glob_0_0 = "---\ntitle: \"Hello, Retro World!\"\ndate: \"2026-05-28\"\nsummary: \"The first post: why this site is a cozy handheld instead of a portfolio grid.\"\n---\n\n# Hello, Retro World!\n\nWelcome to my personal home page!\n\nThis website is styled as a cozy retro handheld virtual pet device, utilizing a modern **React microfrontend architecture** powered by **Vite Module Federation** and styled with **Tailwind CSS v4**.\n\nEach part of this page runs as a decoupled module:\n- The **Shell** is the desktop framework.\n- The **About** directory details my experience.\n- The **Posts** app compiles this writing directly from static Markdown source files.\n- The **Pets** app hosts my pixelated digital pet companion.\n\nStay tuned for more updates!\n";
+
+const __vite_glob_0_1 = "---\ntitle: \"Markdown Verification\"\ndate: \"2026-05-29\"\nsummary: \"A fixture for the markdown renderer: headings, quotes, code and lists.\"\n---\n\n# Heading 1\nWelcome to the markdown verification post!\n\n## Blockquotes\n> This is a blockquote containing some *italicized* text.\n> It should have a nice left border indicator.\n\n## Lists & Tasks\n- [ ] Task 1: Refactor MFE\n- [x] Task 2: Fix MFE loading issue\n- Standard list item 1\n- Standard list item 2\n\n## Tables\n| Key | Value | Description |\n|---|---|---|\n| theme | notebook | Cozy cream book layout |\n| code | prism | Token syntax highlighting |\n\n## Code Blocks\n```javascript\nconst pet = \"tamagotchi\";\nconsole.log(`Hello, ${pet}!`);\n```\n";
+
+const REQUIRED_FIELDS = ["title", "date", "summary"];
+const OPTIONAL_FIELDS = ["teaserGame", "teaserLevel"];
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+function isKnownField(key) {
+  return REQUIRED_FIELDS.includes(key) || OPTIONAL_FIELDS.includes(key);
+}
+function parseFrontmatter(source, file) {
+  if (!source.startsWith("---")) {
+    throw new Error(`[posts] ${file}: missing frontmatter block`);
+  }
+  const end = source.indexOf("\n---", 3);
+  if (end === -1) {
+    throw new Error(`[posts] ${file}: frontmatter block is not closed`);
+  }
+  const rawBlock = source.slice(3, end);
+  const body = source.slice(end + 4).replace(/^[\r\n]+/, "");
+  const fields = {};
+  for (const line of rawBlock.split(/\r?\n/)) {
+    if (line.trim() === "") continue;
+    const separator = line.indexOf(":");
+    if (separator === -1) {
+      throw new Error(`[posts] ${file}: frontmatter line is not a key/value pair: ${line.trim()}`);
+    }
+    const key = line.slice(0, separator).trim();
+    const value = line.slice(separator + 1).trim().replace(/^["']/, "").replace(/["']$/, "");
+    if (!isKnownField(key)) {
+      throw new Error(`[posts] ${file}: unknown frontmatter field "${key}"`);
+    }
+    fields[key] = value;
+  }
+  return { fields, body };
+}
+function parsePost(source, file) {
+  const { fields, body } = parseFrontmatter(source, file);
+  for (const field of REQUIRED_FIELDS) {
+    if (fields[field] === void 0 || fields[field] === "") {
+      throw new Error(`[posts] ${file}: missing required frontmatter field "${field}"`);
+    }
+  }
+  const date = fields.date;
+  if (!DATE_PATTERN.test(date)) {
+    throw new Error(`[posts] ${file}: field "date" must be YYYY-MM-DD, got "${date}"`);
+  }
+  const slug = file.replace(/^.*\//, "").replace(/\.md$/, "");
+  return {
+    slug,
+    title: fields.title,
+    date,
+    summary: fields.summary,
+    teaserGame: fields.teaserGame,
+    teaserLevel: fields.teaserLevel,
+    body
+  };
+}
+function sortPosts(posts) {
+  return [...posts].sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
+}
+const postSources = /* #__PURE__ */ Object.assign({"./posts/hello-retro-world.md": __vite_glob_0_0,"./posts/markdown-verification.md": __vite_glob_0_1
+
+
+
+});
+function loadPosts() {
+  const posts = Object.entries(postSources).map(([path, source]) => parsePost(source, path));
+  return sortPosts(posts);
+}
+
 /**
  * marked v12.0.2 - a markdown parser
  * Copyright (c) 2011-2024, Christopher Jeffrey. (MIT Licensed)
@@ -4891,99 +4962,76 @@ marked.use({
     }
   }
 });
-function parsePost(mdText) {
-  const regex = /^---\r?\n([\s\S]+?)\r?\n---\r?\n([\s\S]*)$/;
-  const match = regex.exec(mdText);
-  if (!match) {
-    const defaultPost = {
-      title: "Untitled Post",
-      date: "",
-      author: "",
-      content: mdText
-    };
-    return defaultPost;
-  }
-  const frontmatter = match[1];
-  const content = match[2];
-  const metadata = {};
-  frontmatter.split("\n").forEach((line) => {
-    const parts = line.split(":");
-    if (parts.length >= 2) {
-      const key = parts[0].trim();
-      const value = parts.slice(1).join(":").replace(/"/g, "").trim();
-      metadata[key] = value;
-    }
-  });
-  return {
-    title: metadata.title || "Untitled Post",
-    date: metadata.date || "",
-    author: metadata.author || "",
-    ...metadata,
-    content
-  };
-}
 async function renderMarkdown(markdownStr) {
   return await marked.parse(markdownStr);
 }
-
-const {useState} = await importShared('react');
-const {useQuery} = await importShared('@tanstack/react-query');
-function PostsApp() {
-  const [selectedPost, setSelectedPost] = useState(null);
-  const postsList = [
-    { id: "first-post", title: "Hello, Retro World!", date: "2026-05-28" },
-    {
-      id: "markdown-test",
-      title: "Markdown Verification",
-      date: "2026-05-29"
+function slugifyHeading(text) {
+  return text.toLowerCase().replace(/<[^>]+>/g, "").replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
+}
+const pageMarked = new Marked({ gfm: true, breaks: true });
+pageMarked.use({
+  renderer: {
+    heading(text, level) {
+      const demoted = Math.min(level + 1, 6);
+      const id = slugifyHeading(text);
+      return `<h${demoted} id="${id}">${text}</h${demoted}>
+`;
     }
-  ];
-  const {
-    data: postContent,
-    isLoading,
-    isError
-  } = useQuery({
-    queryKey: ["post", selectedPost],
-    queryFn: async () => {
-      if (!selectedPost) return null;
-      const res = await fetch(`./posts/${selectedPost}.md`);
-      if (!res.ok) throw new Error("Post not found");
-      const text = await res.text();
-      const parsed = parsePost(text);
-      const htmlContent = await renderMarkdown(parsed.content);
-      return { ...parsed, htmlContent };
-    },
-    enabled: !!selectedPost
-  });
+  }
+});
+
+const {useEffect,useState} = await importShared('react');
+const posts = loadPosts();
+function PostsApp() {
+  const [selectedSlug, setSelectedSlug] = useState(null);
+  const [html, setHtml] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const selected = posts.find((post) => post.slug === selectedSlug) ?? null;
+  useEffect(() => {
+    setHtml(null);
+    setFailed(false);
+    if (!selected) return;
+    let cancelled = false;
+    renderMarkdown(selected.body).then((rendered) => {
+      if (!cancelled) setHtml(rendered);
+    }).catch(() => {
+      if (!cancelled) setFailed(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [selected]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col h-full gap-4 overflow-y-auto", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-muted", children: [
       "guest@prxxie:~$ ",
       /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-ink", children: "ls -l blog/posts/" })
     ] }),
-    selectedPost === null ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-2 pt-2", children: postsList.map((post) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      "button",
-      {
-        onClick: () => setSelectedPost(post.id),
-        className: "text-left text-sm py-1 flex justify-between items-center text-ink hover:text-primary",
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-            "> ",
-            post.title.toUpperCase().replace(/[\s,]+/g, "_").replace(/[!]+/g, ""),
-            ".MD"
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-muted ml-4", children: [
-            "[",
-            post.date,
-            "]"
-          ] })
-        ]
-      },
-      post.id
-    )) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    selected === null ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2 pt-2", children: [
+      posts.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted", children: "No posts yet." }),
+      posts.map((post) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "button",
+        {
+          onClick: () => setSelectedSlug(post.slug),
+          className: "text-left text-sm py-1 flex flex-col gap-1 text-ink hover:text-primary",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "flex justify-between items-center w-full", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: post.title }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-muted ml-4", children: [
+                "[",
+                post.date,
+                "]"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-muted font-body", children: post.summary })
+          ]
+        },
+        post.slug
+      ))
+    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         "button",
         {
-          onClick: () => setSelectedPost(null),
+          onClick: () => setSelectedSlug(null),
           className: "btn btn-primary btn-sm h-10 px-5 mb-2",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(PixelBackIcon, { className: "w-3.5 h-3.5 mr-1" }),
@@ -4991,25 +5039,15 @@ function PostsApp() {
           ]
         }
       ),
-      isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs pt-4 text-center", children: "LOADING POST CONTENT..." }),
-      isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-error text-sm", children: "Failed to load post." }),
-      postContent && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "card bg-surface-dark text-on-dark p-6 min-h-[300px]", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold border-b border-hairline pb-2 mb-2 text-md uppercase", children: postContent.title }),
+      html === null && !failed && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs pt-4 text-center", children: "LOADING POST CONTENT..." }),
+      failed && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-error text-sm", children: "Failed to load post." }),
+      html !== null && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "card bg-surface-dark text-on-dark p-6 min-h-[300px]", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-bold border-b border-hairline pb-2 mb-2 text-md uppercase", children: selected.title }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-on-dark-soft mb-4", children: [
           "DATE: ",
-          postContent.date,
-          " | AUTHOR: ",
-          postContent.author?.toUpperCase() || "PRXXIE"
+          selected.date
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "div",
-          {
-            className: "text-sm leading-relaxed font-body",
-            dangerouslySetInnerHTML: {
-              __html: postContent.htmlContent
-            }
-          }
-        )
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm leading-relaxed font-body", dangerouslySetInnerHTML: { __html: html } })
       ] })
     ] })
   ] });

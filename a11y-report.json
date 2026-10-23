@@ -1,0 +1,165 @@
+{
+  "checkedRoutes": 9,
+  "routes": [
+    {
+      "path": "/",
+      "file": "index.html",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "path": "/games",
+      "file": "games/index.html",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "path": "/games/shikaku",
+      "file": "games/shikaku/index.html",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "path": "/games/sokoban",
+      "file": "games/sokoban/index.html",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "path": "/games/slitherlink",
+      "file": "games/slitherlink/index.html",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "path": "/devlog",
+      "file": "devlog/index.html",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "path": "/devlog/hello-retro-world",
+      "file": "devlog/hello-retro-world/index.html",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "path": "/devlog/markdown-verification",
+      "file": "devlog/markdown-verification/index.html",
+      "serious": 0,
+      "violations": []
+    },
+    {
+      "path": "/404",
+      "file": "404.html",
+      "serious": 0,
+      "violations": []
+    }
+  ],
+  "contrast": [
+    {
+      "pair": "color-ink on color-canvas",
+      "ratio": 17.5,
+      "minimum": 4.5,
+      "note": "body copy on the page"
+    },
+    {
+      "pair": "color-ink on color-surface-card",
+      "ratio": 15.26,
+      "minimum": 4.5,
+      "note": "a headline on a card"
+    },
+    {
+      "pair": "color-body on color-canvas",
+      "ratio": 10.34,
+      "minimum": 4.5,
+      "note": "secondary copy on the page"
+    },
+    {
+      "pair": "color-body on color-surface-card",
+      "ratio": 9.02,
+      "minimum": 4.5,
+      "note": "secondary copy on a card"
+    },
+    {
+      "pair": "color-muted on color-canvas",
+      "ratio": 5.29,
+      "minimum": 4.5,
+      "note": "small labels on the page"
+    },
+    {
+      "pair": "color-muted on color-surface-card",
+      "ratio": 4.61,
+      "minimum": 4.5,
+      "note": "small labels on a card"
+    },
+    {
+      "pair": "color-ink on color-primary",
+      "ratio": 5.63,
+      "minimum": 4.5,
+      "note": "ink on a coral fill"
+    },
+    {
+      "pair": "color-on-dark on color-surface-dark",
+      "ratio": 17,
+      "minimum": 4.5,
+      "note": "text on the inverted surface"
+    },
+    {
+      "pair": "color-on-dark-soft on color-surface-dark",
+      "ratio": 6.62,
+      "minimum": 4.5,
+      "note": "secondary text on the inverted surface"
+    },
+    {
+      "pair": "color-on-dark-soft on color-surface-dark-elevated",
+      "ratio": 5.79,
+      "minimum": 4.5,
+      "note": "secondary text on a raised inverted surface"
+    },
+    {
+      "pair": "color-primary on color-surface-dark",
+      "ratio": 5.47,
+      "minimum": 4.5,
+      "note": "the coral link on the inverted surface"
+    },
+    {
+      "pair": "color-primary-active on color-canvas",
+      "ratio": 5.28,
+      "minimum": 4.5,
+      "note": "a link on the page"
+    },
+    {
+      "pair": "color-primary-active on color-surface-card",
+      "ratio": 4.61,
+      "minimum": 4.5,
+      "note": "a link on a card"
+    },
+    {
+      "pair": "color-accent-teal on color-surface-dark",
+      "ratio": 7.57,
+      "minimum": 4.5,
+      "note": "the teal label on the inverted surface"
+    },
+    {
+      "pair": "color-accent-teal on color-surface-dark-elevated",
+      "ratio": 6.62,
+      "minimum": 4.5,
+      "note": "the teal label on a raised inverted surface"
+    },
+    {
+      "pair": "color-error on color-canvas",
+      "ratio": 6.29,
+      "minimum": 4.5,
+      "note": "an error message on the page"
+    },
+    {
+      "pair": "color-success on color-canvas",
+      "ratio": 5.42,
+      "minimum": 4.5,
+      "note": "a success message on the page"
+    }
+  ],
+  "contrastFindings": [],
+  "passed": true
+}

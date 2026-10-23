@@ -2,8 +2,8 @@ const currentImports = {};
       const exportSet = new Set(['Module', '__esModule', 'default', '_export_sfc']);
       let moduleMap = {
 "./PostsApp":()=>{
-      dynamicLoadingCss(["style-DnyV0q7z.css"], false, './PostsApp');
-      return __federation_import('/mfe/posts/assets/__federation_expose_PostsApp-CGpgv5K8.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
+      dynamicLoadingCss(["style-B5rnGtRB.css"], false, './PostsApp');
+      return __federation_import('/mfe/posts/assets/__federation_expose_PostsApp-BW87DNau.js').then(module =>Object.keys(module).every(item => exportSet.has(item)) ? () => module.default : () => module)},};
       const seen = {};
       const dynamicLoadingCss = (cssFilePaths, dontAppendStylesToHead, exposeItemName) => {
         const metaUrl = import.meta.url;

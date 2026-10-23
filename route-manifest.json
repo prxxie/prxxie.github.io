@@ -1,0 +1,81 @@
+[
+  {
+    "path": "/",
+    "title": "prxxie.dev — small, finished things",
+    "file": "index.html",
+    "files": [
+      "index.html"
+    ]
+  },
+  {
+    "path": "/games",
+    "title": "Games — prxxie.dev",
+    "file": "games/index.html",
+    "files": [
+      "games.html",
+      "games/index.html"
+    ]
+  },
+  {
+    "path": "/games/shikaku",
+    "title": "Shikaku — prxxie.dev",
+    "file": "games/shikaku/index.html",
+    "files": [
+      "games/shikaku.html",
+      "games/shikaku/index.html"
+    ]
+  },
+  {
+    "path": "/games/sokoban",
+    "title": "Sokoban — prxxie.dev",
+    "file": "games/sokoban/index.html",
+    "files": [
+      "games/sokoban.html",
+      "games/sokoban/index.html"
+    ]
+  },
+  {
+    "path": "/games/slitherlink",
+    "title": "Slitherlink — prxxie.dev",
+    "file": "games/slitherlink/index.html",
+    "files": [
+      "games/slitherlink.html",
+      "games/slitherlink/index.html"
+    ]
+  },
+  {
+    "path": "/devlog",
+    "title": "Devlog — prxxie.dev",
+    "file": "devlog/index.html",
+    "files": [
+      "devlog.html",
+      "devlog/index.html"
+    ]
+  },
+  {
+    "path": "/devlog/hello-retro-world",
+    "title": "Hello, Retro World! — Devlog — prxxie.dev",
+    "file": "devlog/hello-retro-world/index.html",
+    "files": [
+      "devlog/hello-retro-world.html",
+      "devlog/hello-retro-world/index.html"
+    ]
+  },
+  {
+    "path": "/devlog/markdown-verification",
+    "title": "Markdown Verification — Devlog — prxxie.dev",
+    "file": "devlog/markdown-verification/index.html",
+    "files": [
+      "devlog/markdown-verification.html",
+      "devlog/markdown-verification/index.html"
+    ]
+  },
+  {
+    "path": "/404",
+    "title": "Page not found — prxxie.dev",
+    "file": "404.html",
+    "files": [
+      "404.html"
+    ]
+  }
+]

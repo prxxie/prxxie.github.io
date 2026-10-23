@@ -89,7 +89,8 @@ packages/
   - `src/store/petStore.ts` — pet state (injected into `pets` MFE as props)
   - `src/store/uiStore.ts` — UI state
   - `src/hooks/useProgressService.ts` — wraps ProgressService, exposes `hungryLevel`
-  - `src/index.css` — all CSS custom tokens, CRT/scanline animations
+  - `src/index.css` — the single design system (ADR-0001): `@theme` tokens, component recipes, prose rules
+  - `src/fonts.ts` — the three self-hosted Fontsource families (weights + `LICENSE-NOTES.md`)
 - **MFE remotes served at**: `/mfe/<name>/assets/remoteEntry.js`
 - **Dev**: sirv middleware mounts each MFE's `dist/` at `/mfe/<name>`
 

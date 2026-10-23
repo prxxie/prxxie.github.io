@@ -20,7 +20,7 @@ Generated from story frontmatter — run `python3 .agents/scripts/verify-docs.py
 | Id | Title | Priority | Size | Status | Depends on |
 |---|---|---|---|---|---|
 | [US-DS-001](US-DS-001-collapse-the-two-token-sets-into-one.md) | Collapse the two token sets into one | P0 | L | done | US-FND-001 |
-| [US-DS-002](US-DS-002-load-free-licensed-typefaces.md) | Load free-licensed typefaces | P1 | M | ready | US-DS-001 |
+| [US-DS-002](US-DS-002-load-free-licensed-typefaces.md) | Load free-licensed typefaces | P1 | M | done | US-DS-001 |
 | [US-DS-003](US-DS-003-rebuild-the-chrome-and-the-shared-primitives.md) | Rebuild the chrome and the shared primitives | P1 | L | ready | US-DS-001, US-DS-002 |
 <!-- /adf:epic-stories -->
 

@@ -2,7 +2,7 @@
 id: US-FND-003
 title: Green the lint gate
 epic: EPIC-00-foundation
-status: ready
+status: done
 priority: P0
 size: M
 depends_on: [US-FND-001]
@@ -47,6 +47,10 @@ No new lint rule is added in this story; the existing configuration is honoured 
 
 - Prefer deleting dead code over silencing a rule.
 - `packages/*/src/engine/**` must stay linted — it is the code with the most logic per line.
+
+**Shipped.** US-FND-001 had already removed the cause of the 102 warnings; what remained was making the gate mean
+something: `--max-warnings=0` fails on a warning, the three repo-wide rule disables carry a written reason, and
+`tests/lint-gate.test.ts` fails if a rule is switched off without one or the engines stop being linted.
 
 ## 6. Implementation notes
 

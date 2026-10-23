@@ -6,7 +6,7 @@
     "build": "pnpm -r run build",
     "build:static": "bash scripts/build-static.sh",
     "test": "vitest run",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },

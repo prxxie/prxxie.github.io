@@ -27,12 +27,15 @@ export default tseslint.config(
     rules: {
       ...reactPlugin.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
+      // React 17+ JSX transform: React does not need to be in scope.
       "react/react-in-jsx-scope": "off",
+      // Props are typed by TypeScript; PropTypes would duplicate every contract.
       "react/prop-types": "off",
       "@typescript-eslint/no-explicit-any": "error",
       "@typescript-eslint/no-unsafe-assignment": "warn",
       "@typescript-eslint/no-unsafe-member-access": "warn",
       "@typescript-eslint/no-unsafe-call": "warn",
+      // Test doubles pass unbound matchers (e.g. expect(...).toBe) around by design.
       "@typescript-eslint/unbound-method": "off",
       "@typescript-eslint/no-floating-promises": [
         "error",

@@ -25,7 +25,7 @@ describe("MatrixMenu", () => {
   it("highlights the currently active tab", () => {
     render(<MatrixMenu currentTab="about" navigate={vi.fn()} />);
     const aboutBtn = screen.getByRole("button", { name: /\[AB\]\s+about/i });
-    expect(aboutBtn.className).toMatch(/bg-cozy-accent/);
+    expect(aboutBtn.className).toMatch(/bg-primary/);
   });
 
   it("triggers navigation when a button is clicked", () => {

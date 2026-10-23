@@ -6,12 +6,15 @@ source.
 
 ## Current state, in one paragraph
 
-`packages/shell/src/index.css` holds **two token sets at once**. The `:root` block (lines 5–33) carries the cream and
-coral palette with one radius scale and three type families; the `@theme` block (lines 35–45) carries the amber
-terminal palette (`--color-cozy-text: #FFB000` on `--color-cozy-bg: #000000`) plus the `--font-pixel`/`--font-press`
-aliases that the retro chrome and 36 component call sites still use, and `body` is still painted with the amber
-palette. The rework deletes the amber block, repaints the body from the cream tokens, and moves the 81 `text-cozy-*`
-usages onto the surviving tokens. Until that lands, the shipped site is amber.
+`packages/shell/src/index.css` declares the system exactly once, in a `@theme` block that carries the eighteen colour
+tokens, the six radius tokens and the three families below; Tailwind reads that block, so `bg-canvas`, `text-ink`,
+`border-hairline`, `rounded-lg` and `font-display` exist as utilities and hand-written rules use `var(--token)`. The
+stylesheet also holds the component recipes (`.panel`, `.panel-dark`, `.panel-header`, `.panel-body`, `.btn`,
+`.btn-primary`), the prose rules for rendered markdown, and the three motion keyframes that survive (`blink`,
+`slideIn`, `fade-in`). The amber terminal palette, the `--color-cozy-*` tokens, the `--font-pixel`/`--font-press`
+aliases, the pixel classes and the daisyUI import are gone, and `body` is painted with `--color-canvas` on
+`--color-body`. `tests/design-tokens.test.ts` is the enforcement: it fails if a legacy class or amber value returns, and
+it fails if a declared token is never used.
 
 ## Colour
 
@@ -84,6 +87,7 @@ recipes above, and the accessibility rules of ADR-0008 apply identically inside 
 
 ## Enforcement
 
-`docs/01-overview/conventions.md` fixes the naming rules (`--color-<role>` etc., no raw hex in components). The
-restyle's measure of done is the call-site count: zero `text-cozy-*`, zero `font-press` and zero `retro-window` outside
-`index.css`. `DESIGN.md` remains the raw spec until the restyle finishes, at which point it is deleted (OQ-09).
+`docs/01-overview/conventions.md` fixes the naming rules (`--color-<role>` etc., no raw hex in components). The effect of
+the collapse is asserted, not counted by hand: `tests/design-tokens.test.ts` fails on any `text-cozy-*`, `font-press`,
+`retro-window` or `pixel-` reference outside `index.css`, on any amber hex, and on any declared token that no file
+consumes. `DESIGN.md` remains the raw spec until the restyle finishes, at which point it is deleted (OQ-09).

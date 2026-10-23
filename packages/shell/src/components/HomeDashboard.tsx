@@ -132,13 +132,13 @@ export default function HomeDashboard(): React.ReactElement {
   return (
     <div className="flex flex-col gap-3 h-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
-        <div className="border border-cozy-border p-2 flex gap-3 items-center bg-black relative">
-          <div className="flex flex-col justify-between h-full font-mono text-[9px]">
+        <div className="border border-hairline p-2 flex gap-3 items-center bg-surface-dark relative">
+          <div className="flex flex-col justify-between h-full font-code text-[9px]">
             <div>
-              <div className="text-[7px] text-cozy-muted uppercase">
+              <div className="text-[7px] text-on-dark-soft uppercase">
                 Planet Designation
               </div>
-              <div className="text-cozy-text font-bold font-press text-[9px] mb-1">
+              <div className="text-on-dark font-bold font-code text-[9px] mb-1">
                 BYRIA-RR9
               </div>
             </div>
@@ -158,40 +158,40 @@ export default function HomeDashboard(): React.ReactElement {
           </div>
         </div>
 
-        <div className="border border-cozy-border p-2 bg-black flex flex-col">
-          <div className="text-[9px] font-press text-cozy-accent border-b border-cozy-border pb-1 mb-1.5 flex justify-between">
+        <div className="panel panel-dark p-2 flex flex-col">
+          <div className="text-[9px] font-code text-accent-teal border-b border-hairline pb-1 mb-1.5 flex justify-between">
             <span>SYSTEM_BOOT_LOGS</span>
-            <span className="text-cozy-text text-[8px] animate-pulse">● ONLINE</span>
+            <span className="text-success text-[8px] animate-pulse">● ONLINE</span>
           </div>
-          <div className="font-mono text-[9px] text-cozy-text leading-tight overflow-hidden whitespace-pre">
+          <div className="font-code text-[9px] text-on-dark leading-tight overflow-hidden whitespace-pre">
             {logs.join("\n")}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="border border-cozy-border p-2 bg-black flex flex-col h-[100px]">
-          <div className="text-[8px] font-mono text-cozy-accent border-b border-cozy-border pb-1 mb-1 flex justify-between">
+        <div className="panel panel-dark p-2 flex flex-col h-[100px]">
+          <div className="text-[8px] font-code text-accent-teal border-b border-hairline pb-1 mb-1 flex justify-between">
             <span>Transmissions Scanning</span>
-            <span className="text-cozy-text font-bold">1285 kHz</span>
+            <span className="text-on-dark font-bold">1285 kHz</span>
           </div>
           <div className="flex-1 min-h-0 relative">
-            <canvas ref={waterfallRef} className="w-full h-full block bg-black/40" />
+            <canvas ref={waterfallRef} className="w-full h-full block bg-surface-dark-elevated" />
           </div>
         </div>
 
-        <div className="border border-cozy-border p-2 bg-black flex flex-col h-[100px]">
-          <div className="text-[8px] font-mono text-cozy-accent border-b border-cozy-border pb-1 mb-1 flex justify-between">
+        <div className="panel panel-dark p-2 flex flex-col h-[100px]">
+          <div className="text-[8px] font-code text-accent-teal border-b border-hairline pb-1 mb-1 flex justify-between">
             <span>Incoming Signal Wave</span>
-            <span className="text-cozy-text font-bold">Channel: 98</span>
+            <span className="text-on-dark font-bold">Channel: 98</span>
           </div>
           <div className="flex-1 min-h-0 relative">
-            <canvas ref={oscilloscopeRef} className="w-full h-full block bg-black/40" />
+            <canvas ref={oscilloscopeRef} className="w-full h-full block bg-surface-dark-elevated" />
           </div>
         </div>
 
-        <div className="border border-cozy-border p-2 bg-black flex flex-col justify-between h-[100px] font-mono text-[9px]">
-          <div className="text-[8px] font-press text-cozy-accent border-b border-cozy-border pb-1 mb-1">
+        <div className="panel panel-dark p-2 flex flex-col justify-between h-[100px] font-code text-[9px]">
+          <div className="text-[8px] font-code text-accent-teal border-b border-hairline pb-1 mb-1">
             BROADCAST_TOWERS
           </div>
           <div className="flex flex-col gap-1 text-[8px]">
@@ -202,7 +202,7 @@ export default function HomeDashboard(): React.ReactElement {
               className="hover:underline flex justify-between"
             >
               <span>BRT-743-T (GITHUB)</span>
-              <span className="text-cozy-text">ONLINE</span>
+              <span className="text-success">ONLINE</span>
             </a>
             <a
               href="https://twitter.com"
@@ -211,9 +211,9 @@ export default function HomeDashboard(): React.ReactElement {
               className="hover:underline flex justify-between"
             >
               <span>AEW-DYM-Y (TWITTER)</span>
-              <span className="text-cozy-text">STABLE</span>
+              <span className="text-success">STABLE</span>
             </a>
-            <div className="flex justify-between text-cozy-muted">
+            <div className="flex justify-between text-on-dark-soft">
               <span>RT-GPT-05 (LOCAL)</span>
               <span>RSSI: -83dBm</span>
             </div>

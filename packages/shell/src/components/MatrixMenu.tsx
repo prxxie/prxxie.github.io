@@ -26,8 +26,8 @@ export default function MatrixMenu({
   };
 
   return (
-    <div className="border border-cozy-border p-2 bg-black">
-      <div className="text-[10px] font-press text-cozy-accent mb-2 text-center bg-cozy-muted/20 py-1">
+    <div className="panel panel-dark p-2">
+      <div className="text-[10px] font-code text-accent-teal mb-2 text-center bg-surface-dark-elevated py-1">
         COMMAND_MATRIX
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -35,10 +35,10 @@ export default function MatrixMenu({
           <button
             key={item.tab}
             onClick={() => handleButtonClick(item.tab)}
-            className={`pixel-btn text-[9px] py-2 px-1 text-center font-press capitalize ${
+            className={`btn text-[9px] py-2 px-1 text-center font-code capitalize ${
               currentTab === item.tab
-                ? "bg-cozy-accent text-black border-cozy-border"
-                : "bg-transparent text-cozy-text hover:bg-cozy-muted/20"
+                ? "bg-primary text-canvas border-hairline"
+                : "bg-transparent text-on-dark hover:bg-surface-dark-elevated"
             }`}
           >
             [{item.key}] {item.tab}

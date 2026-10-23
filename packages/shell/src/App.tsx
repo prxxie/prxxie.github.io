@@ -55,7 +55,7 @@ const SlitherlinkApp = lazy(
 function Fallback({ name }: { name: string }): React.ReactElement {
   return (
     <div className="flex flex-col items-center justify-center h-full gap-2 p-4">
-      <p className="font-press text-[10px] text-red-600">⚠ MFE LOAD ERROR</p>
+      <p className="font-code text-[10px] text-red-600">⚠ MFE LOAD ERROR</p>
       <p className="text-sm text-center">Remote `{name}` is offline.</p>
     </div>
   );
@@ -116,28 +116,28 @@ function AppContent(): React.ReactElement {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
             <div
               ref={windowRef}
-              className="lg:col-span-3 retro-window"
+              className="lg:col-span-3 panel rounded-xl"
             >
-              <div className="window-header">
+              <div className="panel-header">
                 <span className="flex items-center gap-1">
-                  <span className="window-header-accent">
+                  <span className="panel-header-accent">
                     {currentTab.toUpperCase()}_VIEW
                   </span>
                 </span>
                 <div className="flex gap-2 items-center">
                   <button
                     onClick={toggleFullscreen}
-                    className="text-cozy-accent font-bold cursor-pointer hover:underline bg-transparent border-none p-0 font-press text-[9px]"
+                    className="text-muted font-medium cursor-pointer hover:text-ink bg-transparent border-none p-0 font-body text-[12px]"
                     aria-label="Toggle Fullscreen"
                   >
                     {isFullscreen ? "[🗗]" : "[⛶]"}
                   </button>
-                  <span className="text-cozy-accent font-bold cursor-pointer">
+                  <span className="text-muted font-medium cursor-pointer">
                     [X]
                   </span>
                 </div>
               </div>
-              <div className="window-body min-h-[350px]">
+              <div className="panel-body min-h-[350px]">
                 <Suspense
                   fallback={
                     <MfeLoader petStage={progressService.state.pet.stage} />
@@ -151,16 +151,16 @@ function AppContent(): React.ReactElement {
             <div className="hidden lg:flex lg:col-span-1 flex-col gap-4">
               <MatrixMenu currentTab={currentTab} navigate={navigate} />
 
-              <div className="retro-window">
-                <div className="window-header">
+              <div className="panel">
+                <div className="panel-header">
                   <span className="flex items-center gap-1">
-                    <span className="window-header-accent">PET_HUD</span>
+                    <span className="panel-header-accent">PET_HUD</span>
                   </span>
-                  <span className="text-cozy-accent font-bold cursor-pointer">
+                  <span className="text-muted font-medium cursor-pointer">
                     [-]
                   </span>
                 </div>
-                <div className="window-body p-0">
+                <div className="panel-body p-0">
                   <Suspense fallback={<MfeLoader petStage={progressService.state.pet.stage} />}>
                     <PetsApp progressState={progressService} />
                   </Suspense>
@@ -173,22 +173,22 @@ function AppContent(): React.ReactElement {
 
           {isMobileHudOpen && (
             <div
-              className="fixed inset-0 bg-black/75 z-45 lg:hidden"
+              className="fixed inset-0 bg-ink/75 z-45 lg:hidden"
               onClick={() => setIsMobileHudOpen(false)}
             />
           )}
           <div
-            className={`fixed top-0 right-0 bottom-0 w-80 bg-black border-l border-cozy-border z-50 p-4 flex flex-col gap-4 transition-transform duration-300 lg:hidden ${
+            className={`fixed top-0 right-0 bottom-0 w-80 bg-canvas border-l border-hairline z-50 p-4 flex flex-col gap-4 transition-transform duration-300 lg:hidden ${
               isMobileHudOpen ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="flex justify-between items-center border-b border-dashed border-cozy-border pb-2">
-              <span className="font-press text-[9px] text-cozy-text flex items-center gap-1">
+            <div className="flex justify-between items-center border-b border-dashed border-hairline pb-2">
+              <span className="font-code text-[11px] text-muted flex items-center gap-1">
                 MOBILE_HUD
               </span>
               <button
                 onClick={() => setIsMobileHudOpen(false)}
-                className="text-cozy-text font-bold cursor-pointer font-press text-[9px] bg-transparent border-none"
+                className="text-ink font-medium cursor-pointer font-body text-[11px] bg-transparent border-none"
               >
                 [X]
               </button>
@@ -203,7 +203,7 @@ function AppContent(): React.ReactElement {
             />
 
             <div className="flex-1 overflow-y-auto flex flex-col gap-4">
-              <div className="border border-cozy-border">
+              <div className="border border-hairline">
                 <Suspense fallback={<MfeLoader petStage={progressService.state.pet.stage} />}>
                   <PetsApp progressState={progressService} />
                 </Suspense>

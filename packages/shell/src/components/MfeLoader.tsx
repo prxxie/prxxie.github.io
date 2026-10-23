@@ -81,7 +81,7 @@ export default function MfeLoader({ petStage = 1 }: MfeLoaderProps) {
       {/* Status text */}
       <div className="flex flex-col items-center gap-2">
         <span
-          className="font-press text-[9px] text-cozy-accent"
+          className="font-code text-[9px] text-accent-teal"
           style={{ minWidth: "16ch", textAlign: "center", letterSpacing: "0.05em" }}
         >
           {MESSAGES[msgIdx].replace(/\.\.\.$/, "")}{dots}
@@ -89,11 +89,11 @@ export default function MfeLoader({ petStage = 1 }: MfeLoaderProps) {
 
         {/* Pixel progress bar */}
         <div
-          className="border border-cozy-border bg-black overflow-hidden"
+          className="panel panel-dark overflow-hidden"
           style={{ width: 120, height: 6 }}
         >
           <div
-            className="h-full bg-cozy-accent"
+            className="h-full bg-primary"
             style={{
               animation: "mfe-progress-slide 1.2s ease-in-out infinite alternate",
             }}

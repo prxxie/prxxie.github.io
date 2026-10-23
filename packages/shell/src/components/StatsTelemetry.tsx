@@ -64,26 +64,26 @@ export default function StatsTelemetry(): React.ReactElement {
   }, []);
 
   return (
-    <div className="border border-cozy-border p-2 bg-black text-cozy-text font-mono text-[9px] flex flex-col gap-2">
-      <div className="font-press text-[9px] text-cozy-accent text-center bg-cozy-muted/20 py-1">
+    <div className="panel panel-dark p-2 text-on-dark font-code text-[9px] flex flex-col gap-2">
+      <div className="font-code text-[9px] text-accent-teal text-center bg-surface-dark-elevated py-1">
         USER_STATS_TELEMETRY
       </div>
 
       <div className="flex flex-col gap-1.5 leading-relaxed">
         <div>
-          <span className="text-cozy-accent font-bold">● SHIKAKU CORES</span>
+          <span className="text-accent-teal font-bold">● SHIKAKU CORES</span>
           <br />
           <span>SOLVED: {shikakuSolved} PUZZLE(S)</span>
         </div>
         <div>
-          <span className="text-cozy-accent font-bold">● SOKOBAN CARGO</span>
+          <span className="text-accent-teal font-bold">● SOKOBAN CARGO</span>
           <br />
           <span>
             SOLVED: {sokobanSolved} | BEST LEVEL: {sokobanMaxLevel >= 0 ? sokobanMaxLevel + 1 : 0}
           </span>
         </div>
-        <div className="border-t border-dashed border-cozy-border pt-1.5 mt-1">
-          <span className="text-cozy-accent font-bold">● NEWEST POSTS LOG</span>
+        <div className="border-t border-dashed border-hairline pt-1.5 mt-1">
+          <span className="text-accent-teal font-bold">● NEWEST POSTS LOG</span>
           <ul className="list-none flex flex-col gap-1 mt-1">
             {STATIC_POSTS.map((post, idx) => (
               <li key={idx} className="truncate">

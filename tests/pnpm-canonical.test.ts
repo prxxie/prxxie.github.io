@@ -31,11 +31,23 @@ describe("pnpm is the only package manager", () => {
       .map((name) => ({ name, manifest: readJson(`packages/${name}/package.json`) }))
       .filter(({ manifest }) => {
         const specifier = manifest.dependencies?.shared;
-        return specifier !== undefined && specifier !== "workspace:*";
+        // An in-repo package must link the workspace copy, never a registry
+        // package that happens to share the name. The three game submodules live in
+        // their own repositories and spell it `*`; the root `.npmrc` makes pnpm link
+        // the workspace copy for that spelling too, and the test below proves it.
+        return specifier !== undefined && specifier !== "workspace:*" && specifier !== "*";
       })
       .map(({ name }) => name);
 
     expect(offenders).toEqual([]);
+  });
+
+  it("links the workspace copy even for the submodules' bare star", () => {
+    const npmrc = readFileSync(join(root, ".npmrc"), "utf8");
+    const lockfile = readFileSync(join(root, "pnpm-lock.yaml"), "utf8");
+
+    expect(npmrc).toContain("link-workspace-packages=true");
+    expect(lockfile).not.toMatch(/^ {2}shared@\d/m);
   });
 
   it("publishes the shared sources to the packages that import them", () => {

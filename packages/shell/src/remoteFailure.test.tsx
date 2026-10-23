@@ -10,7 +10,7 @@ import GameRoute from "./screens/GameRoute";
 // rejected `import()` leaves behind once React.lazy re-throws it. Mocked at the
 // file the vitest alias resolves the remote to, because an alias specifier does
 // not intercept the aliased module id.
-vi.mock("/home/cpt0912/WORKS/CDEV/prxxie-home/packages/shell/src/components/MockMfe.tsx", () => ({
+vi.mock(new URL("./components/MockMfe.tsx", import.meta.url).pathname, () => ({
   default: (): never => {
     throw new Error("Failed to fetch dynamically imported module");
   },

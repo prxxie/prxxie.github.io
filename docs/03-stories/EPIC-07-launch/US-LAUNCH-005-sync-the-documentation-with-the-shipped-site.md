@@ -2,7 +2,7 @@
 id: US-LAUNCH-005
 title: Sync the documentation with the shipped site
 epic: EPIC-07-launch
-status: done
+status: ready
 priority: P3
 size: M
 depends_on: [US-SITE-001, US-DS-001, US-PET-003]
@@ -64,7 +64,7 @@ The verifier is the test: `python3 .agents/scripts/verify-docs.py` exits 0, plus
 
 None.
 
-## 10. Outcome
+## 10. Progress so far (not closed — US-PET-003 is still `ready`)
 
 | # | Criterion | Where it is proven |
 |---|-----------|--------------------|

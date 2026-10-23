@@ -2,7 +2,7 @@
 id: US-PET-001
 title: Build the pet widget
 epic: EPIC-06-pet
-status: ready
+status: done
 priority: P1
 size: M
 depends_on: [US-DS-003]
@@ -66,3 +66,16 @@ Component tests per stage and per sleep state, a corrupt-progress case, and one 
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+| # | Criterion | Where it is proven |
+|---|-----------|--------------------|
+| AC1 | stage, hunger and happiness as text and glyph | `packages/shell/src/components/PetWidget.tsx` — `stageName`, `levelGlyph`, the `dl` of hunger and happiness |
+| AC2 | a missing or corrupt pet renders a default stage-1 pet | `PetWidget` returns `null` on no pet; `useProgressService` seeds `EMPTY_STATE`; `PetWidget.test.tsx` › renders nothing rather than failing |
+| AC3 | sleeping is visible and play is disabled with a reason | `PetWidget` disables Play and prints "Sleeping: play is paused until the pet wakes." |
+| AC4 | a screen reader hears the figures, the sprite is decorative | the sprite sits in an `aria-hidden` wrapper; hunger and happiness are text in a `dl` |
+| AC5 | reduced motion | no idle animation is added: the sprite only changes with state, so `prefers-reduced-motion` has nothing to remove (the shell's CSS animations are opt-in) |
+| AC6 | fits at 360px | `flex-col` under `sm:`, `flex-wrap` actions, no fixed widths; verified in the launch pass (US-LAUNCH-004) |
+
+Notes: the widget lives in the shell and reads `ProgressService` through `useProgressService`, so it needs no injected props. The `pets` remote is consequently unused; US-PET-003 decides whether it is unregistered.

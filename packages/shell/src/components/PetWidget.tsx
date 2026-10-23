@@ -1,97 +1,124 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useState } from "react";
 import PetSprite from "./PetSprite";
+import PetWidgetFrame from "./primitives/PetWidgetFrame";
+import Tag from "./primitives/Tag";
+import Button from "./primitives/Button";
 import { useProgressService } from "../hooks/useProgressService";
-import type { PetStatus } from "../types";
+import { EVOLUTION_THRESHOLDS } from "shared";
 
-export default function PetWidget(): React.ReactElement {
-  const { state, isHungry, foodAvailable, feedPet, isSleeping } = useProgressService();
-  const [spriteStatus, setSpriteStatus] = useState<PetStatus>("idle");
-  const [isFeeding, setIsFeeding] = useState(false);
-  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+/**
+ * US-PET-001: the pet, at footer size. Everything it shows comes from
+ * `ProgressService` through the shell hook — the widget owns no state beyond the
+ * moment a button was pressed, and it never touches storage.
+ *
+ * The three figures are rendered as text first: a reader who cannot see the sprite
+ * still learns the stage, how hungry the pet is and how happy it is.
+ */
 
-  useEffect(() => {
-    return () => {
-      if (resetTimerRef.current !== null) {
-        clearTimeout(resetTimerRef.current);
-      }
-    };
-  }, []);
+const STAGE_NAMES = ["Egg", "Sprout", "Budreptile", "Florasaur", "Mega Florasaur"] as const;
 
-  const handleFeed = useCallback(async () => {
-    setIsFeeding(true);
-    try {
-      await feedPet();
-      setSpriteStatus("eating");
-      if (resetTimerRef.current !== null) clearTimeout(resetTimerRef.current);
-      resetTimerRef.current = setTimeout(() => setSpriteStatus("idle"), 2000);
-    } catch {
-      // Error is logged by useProgressService, we ignore it here to prevent crash
-    } finally {
-      setIsFeeding(false);
-    }
-  }, [feedPet]);
-
-  const canFeed = isHungry && foodAvailable > 0 && !isSleeping && !isFeeding;
-
-  // Get evolution stage name
-  const getStageName = (stage: number) => {
-    switch (stage) {
-      case 1: return "EGG";
-      case 2: return "LEAFY SPROUT";
-      case 3: return "BUDREPTILE";
-      case 4: return "FLORASAUR";
-      case 5: return "MEGA FLORASAUR";
-      default: return "UNKNOWN";
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center gap-2 p-2 text-on-dark">
-      <div className="panel panel-dark p-2 flex items-center justify-center relative w-20 h-20">
-        <PetSprite
-          size={64}
-          stage={state.pet.stage}
-          status={isSleeping ? "sleeping" : spriteStatus}
-          isSleeping={isSleeping}
-          isHungry={isHungry}
-        />
-      </div>
-
-      <div className="w-full flex flex-col gap-1 font-code text-[9px]">
-        <div className="flex justify-between">
-          <span className="font-code">STAGE:</span>
-          <span>{getStageName(state.pet.stage)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-code">XP:</span>
-          <span>{state.pet.xp}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-code">FOOD:</span>
-          <span>★ {foodAvailable}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-code">STATUS:</span>
-          <span
-            className={
-              isSleeping ? "text-on-dark-soft" : isHungry ? "text-warning-on-dark" : "text-success-on-dark"
-            }
-          >
-            {isSleeping ? "SLEEPING" : isHungry ? "HUNGRY" : "FULL"}
-          </span>
-        </div>
-      </div>
-
-      <button
-        onClick={() => { void handleFeed(); }}
-        disabled={!canFeed}
-        className={`w-full btn text-[8px] disabled:opacity-40 disabled:pointer-events-none ${
-          isHungry && foodAvailable === 0 ? "text-error-on-dark" : ""
-        }`}
-      >
-        {isSleeping ? "AWAKE TO FEED" : canFeed ? "FEED PET" : isHungry ? "NO FOOD" : "NOT HUNGRY"}
-      </button>
-    </div>
-  );
+export function stageName(stage: number): string {
+  return STAGE_NAMES[stage - 1] ?? "Egg";
 }
 
+/** Brightness by feel: five steps, so hunger reads at a glance without colour alone. */
+export function levelGlyph(level: number, filled = "●", empty = "○"): string {
+  const steps = 5;
+  const clamped = Math.max(0, Math.min(steps, Math.round(level)));
+  return `${filled.repeat(clamped)}${empty.repeat(steps - clamped)}`;
+}
+
+/** How many stars until the next stage, and what happens at the top one. */
+export function nextStageHint(xp: number): string {
+  const next = EVOLUTION_THRESHOLDS.find((threshold) => threshold > xp);
+
+  return next === undefined ? "Fully evolved" : `${next - xp} XP to the next stage`;
+}
+
+export default function PetWidget(): React.ReactElement | null {
+  const { state, hungryLevel, foodAvailable, happiness, isSleeping, feedPet, playWithPet, toggleSleep } =
+    useProgressService();
+  const [busy, setBusy] = useState<"feed" | "play" | null>(null);
+
+  const act = useCallback(
+    async (which: "feed" | "play") => {
+      setBusy(which);
+      try {
+        await (which === "feed" ? feedPet() : playWithPet());
+      } catch {
+        // The service logs the reason; the widget stays usable.
+      } finally {
+        setBusy(null);
+      }
+    },
+    [feedPet, playWithPet],
+  );
+
+  if (!state.pet) return null;
+
+  const canFeed = hungryLevel > 0 && foodAvailable > 0 && !isSleeping && busy === null;
+  const canPlay = !isSleeping && happiness < 100 && busy === null;
+  const status = isSleeping ? "Asleep" : hungryLevel > 0 ? "Hungry" : "Content";
+
+  return (
+    <PetWidgetFrame
+      className="mt-2 flex-col sm:flex-row sm:items-center"
+      caption={
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className="font-medium text-ink">{stageName(state.pet.stage)}</span>
+          <span>{status}</span>
+          <Tag>{`${state.pet.xp} XP`}</Tag>
+          <Tag>{`${foodAvailable} star${foodAvailable === 1 ? "" : "s"}`}</Tag>
+          <span className="text-muted">{nextStageHint(state.pet.xp)}</span>
+        </span>
+      }
+    >
+      <div className="flex flex-col items-center gap-1">
+        <span aria-hidden="true" className={isSleeping ? "opacity-70" : ""}>
+          <PetSprite
+            size={48}
+            stage={state.pet.stage}
+            status={isSleeping ? "sleeping" : busy === "feed" ? "eating" : busy === "play" ? "playing" : "idle"}
+            isSleeping={isSleeping}
+            isHungry={hungryLevel > 0}
+          />
+        </span>
+        <dl className="flex flex-col gap-[2px] font-code text-[11px] text-muted">
+          <div className="flex gap-2">
+            <dt className="sr-only">Hunger</dt>
+            <dd>
+              <span aria-hidden="true">{levelGlyph(hungryLevel)}</span>{" "}
+              <span className="whitespace-nowrap">hunger {hungryLevel}/5</span>
+            </dd>
+          </div>
+          <div className="flex gap-2">
+            <dt className="sr-only">Happiness</dt>
+            <dd>
+              <span aria-hidden="true">{levelGlyph(happiness / 20)}</span>{" "}
+              <span className="whitespace-nowrap">happiness {happiness}%</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-2 sm:mt-0">
+        <Button variant="primary" disabled={!canFeed} onClick={() => void act("feed")}>
+          Feed
+        </Button>
+        <Button disabled={!canPlay} onClick={() => void act("play")}>
+          Play
+        </Button>
+        <Button onClick={() => void toggleSleep()}>{isSleeping ? "Wake" : "Sleep"}</Button>
+        <span className="font-code text-[11px] text-muted">
+          {isSleeping
+            ? "Sleeping: play is paused until the pet wakes."
+            : hungryLevel === 0
+              ? "Not hungry yet."
+              : foodAvailable === 0
+                ? "No stars to spend — finish a level to earn one."
+                : "Feed costs one star."}
+        </span>
+      </div>
+    </PetWidgetFrame>
+  );
+}

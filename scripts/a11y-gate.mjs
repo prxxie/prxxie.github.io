@@ -39,10 +39,6 @@ export const CONTRAST_PAIRS = [
   { foreground: "color-primary-active", background: "color-surface-card", minimum: 4.5, note: "a link on a card" },
   { foreground: "color-accent-teal", background: "color-surface-dark", minimum: 4.5, note: "the teal label on the inverted surface" },
   { foreground: "color-accent-teal", background: "color-surface-dark-elevated", minimum: 4.5, note: "the teal label on a raised inverted surface" },
-  { foreground: "color-success-on-dark", background: "color-surface-dark", minimum: 4.5, note: "a status dot on the inverted surface" },
-  { foreground: "color-success-on-dark", background: "color-surface-dark-elevated", minimum: 4.5, note: "a status dot on a raised inverted surface" },
-  { foreground: "color-warning-on-dark", background: "color-surface-dark", minimum: 4.5, note: "a warning on the inverted surface" },
-  { foreground: "color-error-on-dark", background: "color-surface-dark", minimum: 4.5, note: "an error on the inverted surface" },
   { foreground: "color-error", background: "color-canvas", minimum: 4.5, note: "an error message on the page" },
   { foreground: "color-success", background: "color-canvas", minimum: 4.5, note: "a success message on the page" },
 ];

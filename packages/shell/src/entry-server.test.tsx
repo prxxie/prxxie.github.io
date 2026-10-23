@@ -30,7 +30,7 @@ describe("prerendering", () => {
   it("names each route in its title", () => {
     expect(titleForPath("/games/sokoban")).toBe("Sokoban — prxxie.dev");
     expect(titleForPath("/games")).toBe("Games — prxxie.dev");
-    expect(titleForPath("/devlog/hello-retro-world")).toContain("hello-retro-world");
+    expect(titleForPath("/devlog/hello-retro-world")).toContain("Hello, Retro World!");
     expect(titleForPath("/devlog")).toBe("Devlog — prxxie.dev");
     expect(titleForPath("/404")).toContain("not found");
     expect(titleForPath("/nope")).toContain("not found");

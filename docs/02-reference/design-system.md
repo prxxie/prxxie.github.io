@@ -35,11 +35,8 @@ it fails if a declared token is never used.
 | `--color-accent-teal` | `#5db8a6` | the one non-coral accent, for success-adjacent emphasis |
 | `--color-accent-amber` | `#e8a55a` | star ratings, earned XP |
 | `--color-success` | `#3a7247` | solved state on a light surface |
-| `--color-success-on-dark` | `#7ad191` | solved state on an inverted surface |
 | `--color-warning` | `#8a6a0f` | the pet's hunger warning on a light surface |
-| `--color-warning-on-dark` | `#f0b862` | the pet's hunger warning on an inverted surface |
 | `--color-error` | `#a83232` | errors and invalid moves on a light surface |
-| `--color-error-on-dark` | `#f08585` | errors and invalid moves on an inverted surface |
 | `--color-hairline` | `#e6dfd8` | every 1px rule and border |
 
 Rules: coral is the only action colour and appears once per view; a second coral element means one of the two is not an
@@ -113,7 +110,7 @@ values were set so every pair passes — `--color-muted` `#6a6862` (4.61:1 on a 
 darkened to clear the line.
 
 No single value can clear 4.5:1 on both `#faf9f5` and `#181715`, so the three status colours carry
-an `-on-dark` twin (`--color-success-on-dark` `#7ad191`, `--color-warning-on-dark` `#f0b862`,
-`--color-error-on-dark` `#f08585`) used on the inverted surface. The theme block is declared
+no `-on-dark` twin: a game that needs a lighter success tone declares it in its own stylesheet, because the shell does
+not render that surface. The theme block is declared
 `@theme static`, so every token ships whether a utility uses it or not — the gate measures the
 tokens, not the classes.

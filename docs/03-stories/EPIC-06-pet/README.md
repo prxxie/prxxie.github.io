@@ -21,7 +21,7 @@ Generated from story frontmatter — run `python3 .agents/scripts/verify-docs.py
 |---|---|---|---|---|---|
 | [US-PET-001](US-PET-001-build-the-pet-widget.md) | Build the pet widget | P1 | M | done | US-DS-003 |
 | [US-PET-002](US-PET-002-make-the-feeding-economy-legible.md) | Make the feeding economy legible | P2 | M | done | US-PET-001 |
-| [US-PET-003](US-PET-003-put-the-pet-in-the-home-footer-and-only-there.md) | Put the pet in the home footer, and only there | P1 | S | ready | US-PET-001, US-SITE-002 |
+| [US-PET-003](US-PET-003-put-the-pet-in-the-home-footer-and-only-there.md) | Put the pet in the home footer, and only there | P1 | S | done | US-PET-001, US-SITE-002 |
 <!-- /adf:epic-stories -->
 
 ## Out of scope

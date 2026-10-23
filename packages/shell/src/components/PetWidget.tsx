@@ -46,16 +46,19 @@ export default function PetWidget(): React.ReactElement | null {
   const { state, hungryLevel, foodAvailable, happiness, isSleeping, feedPet, playWithPet, toggleSleep } =
     useProgressService();
   const [busy, setBusy] = useState<"feed" | "play" | null>(null);
+  const [failure, setFailure] = useState<string | null>(null);
 
   const act = useCallback(
     async (which: "feed" | "play") => {
       setBusy(which);
       try {
         await (which === "feed" ? feedPet() : playWithPet());
-      } catch {
-        // The service logs the reason; the widget stays usable.
+      } catch (error) {
+        // The service logs the reason; say it once, in the reader's line of sight.
+        setFailure(error instanceof Error ? error.message : "That did not work. Try again.");
       } finally {
-        setBusy(null);
+        setFailure(null);
+      setBusy(null);
       }
     },
     [feedPet, playWithPet],
@@ -68,6 +71,7 @@ export default function PetWidget(): React.ReactElement | null {
   const canFeed = hungryLevel > 0 && foodAvailable > 0 && waitMinutes === 0 && !isSleeping && busy === null;
   const canPlay = !isSleeping && happiness < 100 && busy === null;
   const status = isSleeping ? "Asleep" : hungryLevel > 0 ? "Hungry" : "Content";
+  const statusTone = isSleeping ? "text-muted" : hungryLevel > 0 ? "text-warning" : "text-success";
 
   return (
     <PetWidgetFrame
@@ -75,7 +79,7 @@ export default function PetWidget(): React.ReactElement | null {
       caption={
         <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-medium text-ink">{stageName(state.pet.stage)}</span>
-          <span>{status}</span>
+          <span className={statusTone}>{status}</span>
           <Tag>{`${state.pet.xp} XP`}</Tag>
           <Tag>{`${foodAvailable} of ${starsEarned} stars`}</Tag>
           <span className="text-muted">{nextStageHint(state.pet.xp)}</span>
@@ -118,6 +122,11 @@ export default function PetWidget(): React.ReactElement | null {
           Play
         </Button>
         <Button onClick={() => void toggleSleep()}>{isSleeping ? "Wake" : "Sleep"}</Button>
+        {failure !== null && (
+          <span role="status" className="font-code text-[11px] text-error">
+            {failure}
+          </span>
+        )}
         <span className="font-code text-[11px] text-muted">
           {isSleeping
             ? "Sleeping: play is paused until the pet wakes."

@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router";
 import Footer from "./components/regions/Footer";
+import { ProgressServiceProvider } from "./hooks/useProgressService";
 import ContactBlock from "./components/ContactBlock";
 import { CONTACT, mailtoHref } from "./contact";
 
@@ -46,9 +47,11 @@ describe("the contact path", () => {
 
   it("is in the footer, so every page carries it without JavaScript", () => {
     render(
-      <MemoryRouter>
-        <Footer />
-      </MemoryRouter>,
+      <ProgressServiceProvider>
+        <MemoryRouter>
+          <Footer />
+        </MemoryRouter>
+      </ProgressServiceProvider>,
     );
 
     const contentinfo = screen.getByRole("contentinfo");

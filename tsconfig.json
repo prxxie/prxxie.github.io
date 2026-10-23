@@ -13,8 +13,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "allowImportingTsExtensions": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "types": ["vitest/globals"]
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vitest/globals"
+    ]
   },
   "include": [
     "packages/shell/src/**/*.ts",
@@ -36,6 +42,9 @@
     "packages/shared/src/**/*.ts",
     "tests/**/*.ts",
     "vitest.config.ts",
-    "packages/*/vite.config.ts"
+    "packages/*/vite.config.ts",
+    "packages/*/vite.ssr.config.ts",
+    "scripts/**/*.mjs",
+    "scripts/**/*.d.mts"
   ]
 }

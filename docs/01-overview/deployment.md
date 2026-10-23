@@ -22,7 +22,8 @@ a release (`.github/workflows/deploy.yml:3-8`). A game therefore ships without a
 | Node | Sets up Node 20 | `.github/workflows/deploy.yml:23-26` |
 | Install | Installs the workspace (`npm install` today, `pnpm install --frozen-lockfile` after ADR-0005) | `.github/workflows/deploy.yml:28-29` |
 | Download game bundles | For each of `shikaku`, `sokoban`, `slitherlink`: creates `packages/<game>/dist` and extracts that repository's latest `dist.tar.gz` release into it | `.github/workflows/deploy.yml:31-40` |
-| Assemble | Runs `scripts/build-static.sh`: builds `about`, `posts` and `pets`; uses the pre-downloaded `dist/` for a game when `dist/assets/remoteEntry.js` exists, otherwise builds it from source; builds the host; copies everything into `dist/` with each remote under `dist/mfe/<name>/` | `.github/workflows/deploy.yml:42-46`, `scripts/build-static.sh:5-40` |
+| Assemble | Runs `scripts/build-static.sh`: builds `about`, `posts` and `pets`; uses the pre-downloaded `dist/` for a game when `dist/assets/remoteEntry.js` exists, otherwise builds it from source; builds the host; copies everything into `dist/` with each remote under `dist/mfe/<name>/` | `.github/workflows/deploy.yml:42-46`, `scripts/build-static.sh` |
+| Prerender | Runs `node scripts/prerender.mjs` on the assembled artifact: builds the renderer from `packages/shell/vite.ssr.config.ts`, renders all nine routes through `createStaticHandler` into `dist/<path>/index.html`, writes `dist/404.html` and `dist/route-manifest.json` | `scripts/build-static.sh`, `scripts/prerender.mjs` |
 | Publish | Pushes `./dist` to the `gh-pages` branch | `.github/workflows/deploy.yml:48-52` |
 
 The assembly is idempotent with respect to game bundles: a pre-built `dist/` wins, so the deployed game is the released

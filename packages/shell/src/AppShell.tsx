@@ -32,7 +32,11 @@ export default function AppShell(): React.ReactElement {
     mainRef.current?.focus();
   }, [pathname]);
 
-  const petHud = (
+  // The pet is a remote, so the build renders a sentence where the widget goes
+  // instead of suspending: `renderToString` cannot wait for a fetcher to arrive.
+  const petHud = import.meta.env.SSR ? (
+    <p className="panel-body text-[11px] text-muted">The pet lives in the footer and wakes up in the browser.</p>
+  ) : (
     <Suspense fallback={<p className="panel-body text-[11px] text-muted">Loading the pet…</p>}>
       <PetsApp progressState={progress} />
     </Suspense>

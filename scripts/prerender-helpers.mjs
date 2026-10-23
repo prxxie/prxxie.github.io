@@ -37,6 +37,7 @@ export function assertReadable(route, page) {
   };
 
   if (!page.title || page.title.trim() === "") fail("no title");
+  if (!page.description || page.description.trim() === "") fail("no description");
   if (!page.html.includes("<main")) fail("no main region");
   if (!page.html.includes('id="main"')) fail("no skip-link target");
   if (page.html.includes("data-msg=")) fail("a Suspense boundary never finished on the server");
@@ -50,10 +51,55 @@ export function assertReadable(route, page) {
   }
 }
 
+/** The share card (US-LAUNCH-001): one raster image, described in words. */
+export const SHARE_IMAGE = {
+  path: "/og.png",
+  alt: "prxxie.dev — a cream page with a coral band",
+  width: "1200",
+  height: "630",
+};
+
+/**
+ * The metadata block for one route. Everything route-specific comes from the page
+ * the route rendered, so a route added to the table needs no edit here (AC5).
+ */
+export function metadata(page) {
+  const url = canonicalUrl(page.path);
+  const type = page.path.startsWith("/devlog/") ? "article" : "website";
+  const image = `${SITE_ORIGIN}${SHARE_IMAGE.path}`;
+
+  return [
+    ["name", "description", page.description],
+    ["property", "og:type", type],
+    ["property", "og:title", page.title],
+    ["property", "og:description", page.description],
+    ["property", "og:url", url],
+    ["property", "og:site_name", "prxxie.dev"],
+    ["property", "og:image", image],
+    ["property", "og:image:alt", SHARE_IMAGE.alt],
+    ["property", "og:image:width", SHARE_IMAGE.width],
+    ["property", "og:image:height", SHARE_IMAGE.height],
+    ["name", "twitter:card", "summary_large_image"],
+    ["name", "twitter:title", page.title],
+    ["name", "twitter:description", page.description],
+    ["name", "twitter:image", image],
+    ["name", "twitter:image:alt", SHARE_IMAGE.alt],
+  ]
+    .map(([attribute, key, value]) => `    <meta ${attribute}="${key}" content="${escapeAttribute(value)}" />`)
+    .join("\n");
+}
+
+function escapeAttribute(value) {
+  return String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+
 export function inject(template, page) {
   const withTitle = template.replace(/<title>[\s\S]*?<\/title>/, `<title>${page.title}</title>`);
   const withCanonical = withTitle.includes("</head>")
-    ? withTitle.replace("</head>", `    <link rel="canonical" href="${canonicalUrl(page.path)}" />\n  </head>`)
+    ? withTitle.replace(
+        "</head>",
+        `    <link rel="canonical" href="${canonicalUrl(page.path)}" />\n${metadata(page)}\n  </head>`,
+      )
     : withTitle;
 
   if (!withCanonical.includes('<div id="root"></div>')) {

@@ -2,7 +2,7 @@
 id: US-LAUNCH-001
 title: Give every page its metadata and a share card
 epic: EPIC-07-launch
-status: ready
+status: done
 priority: P2
 size: M
 depends_on: [US-SITE-003]
@@ -64,3 +64,15 @@ Build assertions over every generated HTML file; a manual preview check with a c
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+| # | Criterion | Where it is proven |
+|---|-----------|--------------------|
+| AC1 | `<title>`, description, canonical, `og:*`, `twitter:*` per route | `scripts/prerender-helpers.mjs` `metadata(page)`; `tests/prerender.test.ts` › share metadata |
+| AC2 | canonical matches the served URL, no trailing slash | `canonicalUrl` in `scripts/prerender-helpers.mjs`; `tests/prerender.test.ts` › canonicalises |
+| AC3 | the share image returns 200, absolute URL, described alt | `scripts/make-og-image.mjs` writes `public/og.png` (1200×630, copied into `dist/`); `SHARE_IMAGE` exports the alt |
+| AC4 | a post describes itself from its frontmatter | `descriptionForPath` in `packages/shell/src/entry-server.tsx` returns `post.summary`; `titleForPath` returns `post.title` |
+| AC5 | a route added later needs no code change | `metadata(page)` reads the rendered page only; `descriptionForPath` has a site fallback |
+
+Notes: the share card is generated from tokens in code rather than by hand, and `build-static.sh` builds it before the shell, so it cannot go stale. A route with no description fails the build (`assertReadable`).

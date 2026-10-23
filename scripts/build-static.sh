@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 
-# The proof figures on the front page are measured before the build reads them
-# (US-HOME-003), and a failing gate stops the build here rather than printing a
-# number the page cannot back up.
+# The share card is drawn from code (US-LAUNCH-001) and the proof figures on the
+# front page are measured before the build reads them (US-HOME-003) — a failing
+# gate stops the build here rather than printing a number the page cannot back up.
+pnpm run build:assets
 pnpm run build:facts
 
 # Clean top-level dist only (don't wipe pre-downloaded MFE dists)

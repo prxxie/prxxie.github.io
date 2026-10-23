@@ -6,9 +6,10 @@ import { assertReadable, canonicalUrl, inject, outputFiles } from "../scripts/pr
 const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
 
-const page = (overrides: Partial<{ title: string; html: string }> = {}) => ({
+const page = (overrides: Partial<{ title: string; description: string; html: string }> = {}) => ({
   path: "/",
   title: "prxxie.dev — small, finished things",
+  description: "prxxie builds small, finished things.",
   html: `<main id="main"><h1>Hello</h1>${"x".repeat(900)}</main>`,
   ...overrides,
 });
@@ -104,5 +105,59 @@ describe("GitHub Pages hosting", () => {
     expect(script).not.toContain("_redirects");
     expect(script).not.toContain("404.html?");
     expect(readFileSync(path.join(root, "packages/shell/index.html"), "utf8")).not.toContain("serviceWorker");
+  });
+});
+
+describe("share metadata (US-LAUNCH-001)", () => {
+  const helpers = readFileSync(path.join(root, "scripts/prerender-helpers.mjs"), "utf8");
+  const entry = readFileSync(path.join(root, "packages/shell/src/entry-server.tsx"), "utf8");
+
+  it("describes every route in one sentence, including a fallback for a route added later", () => {
+    expect(entry).toContain("export function descriptionForPath");
+    expect(entry).toContain("descriptionForPath(pathname)");
+    expect(entry).toMatch(/return "prxxie builds small, finished things/);
+  });
+
+  it("emits the description, the Open Graph tags and a large share card", () => {
+    for (const tag of ['"description"', '"og:title"', '"og:description"', '"og:image"', '"og:image:alt"']) {
+      expect(helpers).toContain(tag);
+    }
+    expect(helpers).toContain('["name", "twitter:card", "summary_large_image"]');
+  });
+
+  it("points the share image at an absolute URL that the build copies", () => {
+    expect(helpers).toContain("${SITE_ORIGIN}${SHARE_IMAGE.path}");
+    expect(helpers).toContain('path: "/og.png"');
+    expect(helpers).toContain('width: "1200"');
+    expect(helpers).toContain('height: "630"');
+  });
+
+  it("calls a post an article and everything else a website", () => {
+    expect(helpers).toContain('page.path.startsWith("/devlog/") ? "article" : "website"');
+  });
+
+  it("refuses to prerender a route with no description", () => {
+    expect(helpers).toContain('if (!page.description || page.description.trim() === "") fail("no description")');
+  });
+});
+
+describe("the share card on disk (US-LAUNCH-001)", () => {
+  const png = readFileSync(path.join(root, "public/og.png"));
+
+  it("is a real 1200x630 PNG, not a placeholder", () => {
+    expect(png.subarray(1, 4).toString("ascii")).toBe("PNG");
+    expect(png.readUInt32BE(16)).toBe(1200);
+    expect(png.readUInt32BE(20)).toBe(630);
+  });
+
+  it("is drawn by a script the build runs, so it cannot go stale by hand", () => {
+    const scripts = JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")) as {
+      scripts: Record<string, string>;
+    };
+    const build = readFileSync(path.join(root, "scripts/build-static.sh"), "utf8");
+
+    expect(scripts.scripts["build:assets"]).toBe("node scripts/make-og-image.mjs");
+    expect(build).toContain("pnpm run build:assets");
+    expect(build.indexOf("pnpm run build:assets")).toBeLessThan(build.indexOf("pnpm -F shell run build"));
   });
 });

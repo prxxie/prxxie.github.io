@@ -10,7 +10,8 @@
     "test": "vitest run",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "build:assets": "node scripts/make-og-image.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --fix"

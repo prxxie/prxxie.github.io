@@ -108,8 +108,9 @@ its record behind, and the feed allowance still counts its stars.
 
 ### Posts and content
 
-Posts are markdown files in `public/posts/` compiled to typed objects at build time (ADR-0006); the `devlog` content
-module holds the post list, the hat's copy and the telemetry teaser config. Neither is stored, keyed or indexed — they are
+Posts are markdown files in `packages/posts/src/content/posts/`, compiled to typed objects at build time by
+`loadPosts()` (ADR-0006); `Post` is defined in `packages/posts/src/content/loadPosts.ts` — no `version` field, no storage.
+The `devlog` content module holds the hat's copy and the telemetry teaser config. Neither is stored, keyed or indexed — they are
 build inputs, and their shape is fixed by `docs/02-reference/conventions` and the content module's types.
 
 ## Access rules

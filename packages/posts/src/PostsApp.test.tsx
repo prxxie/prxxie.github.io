@@ -1,102 +1,48 @@
 import React from "react";
-import { describe, it, expect, vi, afterEach } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { describe, expect, it, afterEach, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import PostsApp from "./PostsApp";
-import { parsePost, renderMarkdown } from "./utils/markdown";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const fetchMock = vi.fn();
-vi.stubGlobal("fetch", fetchMock);
+const fetchSpy = vi.fn();
+vi.stubGlobal("fetch", fetchSpy);
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  fetchSpy.mockClear();
 });
 
-function createWrapper(): React.FC<{ children: React.ReactNode }> {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-  const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
-  Wrapper.displayName = "TestWrapper";
-  return Wrapper;
-}
+describe("PostsApp", () => {
+  it("lists the posts compiled at build time, newest first", () => {
+    render(<PostsApp />);
 
-describe("Markdown Utility functions", () => {
-  it("parsePost correctly parses frontmatter and extracts raw markdown content", () => {
-    const rawMarkdown = `---
-title: "Custom Title"
-date: "2026-05-30"
-author: "alice"
----
-This is standard text.`;
-    const parsed = parsePost(rawMarkdown);
-    expect(parsed.title).toBe("Custom Title");
-    expect(parsed.date).toBe("2026-05-30");
-    expect(parsed.author).toBe("alice");
-    expect(parsed.content.trim()).toBe("This is standard text.");
+    const titles = screen.getAllByRole("button").map((button) => button.textContent ?? "");
+
+    expect(titles[0]).toContain("Markdown Verification");
+    expect(titles[1]).toContain("Hello, Retro World!");
   });
 
-  it("renderMarkdown parses standard and rich markdown features including GFM", async () => {
-    const html = await renderMarkdown("# Header\nThis is **bold** text.");
-    expect(html).toContain("<h1>Header</h1>");
-    expect(html).toContain("<strong>bold</strong>");
-  });
+  it("opens a post and renders its markdown without fetching anything", async () => {
+    render(<PostsApp />);
 
-  it("renderMarkdown parses code blocks and applies syntax highlighting classes via PrismJS", async () => {
-    const codeBlock = "```javascript\nconst a = 12;\n```";
-    const html = await renderMarkdown(codeBlock);
-    expect(html).toContain('<pre class="language-javascript">');
-    expect(html).toContain('<code class="language-javascript">');
-    expect(html).toContain('class="token keyword"');
-  });
-});
-
-describe("PostsApp MFE Integration", () => {
-  it("correctly integrates utility and renders markdown component on post click", async () => {
-    const mockMarkdown = `---
-title: "Integrated Test Post"
-date: "2026-05-29"
-author: "testauthor"
----
-# Heading 1
-This is a **bold** word.
-`;
-
-    render(<PostsApp />, { wrapper: createWrapper() });
-
-    const postItem = screen.getByText(/HELLO_RETRO_WORLD/i);
-    expect(postItem).toBeInTheDocument();
-
-    fetchMock.mockResolvedValueOnce({
-      ok: true,
-      text: () => Promise.resolve(mockMarkdown),
-    });
-
-    fireEvent.click(postItem);
+    fireEvent.click(screen.getByText("Hello, Retro World!"));
 
     await waitFor(() => {
-      expect(screen.getByText("Integrated Test Post")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1, name: "Hello, Retro World!" })).toBeInTheDocument();
     });
-    expect(
-      screen.getByText(/DATE: 2026-05-29 | AUTHOR: TESTAUTHOR/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText("DATE: 2026-05-28")).toBeInTheDocument();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
 
-    const heading = screen.getByRole("heading", {
-      level: 1,
-      name: "Heading 1",
+  it("returns to the list", async () => {
+    render(<PostsApp />);
+
+    fireEvent.click(screen.getByText("Markdown Verification"));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /BACK/ })).toBeInTheDocument();
     });
-    expect(heading).toBeInTheDocument();
 
-    const boldWord = screen.getByText("bold");
-    expect(boldWord.tagName.toLowerCase()).toBe("strong");
+    fireEvent.click(screen.getByRole("button", { name: /BACK/ }));
+
+    expect(screen.getByText("Hello, Retro World!")).toBeInTheDocument();
   });
 });

@@ -45,47 +45,6 @@ marked.use({
   },
 });
 
-export interface ParsedPost {
-  title: string;
-  date: string;
-  content: string;
-}
-
-export function parsePost(
-  mdText: string
-): ParsedPost & Record<string, string> {
-  const regex = /^---\r?\n([\s\S]+?)\r?\n---\r?\n([\s\S]*)$/;
-  const match = regex.exec(mdText);
-  if (!match) {
-    const defaultPost: ParsedPost & Record<string, string> = {
-      title: "Untitled Post",
-      date: "",
-      author: "",
-      content: mdText,
-    };
-    return defaultPost;
-  }
-
-  const frontmatter = match[1];
-  const content = match[2];
-  const metadata: Record<string, string> = {};
-  frontmatter.split("\n").forEach((line) => {
-    const parts = line.split(":");
-    if (parts.length >= 2) {
-      const key = parts[0].trim();
-      const value = parts.slice(1).join(":").replace(/"/g, "").trim();
-      metadata[key] = value;
-    }
-  });
-  return {
-    title: metadata.title || "Untitled Post",
-    date: metadata.date || "",
-    author: metadata.author || "",
-    ...metadata,
-    content,
-  };
-}
-
 export async function renderMarkdown(markdownStr: string): Promise<string> {
   return await marked.parse(markdownStr);
 }

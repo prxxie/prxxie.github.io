@@ -31,7 +31,7 @@ product has no admin surface, no user management and no privilege escalation pat
 |--------|------|
 | Progress document | Scoped to one browser profile and one origin. No sharing, no merge, no export. Two devices are two independent visitors (ADR-0004) |
 | Level records | Keyed on `(module, levelId)`; only the best star count is kept, and a lower result is discarded (`packages/shared/src/repository/LocalProgressRepository.ts:122-147`) |
-| Devlog post | A file in `public/posts/`; anyone with repository write access can publish it |
+| Devlog post | A file in `packages/posts/src/content/posts/`; anyone with repository write access can publish it |
 | Game release | Owned by the game's own repository; this repository only consumes the release artifact (ADR-0003) |
 
 ## How roles are assigned

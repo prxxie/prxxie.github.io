@@ -7,7 +7,7 @@ maintainer can observe, plus the evidence that it holds. The order below is the 
 <!-- adf:stats -->
 | Stories | Done | In progress | Ready | Blocked | Draft | Closed |
 |---|---|---|---|---|---|---|
-| 36 | 7 | 0 | 29 | 0 | 0 | 0 |
+| 36 | 8 | 0 | 28 | 0 | 0 | 0 |
 
 Open questions: **Open: 1 · Blocking: 0 · Answered: 11 · Withdrawn: 0**
 <!-- /adf:stats -->
@@ -22,7 +22,7 @@ Open questions: **Open: 1 · Blocking: 0 · Answered: 11 · Withdrawn: 0**
 | [EPIC-02-site-shell](EPIC-02-site-shell/README.md) | SITE | Real routes, prerendered pages, one contact path | 6 | 1 | 0 |
 | [EPIC-03-home](EPIC-03-home/README.md) | HOME | The one-page proof | 3 | 0 | 0 |
 | [EPIC-04-games](EPIC-04-games/README.md) | GAME | The games hub and three games in the same clothes | 5 | 0 | 0 |
-| [EPIC-05-devlog](EPIC-05-devlog/README.md) | DEVLOG | Markdown compiled at build time | 4 | 0 | 0 |
+| [EPIC-05-devlog](EPIC-05-devlog/README.md) | DEVLOG | Markdown compiled at build time | 4 | 1 | 0 |
 | [EPIC-06-pet](EPIC-06-pet/README.md) | PET | The pet becomes a footer widget | 3 | 0 | 0 |
 | [EPIC-07-launch](EPIC-07-launch/README.md) | LAUNCH | Landing page, discovered | 5 | 0 | 0 |
 <!-- /adf:epics -->

@@ -18,7 +18,7 @@ markdown files that do exist are reachable only through the runtime path. Preren
 
 ## Decision
 
-Posts are markdown files under `public/posts/`, loaded eagerly at build time with `import.meta.glob` and `?raw`,
+Posts are markdown files under `packages/posts/src/content/posts/`, loaded eagerly at build time with `import.meta.glob` and `?raw`,
 parsed and rendered during the build. The inline array, the runtime `fetch` and the hand-written Markdown converter are
 deleted.
 

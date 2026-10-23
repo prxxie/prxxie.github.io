@@ -19,7 +19,7 @@ Generated from story frontmatter — run `python3 .agents/scripts/verify-docs.py
 <!-- adf:epic-stories -->
 | Id | Title | Priority | Size | Status | Depends on |
 |---|---|---|---|---|---|
-| [US-DEVLOG-001](US-DEVLOG-001-compile-posts-from-markdown-at-build-time.md) | Compile posts from markdown at build time | P1 | M | ready | US-FND-001 |
+| [US-DEVLOG-001](US-DEVLOG-001-compile-posts-from-markdown-at-build-time.md) | Compile posts from markdown at build time | P1 | M | done | US-FND-001 |
 | [US-DEVLOG-002](US-DEVLOG-002-list-the-posts.md) | List the posts | P1 | M | ready | US-DEVLOG-001, US-SITE-003 |
 | [US-DEVLOG-003](US-DEVLOG-003-give-each-post-its-own-page.md) | Give each post its own page | P1 | M | ready | US-DEVLOG-001, US-SITE-003 |
 | [US-DEVLOG-004](US-DEVLOG-004-put-a-teaser-level-inside-a-post.md) | Put a teaser level inside a post | P2 | M | ready | US-DEVLOG-003, US-HOME-002 |

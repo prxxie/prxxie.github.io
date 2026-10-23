@@ -2,7 +2,7 @@
 id: US-SITE-006
 title: Offer a contact path with no backend
 epic: EPIC-02-site-shell
-status: ready
+status: done
 priority: P1
 size: S
 depends_on: [US-SITE-002]
@@ -65,3 +65,7 @@ Component test: three links, correct hrefs, accessible names; a manual check wit
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+Commit `5677817`. `packages/shell/src/contact.ts` holds the three addresses in one object and builds the mailto link with a subject and no body; `packages/shell/src/components/ContactBlock.tsx` renders three plain anchors (email, LinkedIn, GitHub) with names that say where an external link goes; the footer mounts it on every route. No form, no script, no iframe, no cookie banner. Proven by `packages/shell/src/contact.test.tsx` (5 tests) and the prerendered footer.

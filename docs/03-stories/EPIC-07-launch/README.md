@@ -23,7 +23,7 @@ Generated from story frontmatter — run `python3 .agents/scripts/verify-docs.py
 | [US-LAUNCH-002](US-LAUNCH-002-publish-a-sitemap-and-robots-file.md) | Publish a sitemap and robots file | P2 | S | done | US-LAUNCH-001 |
 | [US-LAUNCH-003](US-LAUNCH-003-meet-a-performance-budget-on-a-cold-load.md) | Meet a performance budget on a cold load | P2 | M | ready | US-HOME-002, US-DS-002 |
 | [US-LAUNCH-004](US-LAUNCH-004-audit-and-fix-accessibility-across-every-route.md) | Audit and fix accessibility across every route | P1 | M | ready | US-FND-006, US-GAME-005, US-DEVLOG-003 |
-| [US-LAUNCH-005](US-LAUNCH-005-sync-the-documentation-with-the-shipped-site.md) | Sync the documentation with the shipped site | P3 | M | ready | US-SITE-001, US-DS-001, US-PET-003 |
+| [US-LAUNCH-005](US-LAUNCH-005-sync-the-documentation-with-the-shipped-site.md) | Sync the documentation with the shipped site | P3 | M | done | US-SITE-001, US-DS-001, US-PET-003 |
 <!-- /adf:epic-stories -->
 
 ## Out of scope

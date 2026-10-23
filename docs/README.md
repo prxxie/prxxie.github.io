@@ -16,7 +16,7 @@ no analytics; the only stored state is the visitor's own progress, in their brow
 <!-- adf:stats -->
 | Stories | Done | In progress | Ready | Blocked | Draft | Closed |
 |---|---|---|---|---|---|---|
-| 36 | 22 | 0 | 14 | 0 | 0 | 0 |
+| 36 | 26 | 0 | 10 | 0 | 0 | 0 |
 
 Open questions: **Open: 1 · Blocking: 0 · Answered: 11 · Withdrawn: 0**
 <!-- /adf:stats -->

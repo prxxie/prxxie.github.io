@@ -2,7 +2,7 @@
 id: US-HOME-003
 title: Print the proof from the build
 epic: EPIC-03-home
-status: ready
+status: done
 priority: P2
 size: M
 depends_on: [US-HOME-001, US-FND-005]
@@ -64,3 +64,7 @@ Build test: the facts file exists after a build and its test count matches the r
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+Commit `5677817`. `scripts/build-facts.mjs` runs the typecheck, lint and test gates, reads the counts the runner reported, counts test files and remotes from the tree, and writes `packages/shell/src/generated/build-facts.json` (and `dist/`, once assembled). A failing gate aborts the build before the page can claim it. The proof section prints those numbers, or "not measured yet" where no source exists (the level count lands with US-GAME-001). Proven by `homePage.test.tsx` and the `build:facts` script.

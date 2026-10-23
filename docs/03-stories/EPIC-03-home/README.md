@@ -19,9 +19,9 @@ Generated from story frontmatter — run `python3 .agents/scripts/verify-docs.py
 <!-- adf:epic-stories -->
 | Id | Title | Priority | Size | Status | Depends on |
 |---|---|---|---|---|---|
-| [US-HOME-001](US-HOME-001-build-the-proof-page.md) | Build the proof page | P1 | M | ready | US-SITE-003, US-DS-003 |
+| [US-HOME-001](US-HOME-001-build-the-proof-page.md) | Build the proof page | P1 | M | done | US-SITE-003, US-DS-003 |
 | [US-HOME-002](US-HOME-002-put-a-playable-puzzle-on-the-front-page.md) | Put a playable puzzle on the front page | P1 | L | ready | US-HOME-001 |
-| [US-HOME-003](US-HOME-003-print-the-proof-from-the-build.md) | Print the proof from the build | P2 | M | ready | US-HOME-001, US-FND-005 |
+| [US-HOME-003](US-HOME-003-print-the-proof-from-the-build.md) | Print the proof from the build | P2 | M | done | US-HOME-001, US-FND-005 |
 <!-- /adf:epic-stories -->
 
 ## Out of scope

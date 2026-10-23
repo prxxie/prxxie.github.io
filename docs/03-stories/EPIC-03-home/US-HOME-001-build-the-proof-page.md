@@ -2,7 +2,7 @@
 id: US-HOME-001
 title: Build the proof page
 epic: EPIC-03-home
-status: ready
+status: done
 priority: P1
 size: M
 depends_on: [US-SITE-003, US-DS-003]
@@ -65,3 +65,7 @@ Prerender assertion on the built HTML plus a component test for the heading stru
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+Commit `5677817`. `packages/shell/src/screens/HomePage.tsx` is now the proof page in one reading order: headline, "What I build", "Try one" (the puzzle slot US-HOME-002 fills), "The proof" (figures from the build, US-HOME-003), "Say hello" (the contact block). One `h1`, four `h2`, no skipped level. Proven by `packages/shell/src/screens/homePage.test.tsx` (6 tests).

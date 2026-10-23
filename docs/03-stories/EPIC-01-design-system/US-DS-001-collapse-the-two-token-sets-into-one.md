@@ -82,3 +82,5 @@ No unit test asserts CSS; the evidence is the grep (zero legacy class references
 ## 9. Open questions
 
 None.
+
+Note: the three game submodules were briefly re-pointed to local pnpm-CI commits; those pointers were reverted to the released commits, and the game repositories adopt pnpm inside US-GAME-002..004, which is where US-FND-005 AC4 deferred it.

@@ -2,6 +2,60 @@
 
 > Keep this file up to date. If you add, remove, or restructure a package or change how MFEs are wired, update the relevant section before ending your session.
 
+<!-- adf:project:start -->
+## Project
+
+| | |
+|---|---|
+| Name | prxxie-home ("Cozy OS") |
+| Tier | `standard` |
+| Project type | `web-app` |
+| Stack | TypeScript 5.9 · React 18 · Vite 5 · Tailwind 4 + daisyUI 5 · Zustand · Module Federation (`@originjs/vite-plugin-federation` 1.3.5) · Vitest 1 · GitHub Actions → GitHub Pages |
+| Stack pack | `adf-stack-react-vite` — its PROJECT values are used where they match this repo; deviations are recorded in `docs/01-overview/conventions.md` |
+| Docs | `docs/README.md` — start there. `docs/00-source/brief.md` is the scope authority; `docs/04-decisions/` holds the ADRs and the open questions |
+
+**Commands** (run in this tree)
+
+| Purpose | Command | State |
+|---------|---------|-------|
+| Install | `npm install` | works today; `pnpm install --frozen-lockfile` is the target (ADR-0005) — `(planned — verify after US-FND-001)` |
+| Run | `npm run dev` | host on `:3000`, remotes on `:3001`–`:3006` |
+| Test | `npm test` → `vitest run` | 36 files, 294 tests, green |
+| Lint | `npm run lint` → `eslint .` | red: 7 errors, 102 warnings (mostly the hoisted `shared@0.2.0` package) |
+| Type check | `npm run typecheck` → `tsc --noEmit` | red: 12 errors, first is `packages/pets/src/PetsApp.tsx(91,20)` |
+| Build | `npm run build:static` | assembles `dist/` from all six remotes plus the host |
+
+**Layout**
+
+```
+packages/shell      host: routing, layout, the two Zustand stores, all design tokens (src/index.css)
+packages/about      MFE: about page
+packages/posts      MFE: devlog (markdown compiled at build time)
+packages/pets       MFE: the pet widget, receives shell state as props
+packages/shikaku    MFE: Shikaku puzzle          [git submodule, own repo and release]
+packages/sokoban    MFE: Sokoban puzzle          [git submodule, own repo and release]
+packages/slitherlink MFE: Slitherlink puzzle     [git submodule, own repo and release]
+packages/shared     ProgressService, ProgressRepository + local adaptor, evolution thresholds
+content/            owner-authored copy and devlog metadata
+public/posts/       the devlog's markdown files
+scripts/            build-static.sh (assembly), verify-docs.py, and the CI helpers
+```
+
+**Conventions** (full detail in `docs/01-overview/conventions.md`)
+
+- Design: cream + coral tokens only, one coral action per view, no raw hex in a component, no `text-cozy-*`/`font-press`.
+- Progress: only `ProgressRepository` touches storage; remotes receive behaviour, never `localStorage`.
+- Remotes: `./XxxApp` exposed, `base: '/mfe/<name>/'`, `react`/`react-dom` shared as singletons.
+- Content: markdown and copy are build inputs, never fetched at runtime.
+- Tests: beside the source; remotes are aliased to `packages/shell/src/components/MockMfe.tsx`.
+- Never add an account, a cloud call, an analytics event or a cookie banner (ADR-0004, ADR-0007).
+- Accessibility is built in, not audited in: WCAG 2.2 AA, an automated gate in CI (ADR-0008).
+
+**The guide below predates ADF** and documents the shipped amber/CRT implementation. Where it disagrees with `docs/`,
+`docs/` wins: the retro palette is retired (ADR-0001), `/posts` becomes `/devlog` with real paths (ADR-0002), Supabase
+cloud sync is deleted (ADR-0004), and the three games are owned and restyled in their own repositories (OQ-11).
+<!-- adf:project:end -->
+
 ---
 
 ## Project Overview

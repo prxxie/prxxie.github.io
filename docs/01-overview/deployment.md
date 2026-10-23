@@ -38,11 +38,10 @@ check does not block a deploy — the gap NFR-18 closes, ahead of the accessibil
 |----------|------------------|-----------|-------|
 | `MFE_DOWNLOAD_TOKEN` | checkout of submodules and `gh release download` | repository secret | not needed |
 | `GITHUB_TOKEN` | publishing to `gh-pages` | provided by Actions | not needed |
-| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | baked into the shell bundle at build time | repository secrets today | unset, which selects the local adaptor | 
-| `VITE_*` build variables after ADR-0004 | — | none remain; the build reads no configuration | none |
+| `VITE_*` build variables | — | none: the build reads no configuration | none |
 
-The two Supabase variables are the only thing build-time configuration is used for today, and they are deleted with the
-cloud adaptor (ADR-0004). After that the bundle contains no configuration and the workflow needs only its two tokens.
+The shell bundle carries no configuration: the cloud adaptor and its two `VITE_SUPABASE_*` variables are gone
+(ADR-0004, US-FND-004), so the workflow needs only its two tokens.
 
 ## Rollback
 

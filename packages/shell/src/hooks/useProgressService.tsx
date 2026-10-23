@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, createContext, useContext, useMemo, ReactNode } from "react";
-import { ProgressService, LocalProgressRepository, SupabaseProgressRepository } from "shared";
+import { ProgressService, LocalProgressRepository } from "shared";
 import type { ProgressState } from "shared";
-import { supabase, isSupabaseConfigured } from "../utils/supabase";
 
 export interface ProgressServiceContextType {
   state: ProgressState;
@@ -28,12 +27,7 @@ export interface ProgressServiceProviderProps {
 }
 
 export function ProgressServiceProvider({ children }: ProgressServiceProviderProps) {
-  const [progressService] = useState(() => {
-    const repo = isSupabaseConfigured && supabase
-      ? new SupabaseProgressRepository(supabase)
-      : new LocalProgressRepository();
-    return new ProgressService(repo);
-  });
+  const [progressService] = useState(() => new ProgressService(new LocalProgressRepository()));
 
   useEffect(() => {
     return () => {

@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# The proof figures on the front page are measured before the build reads them
+# (US-HOME-003), and a failing gate stops the build here rather than printing a
+# number the page cannot back up.
+pnpm run build:facts
+
 # Clean top-level dist only (don't wipe pre-downloaded MFE dists)
 rm -rf dist
 rm -rf packages/about/dist packages/posts/dist packages/pets/dist packages/shell/dist

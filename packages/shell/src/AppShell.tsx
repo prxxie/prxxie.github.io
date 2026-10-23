@@ -3,7 +3,6 @@ import { Outlet, useLocation } from "react-router";
 import Header from "./components/regions/Header";
 import Footer from "./components/regions/Footer";
 import SkipLink from "./components/regions/SkipLink";
-import StatsTelemetry from "./components/StatsTelemetry";
 import { useProgressService } from "./hooks/useProgressService";
 import { useLegacyHashRedirect } from "./hooks/useLegacyHashRedirect";
 
@@ -72,8 +71,7 @@ export default function AppShell(): React.ReactElement {
               </div>
               <div className="panel-body p-0">{petHud}</div>
             </div>
-            <StatsTelemetry />
-          </aside>
+              </aside>
         </div>
       </main>
 
@@ -96,8 +94,7 @@ export default function AppShell(): React.ReactElement {
             <div className="panel">
               <div className="panel-body p-0">{petHud}</div>
             </div>
-            <StatsTelemetry />
-          </div>
+              </div>
         </div>
       )}
     </div>

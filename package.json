@@ -5,6 +5,7 @@
     "dev": "concurrently -n shell,about,posts,pets,shikaku,sokoban,slitherlink -c blue,green,yellow,magenta,cyan,white,red \"pnpm -F shell dev\" \"pnpm -F about dev:watch\" \"pnpm -F posts dev:watch\" \"pnpm -F pets dev:watch\" \"pnpm -F shikaku dev:watch\" \"pnpm -F sokoban dev:watch\" \"pnpm -F slitherlink dev:watch\"",
     "build": "pnpm -r run build",
     "build:static": "bash scripts/build-static.sh",
+    "build:facts": "node scripts/build-facts.mjs",
     "a11y": "node scripts/a11y-gate.mjs",
     "test": "vitest run",
     "lint": "eslint . --max-warnings=0",

@@ -1,0 +1,20 @@
+{
+  "tests": 345,
+  "files": 49,
+  "gates": [
+    {
+      "name": "typecheck",
+      "passing": true
+    },
+    {
+      "name": "lint",
+      "passing": true
+    },
+    {
+      "name": "test",
+      "passing": true
+    }
+  ],
+  "remotes": 6,
+  "levels": null
+}

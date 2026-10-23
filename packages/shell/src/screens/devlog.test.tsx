@@ -20,31 +20,31 @@ const posts = loadPosts();
 
 describe("the devlog index", () => {
   it("lists every published post with its title, date and summary, newest first", () => {
-    const { container } = renderAt("/devlog");
-    const titles = [...container.querySelectorAll("li h2")].map((heading) => heading.textContent);
+    const main = renderAt("/devlog").container.querySelector("main")!;
+    const titles = [...main.querySelectorAll("li h2")].map((heading) => heading.textContent);
 
     expect(titles).toEqual(posts.map((post) => post.title));
     expect(posts.map((post) => post.slug)).toEqual(["markdown-verification", "hello-retro-world"]);
 
     for (const post of posts) {
-      expect(container.textContent).toContain(post.summary);
-      expect(container.textContent).toContain(post.date);
+      expect(main.textContent).toContain(post.summary);
+      expect(main.textContent).toContain(post.date);
     }
   });
 
   it("makes each entry one link to the post, and keeps the heading", () => {
-    const { container } = renderAt("/devlog");
-    const links = [...container.querySelectorAll("li a")];
+    const main = renderAt("/devlog").container.querySelector("main")!;
+    const links = [...main.querySelectorAll("li a")].filter((link) => link.querySelector("h2") !== null);
 
     expect(links).toHaveLength(posts.length);
     expect(links.map((link) => link.getAttribute("href"))).toEqual(posts.map((post) => `/devlog/${post.slug}`));
-    expect(container.querySelectorAll("li a h2")).toHaveLength(posts.length);
-    expect(container.querySelector("h1")?.textContent).toBe("Devlog");
+    expect(main.querySelectorAll("li a h2")).toHaveLength(posts.length);
+    expect(main.querySelector("h1")?.textContent).toBe("Devlog");
   });
 
   it("renders the entries without a client sort or a fetch", () => {
-    const { container } = renderAt("/devlog");
-    const dates = [...container.querySelectorAll("time")].map((time) => time.getAttribute("datetime"));
+    const main = renderAt("/devlog").container.querySelector("main")!;
+    const dates = [...main.querySelectorAll("time")].map((time) => time.getAttribute("datetime"));
 
     expect(dates).toEqual(posts.map((post) => post.date));
   });

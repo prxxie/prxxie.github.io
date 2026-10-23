@@ -19,7 +19,7 @@ Generated from story frontmatter — run `python3 .agents/scripts/verify-docs.py
 <!-- adf:epic-stories -->
 | Id | Title | Priority | Size | Status | Depends on |
 |---|---|---|---|---|---|
-| [US-FND-001](US-FND-001-make-the-workspace-pnpm-canonical.md) | Make the workspace pnpm-canonical | P0 | L | ready | — |
+| [US-FND-001](US-FND-001-make-the-workspace-pnpm-canonical.md) | Make the workspace pnpm-canonical | P0 | L | done | — |
 | [US-FND-002](US-FND-002-green-the-type-check-gate.md) | Green the type-check gate | P0 | M | ready | US-FND-001 |
 | [US-FND-003](US-FND-003-green-the-lint-gate.md) | Green the lint gate | P0 | M | ready | US-FND-001 |
 | [US-FND-004](US-FND-004-delete-the-cloud-sync-code-path.md) | Delete the cloud-sync code path | P1 | M | ready | US-FND-001 |

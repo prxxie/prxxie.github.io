@@ -109,7 +109,7 @@ There is no `.env.example` and none is needed until a variable exists again.
 |-----------|-------------------|-----|
 | React 19, Vite 7–8 | React 18.3.1, Vite ^5.2.11 | The federation plugin version in use targets this pairing; not upgrading mid-rework |
 | `tsc -b` with project references | one root `tsconfig.json`, `tsc --noEmit` | No project references exist, and adopting them is its own change |
-| `npm run …` | `pnpm …` / `pnpm -F packages/<name> …` | ADR-0005; the CI workflows still call npm and are part of that change |
+| `npm run …` | `pnpm …` / `pnpm -F <name> …` | ADR-0005, enforced since US-FND-001: `packageManager` pinned, `workspace:*` links, one root lockfile, the deploy workflow installs frozen |
 | Playwright for end-to-end | none yet | No e2e suite exists; the accessibility gate (ADR-0008) is the first CI-side browser test |
 | MSW for network mocking | none | There is no HTTP layer in the product; tests alias remotes to `MockMfe.tsx` instead (`vitest.config.ts:12-35`) |
 | Coverage run in the test command | `vitest run` plain | No coverage thresholds are enforced yet |

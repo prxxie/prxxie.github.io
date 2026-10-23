@@ -7,7 +7,7 @@ maintainer can observe, plus the evidence that it holds. The order below is the 
 <!-- adf:stats -->
 | Stories | Done | In progress | Ready | Blocked | Draft | Closed |
 |---|---|---|---|---|---|---|
-| 36 | 0 | 0 | 36 | 0 | 0 | 0 |
+| 36 | 1 | 0 | 35 | 0 | 0 | 0 |
 
 Open questions: **Open: 1 · Blocking: 0 · Answered: 11 · Withdrawn: 0**
 <!-- /adf:stats -->
@@ -17,7 +17,7 @@ Open questions: **Open: 1 · Blocking: 0 · Answered: 11 · Withdrawn: 0**
 <!-- adf:epics -->
 | Epic | Code | Title | Stories | Done | Blocked |
 |---|---|---|---|---|---|
-| [EPIC-00-foundation](EPIC-00-foundation/README.md) | FND | Foundation: reproducible workspace and honest gates | 7 | 0 | 0 |
+| [EPIC-00-foundation](EPIC-00-foundation/README.md) | FND | Foundation: reproducible workspace and honest gates | 7 | 1 | 0 |
 | [EPIC-01-design-system](EPIC-01-design-system/README.md) | DS | One design system, warm cream and coral | 3 | 0 | 0 |
 | [EPIC-02-site-shell](EPIC-02-site-shell/README.md) | SITE | Real routes, prerendered pages, one contact path | 6 | 0 | 0 |
 | [EPIC-03-home](EPIC-03-home/README.md) | HOME | The one-page proof | 3 | 0 | 0 |

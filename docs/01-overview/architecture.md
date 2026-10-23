@@ -82,6 +82,15 @@ pet. A feed adds one XP, which may cross an evolution threshold (`packages/share
 workflow: checkout with submodules, download each game's `dist.tar.gz` release into `packages/<game>/dist`, run
 `pnpm`-based assembly, publish `dist/` (`scripts/build-static.sh:14-40`, `.github/workflows/deploy.yml:3-8`).
 
+## The devlog content path
+
+The posts live in `packages/posts/src/content/posts/*.md` and are parsed by
+`packages/posts/src/content/loadPosts.ts` (frontmatter contract, `parsePost`, `sortPosts`). The
+shell imports that module — and `renderPostBody` from `packages/posts/src/utils/markdown.ts` —
+through the `posts/content` and `posts/markdown` aliases, so the index and the post page render
+the same `Post[]`: there is no second source of truth and no fetch. The markdown is bundled as
+data and compiled once; a broken post fails the build rather than the visitor.
+
 ## Cross-cutting
 
 **Authentication.** None, by decision. The site reverted from Supabase-backed accounts to local-only progress

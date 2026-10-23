@@ -44,6 +44,15 @@ export default defineConfig(({ command }) => {
         },
       },
     ].filter(Boolean),
+    resolve: {
+      alias: {
+        // The devlog collection and its renderer are compiled at build time
+        // (US-DEVLOG-002/003): the shell reads them from the posts package, so
+        // there is one parser and one renderer for the list and the page.
+        "posts/content": resolve(__dirname, "../posts/src/content/loadPosts.ts"),
+        "posts/markdown": resolve(__dirname, "../posts/src/utils/markdown.ts"),
+      },
+    },
     build: {
       target: "esnext",
       minify: false,

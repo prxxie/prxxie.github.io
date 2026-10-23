@@ -32,8 +32,8 @@ describe("the route table", () => {
   });
 
   it("renders a devlog post from the URL alone", () => {
-    renderAt("/devlog/some-post");
-    expect(screen.getByText("devlog/some-post")).toBeInTheDocument();
+    renderAt("/devlog/hello-retro-world");
+    expect(screen.getByRole("heading", { level: 1, name: /hello, retro world/i })).toBeInTheDocument();
     expect(screen.queryByText("BYRIA-RR9")).not.toBeInTheDocument();
   });
 

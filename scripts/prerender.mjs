@@ -13,7 +13,7 @@ import { build } from "vite";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { assertReadable, inject, outputFile } from "./prerender-helpers.mjs";
+import { assertReadable, inject, outputFiles } from "./prerender-helpers.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const shellDir = path.join(root, "packages/shell");
@@ -50,11 +50,20 @@ async function main() {
     const page = await renderPage(route);
     assertReadable(route, page);
 
-    const file = outputFile(route);
-    await mkdir(path.dirname(file), { recursive: true });
-    await writeFile(file, inject(template, page), "utf8");
+    const html = inject(template, page);
+    const files = outputFiles(route);
 
-    manifest.push({ path: route, title: page.title, file: path.relative(distDir, file) });
+    for (const file of files) {
+      await mkdir(path.dirname(file), { recursive: true });
+      await writeFile(file, html, "utf8");
+    }
+
+    manifest.push({
+      path: route,
+      title: page.title,
+      file: path.relative(distDir, files[files.length - 1]),
+      files: files.map((file) => path.relative(distDir, file)),
+    });
   }
 
   await writeFile(path.join(distDir, "route-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");

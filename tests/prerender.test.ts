@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { assertReadable, inject, outputFile } from "../scripts/prerender-helpers.mjs";
+import { assertReadable, canonicalUrl, inject, outputFiles } from "../scripts/prerender-helpers.mjs";
 
 const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
@@ -14,11 +14,22 @@ const page = (overrides: Partial<{ title: string; html: string }> = {}) => ({
 });
 
 describe("the prerender step", () => {
-  it("writes the front page as index.html, a 404 at the root and every other route in its own folder", () => {
-    expect(outputFile("/")).toBe(path.join(dist, "index.html"));
-    expect(outputFile("/404")).toBe(path.join(dist, "404.html"));
-    expect(outputFile("/games/sokoban")).toBe(path.join(dist, "games/sokoban/index.html"));
-    expect(outputFile("/devlog/hello-retro-world")).toBe(path.join(dist, "devlog/hello-retro-world/index.html"));
+  it("writes both the file GitHub Pages answers without a redirect and the directory index", () => {
+    expect(outputFiles("/")).toEqual([path.join(dist, "index.html")]);
+    expect(outputFiles("/404")).toEqual([path.join(dist, "404.html")]);
+    expect(outputFiles("/games/sokoban")).toEqual([
+      path.join(dist, "games/sokoban.html"),
+      path.join(dist, "games/sokoban/index.html"),
+    ]);
+    expect(outputFiles("/devlog/hello-retro-world")).toEqual([
+      path.join(dist, "devlog/hello-retro-world.html"),
+      path.join(dist, "devlog/hello-retro-world/index.html"),
+    ]);
+  });
+
+  it("canonicalises to the slash-less URL on the root user site", () => {
+    expect(canonicalUrl("/")).toBe("https://prxxie.github.io/");
+    expect(canonicalUrl("/devlog/a-post")).toBe("https://prxxie.github.io/devlog/a-post");
   });
 
   it("injects the rendered markup and the route title into the shell template", () => {
@@ -26,6 +37,7 @@ describe("the prerender step", () => {
     const html = inject(template, page());
 
     expect(html).toContain("<title>prxxie.dev — small, finished things</title>");
+    expect(html).toContain('<link rel="canonical" href="https://prxxie.github.io/" />');
     expect(html).toContain('<div id="root"><main id="main"><h1>Hello</h1>');
     expect(html).not.toContain(">shell<");
   });
@@ -73,5 +85,24 @@ describe("the build script", () => {
 
   it("keeps the build failing when the prerender step fails", () => {
     expect(script.startsWith("#!/bin/bash\nset -e")).toBe(true);
+  });
+});
+
+describe("GitHub Pages hosting", () => {
+  const script = readFileSync(path.join(root, "scripts/build-static.sh"), "utf8");
+  const shellConfig = readFileSync(path.join(root, "packages/shell/vite.config.ts"), "utf8");
+
+  it("marks the artifact so Pages serves it verbatim", () => {
+    expect(script).toContain("touch dist/.nojekyll");
+  });
+
+  it("bakes no base path into the asset URLs", () => {
+    expect(shellConfig).not.toMatch(/^\s*base:/m);
+  });
+
+  it("needs no rewrite rule, redirect page or service worker to fake clean URLs", () => {
+    expect(script).not.toContain("_redirects");
+    expect(script).not.toContain("404.html?");
+    expect(readFileSync(path.join(root, "packages/shell/index.html"), "utf8")).not.toContain("serviceWorker");
   });
 });

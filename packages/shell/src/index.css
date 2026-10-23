@@ -1,8 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
-@import "daisyui/daisyui.css";
 
-:root {
+/*
+ * The only design system (ADR-0001). Tokens are declared once here and consumed
+ * by class in components and by var() in hand-written rules. The document
+ * docs/02-reference/design-system.md is the contract: a token it does not list
+ * does not ship.
+ */
+@theme {
   --color-primary: #cc785c;
   --color-primary-active: #a9583e;
   --color-primary-disabled: #e6dfd8;
@@ -21,221 +26,290 @@
   --color-warning: #d4a017;
   --color-error: #c64545;
   --color-hairline: #e6dfd8;
+
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-pill: 9999px;
+
   --font-display: "Copernicus", "Tiempos Headline", "Cormorant Garamond", serif;
   --font-body: "StyreneB", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-code: "JetBrains Mono", ui-monospace, monospace;
+  --font-code: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 }
 
-@theme {
-  --font-mono: "Geist Mono", ui-monospace, monospace;
-  --font-pixel: "Geist Mono", ui-monospace, monospace;
-  --font-press: "Geist Mono", ui-monospace, monospace;
-  --color-cozy-bg: #000000;
-  --color-cozy-text: #FFB000;
-  --color-cozy-border: #FFB000;
-  --color-cozy-accent: #FFB000;
-  --color-cozy-muted: #805800;
-  --color-terminal-bg: #050505;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-body);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.55;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-canvas);
+  }
 }
 
-body {
-  background-color: var(--color-cozy-bg);
-  color: var(--color-cozy-text);
-  font-family: var(--font-mono);
-  font-size: 14px;
-  position: relative;
-  overflow-x: hidden;
+@layer components {
+  /* A raised surface: card, board frame, footer widget. */
+  .panel {
+    background-color: var(--color-surface-card);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* The same surface inverted, for a board or a code block. */
+  .panel-dark {
+    background-color: var(--color-surface-dark);
+    border-color: var(--color-surface-dark-elevated);
+    color: var(--color-on-dark);
+  }
+
+  .panel-header {
+    align-items: center;
+    background-color: transparent;
+    border-bottom: 1px solid var(--color-hairline);
+    color: var(--color-muted);
+    display: flex;
+    font-family: var(--font-body);
+    font-size: 12px;
+    justify-content: space-between;
+    padding: 10px 14px;
+  }
+
+  .panel-dark .panel-header {
+    border-bottom-color: var(--color-surface-dark-elevated);
+    color: var(--color-on-dark-soft);
+  }
+
+  .panel-header-accent {
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 16px;
+  }
+
+  .panel-dark .panel-header-accent {
+    color: var(--color-on-dark);
+  }
+
+  .panel-body {
+    padding: 16px;
+  }
+
+  /* Controls. The primary fill is the one action colour on a view. */
+  .btn {
+    background-color: transparent;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-md);
+    color: var(--color-ink);
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 14px;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .btn:hover {
+    border-color: var(--color-ink);
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-canvas);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-active);
+    border-color: var(--color-primary-active);
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    background-color: var(--color-primary-disabled);
+    border-color: var(--color-hairline);
+    color: var(--color-muted);
+    cursor: not-allowed;
+  }
+
+  .hairline {
+    border: 1px solid var(--color-hairline);
+  }
 }
 
-.pixel-border {
-  border: 1px solid var(--color-cozy-border);
-}
-
-.pixel-btn {
-  border: 1px solid var(--color-cozy-border);
-  background-color: #000000;
-  padding: 6px 12px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-  color: var(--color-cozy-text);
-}
-
-.pixel-btn:hover, .pixel-btn:focus-visible {
-  background-color: var(--color-cozy-text);
-  color: #000000;
-}
-
-.pixel-btn:active {
-  opacity: 0.85;
-}
-
-.retro-window {
-  border: 1px solid var(--color-cozy-border);
-  background-color: var(--color-terminal-bg);
-  display: flex;
-  flex-direction: column;
-}
-
-.window-header {
-  background-color: #000000;
-  color: var(--color-cozy-text);
-  border-bottom: 1px solid var(--color-cozy-border);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  padding: 8px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.window-header-accent {
-  color: var(--color-cozy-accent);
-}
-
-.window-body {
-  padding: 12px;
-}
-
-/* Blinking terminal cursor keyframes */
+/* Blinking cursor: the one motion borrowed from the terminal the site replaces. */
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
+
 .blink-cursor::after {
   content: " _";
   animation: blink 1s step-start infinite;
 }
 
-/* --- Cozy Notebook Theme (Option B) --- */
+/* --- Prose rendered from markdown --- */
 .markdown-body {
-  font-family: var(--font-pixel);
-  color: var(--color-cozy-text);
+  color: var(--color-body);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
 }
 
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3 {
-  font-family: var(--font-pixel);
-  color: var(--color-cozy-text);
-  font-weight: bold;
-  margin-top: 16px;
-  margin-bottom: 8px;
-  border-bottom-color: var(--color-cozy-muted);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  margin-top: 32px;
+  margin-bottom: 12px;
 }
 
-.markdown-body h1 { font-size: 1.5em; border-bottom: 2px solid var(--color-cozy-muted); padding-bottom: 4px; }
-.markdown-body h2 { font-size: 1.3em; border-bottom: 1px dashed var(--color-cozy-muted); padding-bottom: 2px; }
-.markdown-body h3 { font-size: 1.1em; }
+.markdown-body h1 {
+  font-size: 2.25rem;
+}
+
+.markdown-body h2 {
+  border-bottom: 1px solid var(--color-hairline);
+  font-size: 1.75rem;
+  padding-bottom: 8px;
+}
+
+.markdown-body h3 {
+  font-size: 1.375rem;
+}
 
 .markdown-body p {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.markdown-body a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary);
+  text-underline-offset: 3px;
 }
 
 .markdown-body ul {
   list-style-type: disc;
   margin-left: 20px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .markdown-body ol {
   list-style-type: decimal;
   margin-left: 20px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .markdown-body blockquote {
-  border-left: 4px solid var(--color-cozy-muted);
-  padding-left: 10px;
-  margin: 12px 0;
-  font-style: italic;
-  background-color: #0c0c0c;
-  color: var(--color-cozy-text);
+  background-color: var(--color-surface-card);
+  border-left: 2px solid var(--color-primary);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--color-muted);
+  margin: 16px 0;
+  padding: 12px 16px;
 }
 
-/* GFM Task List Styling */
 .markdown-body ul li input[type="checkbox"] {
-  margin-right: 6px;
-  accent-color: var(--color-cozy-accent);
+  margin-right: 8px;
+  accent-color: var(--color-primary);
   pointer-events: none;
 }
 
-/* Tables */
 .markdown-body table {
-  width: 100%;
   border-collapse: collapse;
-  margin-bottom: 16px;
-  font-size: 13px;
+  font-size: 15px;
+  margin: 8px 0 24px;
+  width: 100%;
 }
 
 .markdown-body th,
 .markdown-body td {
-  border: 1px solid var(--color-cozy-border);
-  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-hairline);
+  padding: 10px 12px;
   text-align: left;
 }
 
 .markdown-body th {
-  background-color: #151515;
-  color: var(--color-cozy-text);
+  color: var(--color-ink);
+  font-weight: 600;
 }
 
-.markdown-body tr:nth-child(even) {
-  background-color: #090909;
-}
-
-/* Code Syntax & Styling */
 .markdown-body code {
-  font-family: monospace;
-  background-color: #101010;
-  border: 1px solid var(--color-cozy-muted);
-  border-radius: 3px;
-  padding: 2px 4px;
-  font-size: 90%;
-  color: var(--color-cozy-text);
+  background-color: var(--color-surface-card);
+  border-radius: var(--radius-xs);
+  color: var(--color-ink);
+  font-family: var(--font-code);
+  font-size: 0.9em;
+  padding: 2px 5px;
 }
 
 .markdown-body pre {
-  background-color: #0c0c0c;
-  border: 1px solid var(--color-cozy-muted);
-  border-radius: 4px;
-  padding: 12px;
+  background-color: var(--color-surface-dark);
+  border-radius: var(--radius-md);
+  color: var(--color-on-dark);
+  margin-bottom: 24px;
   overflow-x: auto;
-  margin-bottom: 16px;
+  padding: 16px;
 }
 
 .markdown-body pre code {
   background-color: transparent;
   border: none;
-  padding: 0;
   color: inherit;
-  font-size: 12px;
+  font-size: 13px;
+  padding: 0;
 }
 
-/* Prism Token Highlighting (CRT Monochrome Amber) */
+/* Syntax highlighting on the inverted surface. */
 .token.comment,
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  color: var(--color-cozy-muted);
+  color: var(--color-on-dark-soft);
   font-style: italic;
 }
 
-.token.keyword {
-  color: #FFC400;
-  font-weight: bold;
+.token.keyword,
+.token.function {
+  color: var(--color-accent-amber);
 }
 
 .token.string,
 .token.char,
 .token.attr-value {
-  color: #FFE082;
+  color: var(--color-accent-teal);
 }
 
 .token.operator,
@@ -243,19 +317,15 @@ body {
 .token.url,
 .language-css .token.string,
 .style .token.string {
-  color: #FFB000;
-}
-
-.token.function {
-  color: #FFF9C4;
+  color: var(--color-on-dark-soft);
 }
 
 .token.number,
 .token.boolean {
-  color: #FFD54F;
+  color: var(--color-accent-amber);
 }
 
-/* --- Offcanvas Slide-in Drawer Animation --- */
+/* --- Offcanvas slide-in drawer --- */
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -265,7 +335,7 @@ body {
   }
 }
 
-/* --- Backdrop Fade-in Animation --- */
+/* --- Backdrop fade-in --- */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -275,30 +345,18 @@ body {
   }
 }
 
-.retro-window:fullscreen {
-  border: none;
-  box-shadow: none;
-  width: 100vw;
-  height: 100vh;
-}
-.retro-window:fullscreen .window-body {
-  flex-grow: 1;
-}
-
-/* Keyboard navigation focus indicators */
-button:focus-visible,
-[role="button"]:focus-visible,
-.pixel-btn:focus-visible {
-  outline: 3px dashed var(--color-cozy-accent);
+.button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
-/* Respect user preferences for reduced motion */
+/* Respect user preferences for reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   .animate-bounce,
   .animate-shake,
   .transition-transform,
-  .pixel-btn {
+  .btn {
     animation: none !important;
     transition: none !important;
     transform: none !important;
@@ -307,14 +365,27 @@ button:focus-visible,
 
 /* MFE loader progress bar slide */
 @keyframes mfe-progress-slide {
-  from { width: 15%; margin-left: 0%; }
-  to   { width: 40%; margin-left: 60%; }
+  from {
+    width: 15%;
+    margin-left: 0%;
+  }
+  to {
+    width: 40%;
+    margin-left: 60%;
+  }
 }
 
 /* Sokoban target pulse */
 @keyframes targetPulse {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.08); }
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.08);
+  }
 }
 
 /* Sokoban signal pulse */
@@ -323,29 +394,31 @@ button:focus-visible,
     opacity: 0.25;
     transform: scale(0.9);
   }
-
   50% {
     opacity: 0.8;
     transform: scale(1.15);
   }
-
   100% {
     opacity: 0.25;
     transform: scale(0.9);
   }
 }
 
-/* Custom retro scrollbar styling */
-.retro-scrollbar::-webkit-scrollbar {
+/* A thin scrollbar for the inverted surfaces. */
+.scroll-thin::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
-.retro-scrollbar::-webkit-scrollbar-track {
+
+.scroll-thin::-webkit-scrollbar-track {
   background: transparent;
 }
-.retro-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--color-cozy-border);
-  border-radius: 3px;
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background-color: var(--color-surface-dark-elevated);
+  border-radius: var(--radius-pill);
 }
-.retro-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-cozy-border);
+
+.scroll-thin::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-muted);
 }

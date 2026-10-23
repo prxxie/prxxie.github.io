@@ -22,8 +22,8 @@ export default function ConsoleFrame({
   };
 
   return (
-    <div className="w-full min-h-screen flex flex-col bg-cozy-bg box-border">
-      <header className="bg-black border-b border-cozy-border p-3 box-border w-full relative z-30">
+    <div className="w-full min-h-screen flex flex-col bg-canvas box-border">
+      <header className="bg-canvas border-b border-hairline p-3 box-border w-full relative z-30">
         <div className="max-w-5xl mx-auto flex justify-between items-center w-full px-4 box-border">
           <div className="flex items-center gap-2">
             <svg
@@ -32,14 +32,14 @@ export default function ConsoleFrame({
               width="16"
               height="16"
               fill="none"
-              stroke="var(--color-cozy-accent)"
+              stroke="var(--color-accent-teal)"
               strokeWidth="2.5"
               strokeLinecap="square"
             >
               <path d="M3,4 L8,8 L3,12" />
               <line x1="9" y1="12" x2="14" y2="12" />
             </svg>
-            <span className="font-press text-xs font-bold text-cozy-accent uppercase">
+            <span className="font-code text-xs font-bold text-accent-teal uppercase">
               PRXXIE_OS v4.7
             </span>
           </div>
@@ -47,8 +47,8 @@ export default function ConsoleFrame({
           <div className="flex items-center gap-3">
             <button
               onClick={handleAudioToggle}
-              className={`pixel-btn text-[9px] px-3 py-1 ${
-                !muted ? "bg-cozy-accent text-black border-cozy-border" : ""
+              className={`btn text-[9px] px-3 py-1 ${
+                !muted ? "bg-primary text-canvas border-hairline" : ""
               }`}
               aria-label="Toggle Audio Beeps"
             >
@@ -58,7 +58,7 @@ export default function ConsoleFrame({
             {onMobileHud && (
               <button
                 onClick={onMobileHud}
-                className="md:hidden pixel-btn text-[9px] px-3 py-1"
+                className="md:hidden btn text-[9px] px-3 py-1"
                 aria-label="Open mobile HUD"
               >
                 [ HUD ]

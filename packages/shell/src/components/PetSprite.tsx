@@ -209,7 +209,7 @@ export default function PetSprite({
 
       {/* Floating ZZZs when sleeping */}
       {isSleeping && (
-        <g className="animate-pulse" style={{ fill: "var(--color-cozy-border)", opacity: 0.8 }}>
+        <g className="animate-pulse" style={{ fill: "var(--color-hairline)", opacity: 0.8 }}>
           <text x="11" y="4" style={{ fontSize: "4px", fontFamily: "monospace" }}>Z</text>
           <text x="13" y="2" style={{ fontSize: "3px", fontFamily: "monospace" }}>z</text>
         </g>

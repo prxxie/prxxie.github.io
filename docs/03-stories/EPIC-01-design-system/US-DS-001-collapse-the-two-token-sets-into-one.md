@@ -2,7 +2,7 @@
 id: US-DS-001
 title: Collapse the two token sets into one
 epic: EPIC-01-design-system
-status: ready
+status: done
 priority: P0
 size: L
 depends_on: [US-FND-001]
@@ -53,6 +53,20 @@ The surviving tokens are exactly those in `docs/02-reference/design-system.md` �
 - Delete dead CSS rather than leaving it commented out.
 
 ## 6. Implementation notes
+
+**Shipped.** `packages/shell/src/index.css` now holds one `@theme` block (eighteen colours, six radii, three families),
+the component recipes and the prose rules; `body` is painted with `--color-canvas` on `--color-body`. The daisyUI import
+and the dependency left `packages/shell`, the amber tokens, pixel classes, scanline/flicker keyframes and `terminal-bg`
+are deleted, and every call site moved to a role token (`text-cozy-text` → `text-on-dark` inside a dark panel and
+`text-ink` on cream, `font-press` → `font-code`, `pixel-btn` → `btn`, `retro-window` → `panel`). `--color-success`,
+`--color-warning` and `--color-error` were unused after the rename, so the pet status line and its food button now read
+them; `--radius-xl` lands on the page-level view panel. `tests/design-tokens.test.ts` is the regression guard (AC1, AC3,
+AC4). The game remotes keep their own stylesheets until US-GAME-002 to US-GAME-004.
+
+**Two follow-ups for US-LAUNCH-004.** The primary button recipe paints `--color-canvas` on `--color-primary`, which
+measures about 2.9:1 — the document is the contract, so the token pairing stands until the contrast story fixes both the
+recipe and this document. `text-success` on `--color-on-dark` inherits the same problem on the inverted telemetry
+surface.
 
 - No special constraints.
 

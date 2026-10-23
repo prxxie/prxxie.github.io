@@ -1,38 +1,46 @@
 import React from "react";
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import "@testing-library/jest-dom";
 import MatrixMenu from "./MatrixMenu";
 
+vi.mock("../utils/audio", () => ({ playBeepSound: vi.fn() }));
+
+function renderAt(path: string): void {
+  render(
+    <MemoryRouter initialEntries={[path]}>
+      <MatrixMenu />
+    </MemoryRouter>,
+  );
+}
+
 describe("MatrixMenu", () => {
-  it("renders all valid tabs as buttons", () => {
-    const mockNavigate = vi.fn();
-    render(<MatrixMenu currentTab="home" navigate={mockNavigate} />);
+  it("links to every section of the site", () => {
+    renderAt("/");
 
-    expect(screen.getByRole("button", { name: /\[HM\]\s+home/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /\[AB\]\s+about/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /\[PO\]\s+posts/i })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /\[PE\]\s+pets/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /\[SH\]\s+shikaku/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /\[SO\]\s+sokoban/i })).toBeInTheDocument();
+    const links = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
+    expect(links).toEqual(["/", "/games", "/games/shikaku", "/games/sokoban", "/games/slitherlink", "/devlog"]);
   });
 
-  it("renders the COMMAND_MATRIX header label", () => {
-    render(<MatrixMenu currentTab="home" navigate={vi.fn()} />);
-    expect(screen.getByText("COMMAND_MATRIX")).toBeInTheDocument();
+  it("marks the section the reader is in", () => {
+    renderAt("/devlog");
+
+    expect(screen.getByRole("link", { name: "Devlog" })).toHaveClass("bg-primary");
+    expect(screen.getByRole("link", { name: "Games" })).not.toHaveClass("bg-primary");
   });
 
-  it("highlights the currently active tab", () => {
-    render(<MatrixMenu currentTab="about" navigate={vi.fn()} />);
-    const aboutBtn = screen.getByRole("button", { name: /\[AB\]\s+about/i });
-    expect(aboutBtn.className).toMatch(/bg-primary/);
+  it("keeps home inactive on a nested route", () => {
+    renderAt("/games/sokoban");
+
+    expect(screen.getByRole("link", { name: "Home" })).not.toHaveClass("bg-primary");
+    expect(screen.getByRole("link", { name: "Sokoban" })).toHaveClass("bg-primary");
   });
 
-  it("triggers navigation when a button is clicked", () => {
-    const mockNavigate = vi.fn();
-    render(<MatrixMenu currentTab="home" navigate={mockNavigate} />);
+  it("is a navigation landmark, not a set of tab buttons", () => {
+    renderAt("/");
 
-    fireEvent.click(screen.getByRole("button", { name: /\[AB\]\s+about/i }));
-    expect(mockNavigate).toHaveBeenCalledWith("about");
+    expect(screen.getByRole("navigation", { name: "Sections" })).toBeInTheDocument();
+    expect(screen.queryAllByRole("button")).toHaveLength(0);
   });
 });

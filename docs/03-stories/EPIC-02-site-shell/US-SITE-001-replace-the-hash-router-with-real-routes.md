@@ -2,7 +2,7 @@
 id: US-SITE-001
 title: Replace the hash router with real routes
 epic: EPIC-02-site-shell
-status: ready
+status: done
 priority: P0
 size: L
 depends_on: [US-FND-001]
@@ -52,6 +52,19 @@ A single route table is the source of truth, exported so the prerender step can 
 - Route change must move focus to the main landmark and reset scroll (AC of US-SITE-002, not here).
 
 ## 6. Implementation notes
+
+**Shipped.** One routing dependency, `react-router@7`, and one route table: `packages/shell/src/routes.tsx` exports
+`createAppRoutes()` (a `RouteObject[]` tree, layout route plus `index`, `games`, `games/:game`, `devlog`,
+`devlog/:slug`, `*`) and `prerenderPaths(postSlugs)` which is the list US-SITE-003 enumerates. `App.tsx` is now
+providers plus `createBrowserRouter`, `AppShell.tsx` holds the chrome and renders an `Outlet`, and `screens/` holds one
+component per route. The catch-all is a real screen with links to home, games and devlog; an unknown game slug explains
+itself instead of blanking. `useHashRouter` and its test are deleted.
+
+**Note for US-SITE-005.** Old `#/about` and `#/posts` links now land on the catch-all, because no route claims them yet.
+The redirect story should turn them into `/devlog` and `/` before the site goes live.
+
+**Note for US-SITE-002.** Focus does not yet move to the main landmark on a route change — that is the accessibility
+story's acceptance criterion, not this one.
 
 - No special constraints.
 

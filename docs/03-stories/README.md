@@ -7,7 +7,7 @@ maintainer can observe, plus the evidence that it holds. The order below is the 
 <!-- adf:stats -->
 | Stories | Done | In progress | Ready | Blocked | Draft | Closed |
 |---|---|---|---|---|---|---|
-| 36 | 6 | 0 | 30 | 0 | 0 | 0 |
+| 36 | 7 | 0 | 29 | 0 | 0 | 0 |
 
 Open questions: **Open: 1 · Blocking: 0 · Answered: 11 · Withdrawn: 0**
 <!-- /adf:stats -->
@@ -19,7 +19,7 @@ Open questions: **Open: 1 · Blocking: 0 · Answered: 11 · Withdrawn: 0**
 |---|---|---|---|---|---|
 | [EPIC-00-foundation](EPIC-00-foundation/README.md) | FND | Foundation: reproducible workspace and honest gates | 7 | 5 | 0 |
 | [EPIC-01-design-system](EPIC-01-design-system/README.md) | DS | One design system, warm cream and coral | 3 | 1 | 0 |
-| [EPIC-02-site-shell](EPIC-02-site-shell/README.md) | SITE | Real routes, prerendered pages, one contact path | 6 | 0 | 0 |
+| [EPIC-02-site-shell](EPIC-02-site-shell/README.md) | SITE | Real routes, prerendered pages, one contact path | 6 | 1 | 0 |
 | [EPIC-03-home](EPIC-03-home/README.md) | HOME | The one-page proof | 3 | 0 | 0 |
 | [EPIC-04-games](EPIC-04-games/README.md) | GAME | The games hub and three games in the same clothes | 5 | 0 | 0 |
 | [EPIC-05-devlog](EPIC-05-devlog/README.md) | DEVLOG | Markdown compiled at build time | 4 | 0 | 0 |

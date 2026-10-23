@@ -108,8 +108,10 @@ in-component.
 
 ```
 packages/
-  shell/          host: App.tsx (routing shell), components/, hooks/ (useHashRouter, useProgressService),
-                  store/ (petStore, uiStore), index.css (design tokens), types/remotes.d.ts (remote typings)
+  shell/          host: main.tsx (mount), App.tsx (providers + browser router), routes.tsx (the route table),
+                  AppShell.tsx (chrome), screens/ (one component per route), components/, hooks/
+                  (useProgressService), store/ (petStore, uiStore), index.css (design tokens),
+                  types/remotes.d.ts (remote typings)
   about/          one exposed component plus its own Tailwind entry
   posts/          PostsApp plus utils/markdown.ts
   pets/           PetsApp, display-only, takes the progress context as a prop

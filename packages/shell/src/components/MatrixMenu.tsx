@@ -1,50 +1,39 @@
 import React from "react";
-import type { Tab } from "../types";
+import { NavLink } from "react-router";
 import { playBeepSound } from "../utils/audio";
 
-interface MatrixMenuProps {
-  currentTab: Tab;
-  navigate: (tab: Tab) => void;
-}
-
-const GRID_ITEMS: Array<{ tab: Tab; key: string }> = [
-  { tab: "home", key: "HM" },
-  { tab: "about", key: "AB" },
-  { tab: "posts", key: "PO" },
-  { tab: "shikaku", key: "SH" },
-  { tab: "sokoban", key: "SO" },
-  { tab: "slitherlink", key: "SL" },
+const NAV_ITEMS: Array<{ to: string; label: string; end?: boolean }> = [
+  { to: "/", label: "Home", end: true },
+  { to: "/games", label: "Games" },
+  { to: "/games/shikaku", label: "Shikaku" },
+  { to: "/games/sokoban", label: "Sokoban" },
+  { to: "/games/slitherlink", label: "Slitherlink" },
+  { to: "/devlog", label: "Devlog" },
 ];
 
-export default function MatrixMenu({
-  currentTab,
-  navigate,
-}: MatrixMenuProps): React.ReactElement {
-  const handleButtonClick = (tabName: Tab): void => {
-    playBeepSound(440, 0.06);
-    navigate(tabName);
-  };
-
+export default function MatrixMenu(): React.ReactElement {
   return (
-    <div className="panel panel-dark p-2">
-      <div className="text-[10px] font-code text-accent-teal mb-2 text-center bg-surface-dark-elevated py-1">
-        COMMAND_MATRIX
+    <nav aria-label="Sections" className="panel">
+      <div className="panel-header">
+        <span className="panel-header-accent">Sections</span>
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        {GRID_ITEMS.map((item) => (
-          <button
-            key={item.tab}
-            onClick={() => handleButtonClick(item.tab)}
-            className={`btn text-[9px] py-2 px-1 text-center font-code capitalize ${
-              currentTab === item.tab
-                ? "bg-primary text-canvas border-hairline"
-                : "bg-transparent text-on-dark hover:bg-surface-dark-elevated"
-            }`}
+      <div className="panel-body grid grid-cols-2 gap-2">
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            onClick={() => playBeepSound(440, 0.06)}
+            className={({ isActive }) =>
+              `btn text-[12px] py-2 px-1 text-center no-underline ${
+                isActive ? "bg-primary text-canvas border-primary" : "text-ink"
+              }`
+            }
           >
-            [{item.key}] {item.tab}
-          </button>
+            {item.label}
+          </NavLink>
         ))}
       </div>
-    </div>
+    </nav>
   );
 }

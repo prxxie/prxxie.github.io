@@ -1,8 +1,7 @@
 ---
 title: "Hello, Retro World!"
 date: "2026-05-28"
-author: "prxxie"
-category: "retro"
+summary: "The first post: why this site is a cozy handheld instead of a portfolio grid."
 ---
 
 # Hello, Retro World!

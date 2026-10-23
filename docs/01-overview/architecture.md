@@ -119,7 +119,7 @@ packages/
   sokoban/        engine/synth.ts, solver/, store/, components/, levels.ts
   slitherlink/    engine/ (validation, synth), store/, components/, levels.ts
   shared/         progress/ (types, service), repository/ (port, local adaptor), pet/evolution.ts
-public/posts/     devlog markdown, compiled at build time (ADR-0006)
+packages/posts/src/content/  devlog markdown + loadPosts(), compiled at build time (ADR-0006)
 scripts/          build-static.sh — build and assembly
 docs/             this doc set
 ```

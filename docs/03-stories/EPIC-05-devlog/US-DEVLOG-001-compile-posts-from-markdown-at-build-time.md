@@ -2,7 +2,7 @@
 id: US-DEVLOG-001
 title: Compile posts from markdown at build time
 epic: EPIC-05-devlog
-status: ready
+status: done
 priority: P1
 size: M
 depends_on: [US-FND-001]
@@ -64,5 +64,24 @@ Frontmatter contract: `title` (string), `date` (`YYYY-MM-DD`), `summary` (string
 Unit tests over fixture files: valid set sorts correctly, invalid files throw with file and field named, unknown keys throw.
 
 ## 9. Open questions
+
+None — resolved before implementation.
+
+## 10. Outcome
+
+- Frontmatter parser and collection live in `packages/posts/src/content/loadPosts.ts`: `parsePost(source, file)` throws
+  with the file and field named, `sortPosts` orders newest first with a stable tie-break on slug, `loadPosts()` is the
+  only reader (an eager `import.meta.glob(..., { query: "?raw" })` at build time).
+- Posts moved from `public/posts/` to `packages/posts/src/content/posts/`; the two legacy posts were migrated to the
+  contract (`author`/`category` dropped, `summary` added) and slugs became file names (`hello-retro-world`,
+  `markdown-verification`).
+- `PostsApp` reads the collection instead of a hardcoded array, and no longer fetches markdown: the old `useQuery` +
+  `fetch('./posts/…')` path and the duplicate `parsePost` in `packages/posts/src/utils/markdown.ts` are gone.
+- AC2's build failure is enforced by the loader throwing at module scope; the deploy build executes it once the prerender
+  step lands in US-SITE-003. Until then the vitest suite (`loadPosts.test.ts`, 10 tests) is the gate that fails on a bad
+  post.
+- Docs updated: `docs/01-overview/architecture.md` (source layout), `docs/01-overview/conventions.md` (content location +
+  frontmatter), `docs/01-overview/roles-and-permissions.md`, `docs/02-reference/data/README.md`,
+  `docs/02-reference/screens/devlog.md` (field table), `ADR-0006`.
 
 None.

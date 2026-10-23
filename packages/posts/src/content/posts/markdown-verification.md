@@ -1,8 +1,7 @@
 ---
 title: "Markdown Verification"
 date: "2026-05-29"
-author: "prxxie"
-category: "retro"
+summary: "A fixture for the markdown renderer: headings, quotes, code and lists."
 ---
 
 # Heading 1

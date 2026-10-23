@@ -33,8 +33,8 @@ conventions are recorded below. The pack's own command table does not apply verb
   `vitest.config.ts:36-39`.
 - A package's public surface is exactly its exposed component. Nothing imports another package's internals; if two
   packages need the same logic it moves into `shared`.
-- Content that is not code lives outside the packages: devlog markdown in `public/posts/`, which the shell mounts as its
-  `publicDir` (`packages/shell/vite.config.ts:21`).
+- Devlog markdown lives with the package that compiles it, in `packages/posts/src/content/posts/`; `loadPosts()` reads it
+  through `import.meta.glob` at build time, so the posts no longer sit in a served `public/` directory (ADR-0006).
 
 ## Module Federation
 
@@ -94,7 +94,8 @@ reach the bundle. There is no `.env.example` and none is needed until a variable
 
 ## Content
 
-- A devlog post is one markdown file in `public/posts/` whose front matter carries `title`, `date` and `slug` (ADR-0006).
+- A devlog post is one markdown file in `packages/posts/src/content/posts/` whose frontmatter carries `title`, `date`,
+  `summary` and optionally `teaserGame`/`teaserLevel`; the file name is the slug (ADR-0006).
   The slug drives the route `/devlog/<slug>` and the prerendered filename, so renaming a slug breaks a URL.
 - Copy is English and inline; no i18n layer (NFR-16).
 

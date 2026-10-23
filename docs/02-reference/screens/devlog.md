@@ -32,12 +32,15 @@ amber chrome, and posts are 2 markdown files plus 2 inline objects.
 
 | Field | Type | Validation | Source |
 |-------|------|-----------|--------|
-| `slug` | `string` | present, unique, URL-safe; the file name is the slug | markdown file name in `public/posts/` |
+| `slug` | `string` | present, unique, URL-safe; the file name is the slug | markdown file name in `packages/posts/src/content/posts/` |
 | `title` | `string` | present, non-empty | frontmatter |
-| `date` | ISO date | present, parseable | frontmatter |
-| `summary` | `string` | present, ≤ 160 characters | frontmatter |
-| `teaserLevelId` | `string` | present in the referenced game's catalog | frontmatter or the content module |
+| `date` | `string` | present, exactly `YYYY-MM-DD` | frontmatter |
+| `summary` | `string` | present, one line | frontmatter |
+| `teaserGame` | `string` | optional; when present, a game slug | frontmatter |
+| `teaserLevel` | `string` | optional; when present, a level id of `teaserGame` | frontmatter |
 | `body` | markdown | must compile at build time | file contents |
+
+An unknown frontmatter key fails the build rather than being dropped (`packages/posts/src/content/loadPosts.ts`).
 
 A post with a missing or invalid field fails the build rather than shipping blank — markdown is compiled at build time,
 not fetched at runtime (ADR-0006).

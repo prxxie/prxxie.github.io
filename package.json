@@ -1,12 +1,9 @@
 {
   "name": "prxxie-home-monorepo",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "concurrently -n shell,about,posts,pets,shikaku,sokoban,slitherlink -c blue,green,yellow,magenta,cyan,white,red \"npm run dev -w packages/shell\" \"npm run dev:watch -w packages/about\" \"npm run dev:watch -w packages/posts\" \"npm run dev:watch -w packages/pets\" \"npm run dev:watch -w packages/shikaku\" \"npm run dev:watch -w packages/sokoban\" \"npm run dev:watch -w packages/slitherlink\"",
-    "build": "npm run build --workspaces --if-present",
+    "dev": "concurrently -n shell,about,posts,pets,shikaku,sokoban,slitherlink -c blue,green,yellow,magenta,cyan,white,red \"pnpm -F shell dev\" \"pnpm -F about dev:watch\" \"pnpm -F posts dev:watch\" \"pnpm -F pets dev:watch\" \"pnpm -F shikaku dev:watch\" \"pnpm -F sokoban dev:watch\" \"pnpm -F slitherlink dev:watch\"",
+    "build": "pnpm -r run build",
     "build:static": "bash scripts/build-static.sh",
     "test": "vitest run",
     "lint": "eslint .",
@@ -36,5 +33,9 @@
     "typescript": "^5.7.0",
     "typescript-eslint": "^8.0.0",
     "vitest": "^1.6.0"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20"
   }
 }

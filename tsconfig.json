@@ -34,6 +34,7 @@
     "packages/slitherlink/src/**/*.ts",
     "packages/slitherlink/src/**/*.tsx",
     "packages/shared/src/**/*.ts",
+    "tests/**/*.ts",
     "vitest.config.ts",
     "packages/*/vite.config.ts"
   ]

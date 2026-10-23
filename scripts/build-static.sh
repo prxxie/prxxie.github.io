@@ -6,9 +6,9 @@ rm -rf dist
 rm -rf packages/about/dist packages/posts/dist packages/pets/dist packages/shell/dist
 
 # Build non-submodule remotes
-npm run build -w packages/about
-npm run build -w packages/posts
-npm run build -w packages/pets
+pnpm -F about run build
+pnpm -F posts run build
+pnpm -F pets run build
 
 # Build submodule MFEs only if their dist doesn't already exist (CI pre-downloads them)
 for mfe in shikaku sokoban slitherlink; do
@@ -16,12 +16,12 @@ for mfe in shikaku sokoban slitherlink; do
     echo "Using pre-built dist for $mfe"
   else
     echo "Building $mfe from source..."
-    npm run build -w packages/$mfe
+    pnpm -F $mfe run build
   fi
 done
 
 # Build shell host
-npm run build -w packages/shell
+pnpm -F shell run build
 
 # Arrange output folder
 mkdir -p dist/mfe/about

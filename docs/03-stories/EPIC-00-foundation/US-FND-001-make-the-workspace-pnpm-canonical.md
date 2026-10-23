@@ -2,7 +2,7 @@
 id: US-FND-001
 title: Make the workspace pnpm-canonical
 epic: EPIC-00-foundation
-status: ready
+status: done
 priority: P0
 size: L
 depends_on: []
@@ -50,6 +50,11 @@ Every package manifest keeps its name (`shell`, `about`, `posts`, `pets`, `shika
 - Set `packageManager` in the root manifest so CI and local agree on the pnpm version.
 - Add `pnpm.onlyBuiltDependencies` if the install needs to run any build script.
 - Do not "fix" the type errors here — they are US-FND-002 and US-FND-003; this story only removes their cause.
+
+**Shipped.** The npm baseline recorded in this story (12 type errors, 7 lint errors, 102 warnings) was mostly the
+symptom of npm hoisting the published `shared@0.2.0` package; with pnpm and `workspace:*` the tree resolves to one
+React and one `shared`, so lint reaches 0 problems and the type gate drops to the single `PetsApp.tsx` overload.
+`tests/pnpm-canonical.test.ts` guards all seven criteria.
 
 ## 6. Implementation notes
 

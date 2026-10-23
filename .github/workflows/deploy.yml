@@ -20,13 +20,17 @@ jobs:
           token: ${{ secrets.MFE_DOWNLOAD_TOKEN }}
           submodules: true
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Download MFE pre-built artifacts
         env:
@@ -43,7 +47,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-        run: npm run build:static
+        run: pnpm run build:static
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

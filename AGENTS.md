@@ -18,12 +18,12 @@
 
 | Purpose | Command | State |
 |---------|---------|-------|
-| Install | `npm install` | works today; `pnpm install --frozen-lockfile` is the target (ADR-0005) — `(planned — verify after US-FND-001)` |
-| Run | `npm run dev` | host on `:3000`, remotes on `:3001`–`:3006` |
-| Test | `npm test` → `vitest run` | 36 files, 294 tests, green |
-| Lint | `npm run lint` → `eslint .` | red: 7 errors, 102 warnings (mostly the hoisted `shared@0.2.0` package) |
-| Type check | `npm run typecheck` → `tsc --noEmit` | red: 12 errors, first is `packages/pets/src/PetsApp.tsx(91,20)` |
-| Build | `npm run build:static` | assembles `dist/` from all six remotes plus the host |
+| Install | `pnpm install --frozen-lockfile` | verified: pnpm 10.33.0 pinned by `packageManager`, one lockfile at the root, `shared` linked as `workspace:*` |
+| Run | `pnpm dev` | verified: host on `:3000` plus a watch build per remote, `:3001`–`:3006` |
+| Test | `pnpm test` → `vitest run` | 37 files, 301 tests, green |
+| Lint | `pnpm run lint` → `eslint .` | green: 0 errors, 0 warnings |
+| Type check | `pnpm run typecheck` → `tsc --noEmit` | red: 1 error, `packages/pets/src/PetsApp.tsx(91,20)` |
+| Build | `pnpm run build:static` | verified: assembles `dist/` from all six remotes plus the host |
 
 **Layout**
 

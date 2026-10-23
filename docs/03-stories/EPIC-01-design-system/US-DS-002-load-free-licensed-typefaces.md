@@ -2,7 +2,7 @@
 id: US-DS-002
 title: Load free-licensed typefaces
 epic: EPIC-01-design-system
-status: ready
+status: done
 priority: P1
 size: M
 depends_on: [US-DS-001]
@@ -65,3 +65,15 @@ Visual check at 360px and 1440px plus a network panel read proving no third-part
 ## 9. Open questions
 
 None.
+
+## 9. Outcome
+
+Shipped on `feat/US-DS-002-typefaces`. `packages/shell/src/fonts.ts` imports the `latin` subset of eight faces from three
+Fontsource packages — Inter 400/500/600/700, Cormorant Garamond 400, JetBrains Mono 400/500/700 — and
+`packages/shell/src/fonts/LICENSE-NOTES.md` records the SIL OFL 1.1 licence of each. `packages/shell/src/index.css` no
+longer imports Google Fonts and its three family tokens name the shipped faces; `packages/shell/index.html` carries no font
+link. The build emits eight hashed `woff2` files into `dist/assets/`, `dist/` contains no `fonts.googleapis.com`,
+`fonts.gstatic.com` or `cdn.jsdelivr.net` reference, and the emitted CSS declares `font-display: swap` for every face
+(`pnpm -F shell run build`, verified by grep over `dist/`). `tests/typefaces.test.ts` holds the result: five tests cover the
+token families, the exact imported weights, the absence of third-party origins, the recorded licences and the `swap`
+declaration.

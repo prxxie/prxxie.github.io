@@ -47,8 +47,8 @@ new pairing must be checked before it ships (NFR-12).
 
 | Role | Family tokens | Use |
 |------|---------------|-----|
-| Display | `--font-display` (`Copernicus`, `Tiempos Headline`, `Cormorant Garamond`, serif) | page and section headings only |
-| Body | `--font-body` (`StyreneB`, `Inter`, system sans) | all interface and prose text |
+| Display | `--font-display` (`Cormorant Garamond`, serif fallbacks) | page and section headings only |
+| Body | `--font-body` (`Inter`, system sans) | all interface and prose text |
 | Code | `--font-code` (`JetBrains Mono`, monospace) | code, level ids, telemetry numbers |
 
 The scale, from the spec in `DESIGN.md` § typography: display-xl 64/1.05 with −1.5px tracking, display-lg 48/1.1, display-md
@@ -56,15 +56,18 @@ The scale, from the spec in `DESIGN.md` § typography: display-xl 64/1.05 with �
 are serif at weight 400; titles and body are sans, 500 and 400 respectively. Nothing renders below 14px except the
 telemetry numerals, which are 11px monospace and never carry meaning alone (NFR-12).
 
-The licensed Anthropic families in the token fallbacks are **not loaded** — the stack degrades to `Cormorant Garamond`,
-`Inter` and system faces, and `@import` fetches only `Geist Mono`
-(`packages/shell/src/index.css:1`). A licensed webfont is a content/licensing decision, not a code one.
+All three families are free-licensed and self-hosted: `packages/shell/src/fonts.ts` imports the `latin` subset of the
+weights the scale uses from the Fontsource packages, so the build hashes the `woff2` files into `dist/assets/` and no
+request leaves the origin (NFR-21). Only the used weights ship — Inter 400/500/600/700, Cormorant Garamond 400, JetBrains
+Mono 400/500/700 — and every face declares `font-display: swap`, so text is readable before the webfont arrives. The
+licences (SIL Open Font License 1.1 for all three) are recorded in `packages/shell/src/fonts/LICENSE-NOTES.md`, and
+`tests/typefaces.test.ts` fails if a third-party font origin, an unlisted weight or an unnamed family comes back.
 
 ## Space and shape
 
 Spacing scale, from `DESIGN.md` § spacing: `4 · 8 · 12 · 16 · 24 · 32 · 48 · 96px` (section rhythm is the 96px step).
 Radius tokens: `--radius-xs 4px`, `--radius-sm 6px`, `--radius-md 8px` (default for controls and cards),
-`--radius-lg 12px` (modal), `--radius-xl 16px` (page-level surfaces), `--radius-pill 9999px` (tags, the star counter).
+`--radius-lg 12px` (modal), `--radius-pill 9999px` (tags, the star counter).
 The rounding is the deliberate break from the pixel chrome: no 0-radius box and no `pixel-border` class survives.
 
 ## Component recipes

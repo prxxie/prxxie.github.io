@@ -2,7 +2,7 @@
 id: US-LAUNCH-005
 title: Sync the documentation with the shipped site
 epic: EPIC-07-launch
-status: ready
+status: done
 priority: P3
 size: M
 depends_on: [US-SITE-001, US-DS-001, US-PET-003]
@@ -63,3 +63,15 @@ The verifier is the test: `python3 .agents/scripts/verify-docs.py` exits 0, plus
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+| # | Criterion | Where it is proven |
+|---|-----------|--------------------|
+| AC1 | `DESIGN.md` gone, the archive removed as OQ-09 decided | `git rm DESIGN.md`, `git rm -r docs/superpowers` — the cream/coral tokens live in `packages/shell/src/index.css`, the solver rationale in `US-GAME-003`, the evolution thresholds in `docs/02-reference/data/README.md` |
+| AC2 | `AGENTS.md` describes routes, tokens, the pet widget and local-only progress | `AGENTS.md` § Routes, Design tokens, Pet and progress, Module Federation, CI and deploy |
+| AC3 | `verify-docs.py` clean | `0 error(s), 0 warning(s)` |
+| AC4 | no `(planned — verify after US-FND-001)` marker anywhere | `grep -r "planned — verify" docs/ AGENTS.md` returns only the two story texts that describe the requirement |
+| AC5 | every screen names the story that built it | `docs/02-reference/screens/README.md` status column refreshed; the ten shipped stories that had no outcome row now carry one |
+
+Notes: the doc set no longer claims an open question — all twelve are answered. Three remotes (`about`, `posts`, `pets`) still import daisyUI; their restyles are the remaining game and pet stories, and `docs/01-overview/conventions.md` records the deviation until then.

@@ -2,7 +2,7 @@
 id: US-FND-006
 title: Add the accessibility gate to CI
 epic: EPIC-00-foundation
-status: ready
+status: done
 priority: P1
 size: M
 depends_on: [US-FND-005, US-SITE-003]
@@ -63,3 +63,7 @@ The gate is its own test: seeded violation must fail.
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+Commit `6b17640`. `scripts/a11y-gate.mjs` runs axe-core in jsdom over every entry of `dist/route-manifest.json` and measures the declared contrast pairs; `pnpm run a11y` fails the build with the rule, the route and the node. First run found a real violation (unlabelled GFM task-list checkboxes in the sample post), fixed in `renderPostBody`. Now reports `a11y gate: checked 9 routes and 21 contrast pairs`.

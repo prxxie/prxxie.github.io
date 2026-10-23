@@ -5,12 +5,12 @@ as a destination, and no hash route survives (OQ-12).
 
 | Screen | Route | File | Job | Status | Story |
 |--------|-------|------|-----|--------|-------|
-| Home | `/` | `home.md` | turn a hiring reader into a contact, using the build as the argument | designed, not built | `US-HOME-001` |
+| Home | `/` | `home.md` | turn a hiring reader into a contact, using the build as the argument | built: headline, what I build, a puzzle slot, the measured proof, contact | `US-HOME-001` |
 | Games hub | `/games` | `games-hub.md` | let a visitor pick a puzzle and keep the star tally visible | route and a three-card listing shipped; the tally lands with `US-GAME-001` | `US-GAME-001` |
 | Shikaku | `/games/shikaku` | `shikaku.md` | the rectangle-fill puzzle, fully re-skinned | routed at its own path, restyle pending | `US-GAME-002` |
 | Sokoban | `/games/sokoban` | `sokoban.md` | the box-pushing puzzle, with two broken levels to fix | routed at its own path, restyle pending | `US-GAME-003` |
 | Slitherlink | `/games/slitherlink` | `slitherlink.md` | the loop-drawing puzzle | routed at its own path, restyle pending | `US-GAME-004` |
-| Devlog | `/devlog` | `devlog.md` | show how the thing is made, one post at a time, teaser level inline | designed, not built | `US-DEVLOG-002` |
+| Devlog | `/devlog` | `devlog.md` | show how the thing is made, one post at a time, teaser level inline | list and post pages built; the inline teaser level lands with `US-DEVLOG-004` | `US-DEVLOG-002` |
 
 ## Shell regions
 

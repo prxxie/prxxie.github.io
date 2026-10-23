@@ -20,25 +20,28 @@
 |---------|---------|-------|
 | Install | `pnpm install --frozen-lockfile` | verified: pnpm 10.33.0 pinned by `packageManager`, one lockfile at the root, `shared` linked as `workspace:*` |
 | Run | `pnpm dev` | verified: host on `:3000` plus a watch build per remote, `:3001`–`:3006` |
-| Test | `pnpm test` → `vitest run` | 37 files, 301 tests, green |
+| Test | `pnpm test` → `vitest run` | 49 files, 345 tests, green |
 | Lint | `pnpm run lint` → `eslint . --max-warnings=0` | green: 0 problems; warnings fail the gate |
 | Type check | `pnpm run typecheck` → `tsc --noEmit` | green: 0 errors |
-| Build | `pnpm run build:static` | verified: assembles `dist/` from all six remotes plus the host |
+| Build | `pnpm run build:static` | verified: creates the share card, measures the gate figures, assembles `dist/` from the host and six remotes, prerenders nine routes, writes the sitemap, then runs the accessibility gate |
+| A11y gate | `pnpm run a11y` | verified: axe-core over every prerendered route plus 21 contrast pairs, no findings |
 
 **Layout**
 
 ```
-packages/shell      host: routing, layout, the two Zustand stores, all design tokens (src/index.css)
+packages/shell      host: the route table, the layout regions, the screens, the pet store, and every
+                    design token (src/index.css). Prerender entry: src/entry-server.tsx
 packages/about      MFE: about page
 packages/posts      MFE: devlog (markdown compiled at build time)
-packages/pets       MFE: the pet widget, receives shell state as props
+packages/pets       MFE: the pet display, receives shell state as props (US-PET-001 moves it into the shell)
 packages/shikaku    MFE: Shikaku puzzle          [git submodule, own repo and release]
 packages/sokoban    MFE: Sokoban puzzle          [git submodule, own repo and release]
 packages/slitherlink MFE: Slitherlink puzzle     [git submodule, own repo and release]
 packages/shared     ProgressService, ProgressRepository + local adaptor, evolution thresholds
-content/            owner-authored copy and devlog metadata
-public/posts/       the devlog's markdown files
-scripts/            build-static.sh (assembly), verify-docs.py, and the CI helpers
+packages/posts/src/content/posts/   the devlog's markdown, compiled at build time by import.meta.glob
+public/             the share card (og.png, drawn by scripts/make-og-image.mjs)
+scripts/            build-static.sh, prerender.mjs, prerender-helpers.mjs, a11y-gate.mjs, build-facts.mjs, make-og-image.mjs
+tests/              repo-level checks: prerender, gate wiring, workflow shape, token and typeface rules
 ```
 
 **Conventions** (full detail in `docs/01-overview/conventions.md`)
@@ -51,148 +54,77 @@ scripts/            build-static.sh (assembly), verify-docs.py, and the CI helpe
 - Never add an account, a cloud call, an analytics event or a cookie banner (ADR-0004, ADR-0007).
 - Accessibility is built in, not audited in: WCAG 2.2 AA, an automated gate in CI (ADR-0008).
 
-**The guide below predates ADF** and documents the shipped amber/CRT implementation. Where it disagrees with `docs/`,
-`docs/` wins: the retro palette is retired (ADR-0001), `/posts` becomes `/devlog` with real paths (ADR-0002), Supabase
-cloud sync is deleted (ADR-0004), and the three games are owned and restyled in their own repositories (OQ-11).
 <!-- adf:project:end -->
 
 ---
 
-## Project Overview
+## Routes
 
-A **retro-styled personal home page** (CRT/pixel aesthetic) built as a Vite + React monorepo using **Module Federation**. The `shell` host app lazy-loads MFE remotes at runtime.
+The shell owns one route table (`packages/shell/src/routes.tsx`) shared by the browser and the build:
 
----
+| Path | Screen | Source |
+|------|--------|--------|
+| `/` | the proof page: headline, what I build, a playable puzzle, the measured proof, contact | `screens/HomePage.tsx` |
+| `/games` | the games hub | `screens/GamesHub.tsx` |
+| `/games/:slug` | one game, loaded as a Module Federation remote | `screens/GameRoute.tsx` |
+| `/devlog` | every post, newest first | `screens/DevlogIndex.tsx` |
+| `/devlog/:slug` | one post | `screens/DevlogPost.tsx` |
+| anything else | not found | `screens/NotFound.tsx` |
 
-## Monorepo Structure
+`prerenderPaths(postSlugs)` is the crawl surface: the build renders each entry through
+`createStaticHandler` (`src/entry-server.tsx`), so the prerendered document and the hydrated app cannot disagree.
+Old hash links (`#posts`, `#pets`, a game tab) are redirected to their new paths by `hooks/useLegacyHashRedirect.ts`.
 
-```
-packages/
-  shell/        — Host app (Module Federation consumer, routing, global state)
-  about/        — MFE: About page
-  posts/        — MFE: Blog/posts reader
-  pets/         — MFE: Virtual pet display (state-injected by shell)
-  shikaku/      — [GIT SUBMODULE] MFE: Shikaku puzzle game (github.com/prxxie/cozyos-shikaku)
-  slitherlink/  — [GIT SUBMODULE] MFE: Slitherlink puzzle game (github.com/prxxie/cozyos-slitherlink)
-  sokoban/      — [GIT SUBMODULE] MFE: Sokoban puzzle game (github.com/prxxie/cozyos-sokoban)
-  shared/       — Internal library: ProgressService, PetState, evolution logic
-```
+## Design tokens
 
----
+One system, cream canvas and coral action (ADR-0001). Every value lives in the `@theme` block of
+`packages/shell/src/index.css`: 18 colours, 6 radii, 3 typefaces. Components use the Tailwind utilities those tokens
+generate (`bg-canvas`, `text-ink`, `border-hairline`, `font-display`, `text-primary`), never a raw hex, and the shared
+recipes are `.panel`, `.panel-dark`, `.panel-header`, `.panel-body`, `.btn`, `.btn-primary`.
+`tests/design-tokens.test.ts` fails on a legacy class (`text-cozy-*`, `font-press`, `retro-window`, `pixel-*`), an amber
+hex, or a token no file consumes. The stack pack's daisyUI deviation is recorded in `docs/01-overview/conventions.md`.
+Typefaces are self-hosted through Fontsource (`src/fonts.ts`), 8 weights, no third-party font origin.
 
-## Package Specs
+## Pet and progress
 
-### `shell`
-- **Role**: Module Federation host. Owns global routing, layout, Zustand stores.
-- **Key files**:
-  - `src/App.tsx` — lazy-loads all MFEs, `useHashRouter` for tab routing
-  - `src/store/petStore.ts` — pet state (injected into `pets` MFE as props)
-  - `src/store/uiStore.ts` — UI state
-  - `src/hooks/useProgressService.ts` — wraps ProgressService, exposes `hungryLevel`
-  - `src/index.css` — the single design system (ADR-0001): `@theme` tokens, component recipes, prose rules
-  - `src/fonts.ts` — the three self-hosted Fontsource families (weights + `LICENSE-NOTES.md`)
-- **MFE remotes served at**: `/mfe/<name>/assets/remoteEntry.js`
-- **Dev**: sirv middleware mounts each MFE's `dist/` at `/mfe/<name>`
+Progress is local only (ADR-0004): `ProgressService` over `LocalProgressRepository`, persisted at
+`localStorage["cozyos.progress.v1"]`. `ProgressState` is `{ completedLevels, foodConsumed, pet }`; `PetState` carries
+`xp`, `stage`, `happiness`, `isSleeping` and the last feed/play timestamps. Feeding spends one star, earns one XP, and is
+rate-limited by a 10-minute cooldown; happiness decays 5 per cooldown; `EVOLUTION_THRESHOLDS = [0, 10, 30, 60, 100]`
+map XP to stages 1–5. Game remotes report a win as a `cozyos:progress-updated` event; the shell listens and updates the
+store. There is no backend, no account and no cloud sync.
 
-### `about` / `posts` / `shikaku` / `slitherlink` / `sokoban`
-- **Role**: Self-contained MFE remotes. No shell state injected.
-- **Exposes**: `./XxxApp` component via `remoteEntry.js`
-- **Build base**: `/mfe/<name>/`
+## Module Federation
 
-### `slitherlink`
-- **Role**: Slitherlink loop-drawing puzzle game.
-- **Engine**: `src/engine/validation.ts` — loop validation (vertex degrees, clue counts, single closed loop traversal)
-- **Store**: `src/store/useSlitherlinkStore.ts` — Zustand store with undo stack, timer, win detection
-- **Synth**: `src/engine/synth.ts` — RetroSynth audio (WebAudio API)
-- **Levels**: `src/engine/levels.ts` — 10 pre-baked levels (5 Easy, 5 Medium)
-- **Integrates**: Dispatches `cozyos:progress-updated` CustomEvent on win for shell ProgressService pickup
+| Where | What |
+|-------|------|
+| `shell/vite.config.ts` | `remotes` = the six entries of `mfePackages`, shared `react`, `react-dom`, `zustand`, `@tanstack/react-query` |
+| each MFE | `exposes: { ./XxxApp }`, `base: command === "build" ? "/mfe/<name>/" : "/"`, `react`/`react-dom` shared as singletons |
+| dev | one watch build per remote on `:3001`–`:3006`, mounted by sirv at `/mfe/<name>` |
+| tests | a remote import is aliased to `packages/shell/src/components/MockMfe.tsx` |
 
-### `pets`
-- **Role**: MFE remote that receives shell's `usePetStore` hook as a prop.
-- **Exposes**: `./PetsApp`
-- **Special**: Only MFE that accepts injected state — keeps it display-only.
+Adding an MFE touches three places: its own `vite.config.ts`, `mfePackages` in `shell/vite.config.ts`, and a route entry.
 
-### `shared`
-- **Role**: Pure TS library. No React, no Vite federation.
-- **Exports**: `ProgressService`, `LocalProgressRepository`, `getEvolutionStage`, `PetState`, `ProgressState`, `CompletedLevel`
-- **Used by**: `shell` (and any MFE that needs game progress logic)
+## CI and deploy
 
----
+`verify` runs `pnpm install --frozen-lockfile`, `pnpm test`, `pnpm run lint`, `pnpm run typecheck` on Node 20;
+`build-and-deploy` then downloads each game's `dist.tar.gz` from its latest release (submodules are not built here),
+runs `pnpm run build:static`, and publishes `dist/` to gh-pages with `peaceiris/actions-gh-pages`. A game repo pushes to
+`main` → its own workflow builds and releases it → it dispatches this repo's deploy.
 
-## Module Federation Wiring
+## Tests
 
-```
-shell vite.config.ts
-  remotes: { about, posts, pets, shikaku, slitherlink, sokoban }
-  shared:  react, react-dom, zustand, @tanstack/react-query
+- Beside the source (`Foo.test.tsx` next to `Foo.tsx`), plus `tests/` for repo-level contracts.
+- The three game engines are pure TypeScript and are tested directly.
+- Run everything: `pnpm test`. Gates: `pnpm run lint`, `pnpm run typecheck`, `pnpm run a11y`.
 
-each MFE vite.config.ts
-  exposes: { ./XxxApp: ./src/XxxApp.tsx }
-  shared:  react, react-dom  (+ zustand for pets, slitherlink)
-```
-
-Adding a new MFE requires changes in **three places**:
-1. New package `vite.config.ts` — add `federation({ exposes })` 
-2. `shell/vite.config.ts` — add to `remotes` and `mfePackages` array
-3. `shell/src/App.tsx` — add `lazy(() => import('name/Component'))` and route
-
----
-
-## State & Data Flow
-
-```
-shared/ProgressService  ←→  LocalProgressRepository (localStorage)
-        ↑
-shell/useProgressService  →  petStore (Zustand)
-                          →  pets MFE (via props)
-        ↑
-MFE game apps (sokoban, shikaku, slitherlink) call completeLevelWithStars on win
-```
-
----
-
-## Submodule MFE CI/CD
-
-Game MFEs (shikaku, sokoban, slitherlink) are separate GitHub repos mounted as git submodules.
-
-**Each MFE repo has its own CI:**
-- Push to `main` → GitHub Actions builds the MFE → creates a GitHub release with `dist.tar.gz`
-- After release, dispatches `repository_dispatch` to `prxxie.github.io` to trigger re-deploy
-
-**Main repo deploy workflow:**
-- Triggers on: push to `main` OR `repository_dispatch` from MFE repos
-- Downloads pre-built `dist.tar.gz` from each MFE's latest GitHub release
-- Builds shell + non-submodule MFEs locally
-- Assembles everything into `dist/` and deploys to gh-pages
-
-**Updating a submodule to latest:**
-```bash
-cd packages/shikaku && git pull origin main && cd ../..
-git add packages/shikaku
-git commit -m "chore: update shikaku submodule"
-```
-
-**`shared` dependency:** Stays in the main monorepo. MFE repos resolve it via npm workspace (`"shared": "*"`). In CI, the MFE workflow sparse-checks out `packages/shared` from the main repo.
-
----
-
-## Testing Rules
-
-- Test files live beside source: `Foo.test.tsx` next to `Foo.tsx`
-- Shell tests **mock all MFE remotes** (see `MockMfe.tsx`)
-- Game engines (`sokoban/engine`, `shikaku/engine`, `slitherlink/engine`) are pure TS — test them directly, no React needed
-- Run all tests: `rtk npm run test`
-
----
-
-## Updating This File
-
-When you make any of these changes, update AGENTS.md in the same session:
+## Updating this file
 
 | Change | Section to update |
 |--------|-------------------|
-| Add/remove a package | Monorepo Structure, Package Specs |
-| Change MFE exposed component name | Module Federation Wiring |
-| Add shell state passed to an MFE | State & Data Flow, `pets` spec note |
-| Add new shared export | `shared` Package Specs |
-| Change port/path conventions | Module Federation Wiring |
+| Add or remove a package | Layout, Module Federation |
+| Change the route table | Routes |
+| Change the exposed component name | Module Federation |
+| Add a token, family or recipe | Design tokens, `docs/02-reference/design-system.md` |
+| Change how progress is stored | Pet and progress |
+| Change a gate or the deploy pipeline | CI and deploy, `docs/01-overview/deployment.md` |

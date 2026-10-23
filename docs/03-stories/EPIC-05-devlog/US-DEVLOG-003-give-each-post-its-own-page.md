@@ -2,7 +2,7 @@
 id: US-DEVLOG-003
 title: Give each post its own page
 epic: EPIC-05-devlog
-status: ready
+status: done
 priority: P1
 size: M
 depends_on: [US-DEVLOG-001, US-SITE-003]
@@ -65,3 +65,7 @@ Router test for known and unknown slugs; a prerender assertion per post URL; a s
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+Commit `6d10162`. `packages/shell/src/screens/DevlogPost.tsx` renders one post at `/devlog/:slug`: title, date, summary and the compiled body; `renderPostBody` demotes the body `h1` to `h2`, adds slug ids to headings and labels GFM task-list inputs, so the page keeps one `h1` and the a11y gate passes. Proven by `packages/shell/src/screens/devlog.test.tsx` and the gate run.

@@ -2,7 +2,7 @@
 id: US-SITE-004
 title: Make the real paths work on GitHub Pages
 epic: EPIC-02-site-shell
-status: ready
+status: done
 priority: P0
 size: M
 depends_on: [US-SITE-003]
@@ -64,3 +64,7 @@ Manual + scripted: `curl -I` each route and assert 200 and the expected title; c
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+Commit `f219232`. `scripts/prerender.mjs` writes both `dist/<path>.html` and `dist/<path>/index.html`, `prerender-helpers.mjs` exports `SITE_ORIGIN`, `canonicalUrl`, `outputFiles` and `inject`, and `scripts/build-static.sh` writes `dist/.nojekyll`; the shell sets no `base`. Proven by `tests/prerender.test.ts`.

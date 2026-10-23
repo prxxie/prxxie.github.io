@@ -54,7 +54,7 @@ new pairing must be checked before it ships (NFR-12).
 | Body | `--font-body` (`Inter`, system sans) | all interface and prose text |
 | Code | `--font-code` (`JetBrains Mono`, monospace) | code, level ids, telemetry numbers |
 
-The scale, from the spec in `DESIGN.md` § typography: display-xl 64/1.05 with −1.5px tracking, display-lg 48/1.1, display-md
+The scale, as the stylesheet sets it: display-xl 64/1.05 with −1.5px tracking, display-lg 48/1.1, display-md
 36/1.15, display-sm 28/1.2; title-lg 22/1.3, title-md 18/1.4, title-sm 16/1.4; body-md 16/1.55, body-sm 14. Display sizes
 are serif at weight 400; titles and body are sans, 500 and 400 respectively. Nothing renders below 14px except the
 telemetry numerals, which are 11px monospace and never carry meaning alone (NFR-12).
@@ -68,7 +68,7 @@ licences (SIL Open Font License 1.1 for all three) are recorded in `packages/she
 
 ## Space and shape
 
-Spacing scale, from `DESIGN.md` § spacing: `4 · 8 · 12 · 16 · 24 · 32 · 48 · 96px` (section rhythm is the 96px step).
+Spacing scale: `4 · 8 · 12 · 16 · 24 · 32 · 48 · 96px` (section rhythm is the 96px step).
 Radius tokens: `--radius-xs 4px`, `--radius-sm 6px`, `--radius-md 8px` (default for controls and cards),
 `--radius-lg 12px` (modal), `--radius-pill 9999px` (tags, the star counter).
 The rounding is the deliberate break from the pixel chrome: no 0-radius box and no `pixel-border` class survives.
@@ -101,7 +101,8 @@ recipes above, and the accessibility rules of ADR-0008 apply identically inside 
 `docs/01-overview/conventions.md` fixes the naming rules (`--color-<role>` etc., no raw hex in components). The effect of
 the collapse is asserted, not counted by hand: `tests/design-tokens.test.ts` fails on any `text-cozy-*`, `font-press`,
 `retro-window` or `pixel-` reference outside `index.css`, on any amber hex, and on any declared token that no file
-consumes. `DESIGN.md` remains the raw spec until the restyle finishes, at which point it is deleted (OQ-09).
+consumes. The stylesheet's `@theme` block is the only source of token values — there is no separate design document to
+drift from it, and US-LAUNCH-005 deleted the amber-era spec that used to sit at the repository root.
 
 ### Contrast, and why three tokens have an inverted twin
 

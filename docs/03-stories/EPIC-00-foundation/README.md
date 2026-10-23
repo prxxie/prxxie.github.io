@@ -24,7 +24,7 @@ Generated from story frontmatter — run `python3 .agents/scripts/verify-docs.py
 | [US-FND-003](US-FND-003-green-the-lint-gate.md) | Green the lint gate | P0 | M | done | US-FND-001 |
 | [US-FND-004](US-FND-004-delete-the-cloud-sync-code-path.md) | Delete the cloud-sync code path | P1 | M | done | US-FND-001 |
 | [US-FND-005](US-FND-005-make-the-deploy-workflow-refuse-a-red-tree.md) | Make the deploy workflow refuse a red tree | P0 | M | done | US-FND-001, US-FND-002, US-FND-003 |
-| [US-FND-006](US-FND-006-add-the-accessibility-gate-to-ci.md) | Add the accessibility gate to CI | P1 | M | ready | US-FND-005, US-SITE-003 |
+| [US-FND-006](US-FND-006-add-the-accessibility-gate-to-ci.md) | Add the accessibility gate to CI | P1 | M | done | US-FND-005, US-SITE-003 |
 | [US-FND-007](US-FND-007-serve-the-site-from-the-user-site-root.md) | Serve the site from the user-site root | P1 | S | ready | US-SITE-004 |
 <!-- /adf:epic-stories -->
 

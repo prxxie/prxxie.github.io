@@ -2,7 +2,7 @@
 id: US-DEVLOG-002
 title: List the posts
 epic: EPIC-05-devlog
-status: ready
+status: done
 priority: P1
 size: M
 depends_on: [US-DEVLOG-001, US-SITE-003]
@@ -65,3 +65,7 @@ Component tests for zero/one/many posts; a prerender assertion that every post a
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+Commit `4d4bb81`. `packages/shell/src/screens/DevlogIndex.tsx` renders `loadPosts()` newest first; each entry is one link with its title, date and summary; `docs/02-reference/screens/devlog-index.md` describes it. Proven by `packages/shell/src/screens/devlog.test.tsx`.

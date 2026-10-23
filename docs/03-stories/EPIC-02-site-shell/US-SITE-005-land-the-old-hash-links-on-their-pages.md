@@ -2,7 +2,7 @@
 id: US-SITE-005
 title: Land the old hash links on their pages
 epic: EPIC-02-site-shell
-status: ready
+status: done
 priority: P2
 size: S
 depends_on: [US-SITE-001]
@@ -59,3 +59,7 @@ Router test: each legacy value resolves to the expected path; a second navigatio
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+Commit `66388a0`. `packages/shell/src/hooks/useLegacyHashRedirect.ts` maps every pre-router fragment (`#posts` → `/devlog`, `#pets` → `/`, each game's tab → `/games/<slug>`) and redirects with `replace`, so the back button does not bounce; an unmapped fragment falls through to the catch-all page once. Mounted once in `AppShell`. Proven by its test file.

@@ -16,7 +16,7 @@ no analytics; the only stored state is the visitor's own progress, in their brow
 <!-- adf:stats -->
 | Stories | Done | In progress | Ready | Blocked | Draft | Closed |
 |---|---|---|---|---|---|---|
-| 36 | 12 | 0 | 24 | 0 | 0 | 0 |
+| 36 | 19 | 0 | 17 | 0 | 0 | 0 |
 
 Open questions: **Open: 1 · Blocking: 0 · Answered: 11 · Withdrawn: 0**
 <!-- /adf:stats -->
@@ -62,18 +62,10 @@ docs/
   01-overview/      product overview, architecture, glossary, NFRs, conventions, roles, state machine, setup, deployment
   02-reference/     the reference layer: design system, screens (one file per screen), data model
   04-decisions/     open questions and the ADR series (0001–0009)
-  superpowers/      the pre-ADF plan and spec archive — historical, superseded, kept for provenance
 ```
 
 ## Open questions
 
-Two questions are still open, and the stories that depend on them cannot start until they are answered. The generated
-count above reads `Blocking: 0` because blocking is counted per story, and the backlog does not exist until `adf-plan`:
-
-- [OQ-12](04-decisions/open-questions.md#oq-12--which-router-and-prerender-toolchain-produce-real-paths-with-prerendered-html)
-  — which router and prerender toolchain produce the real paths (ADR-0009 is `proposed` on this). Blocks the routing and
-  prerender foundations.
-- [OQ-04](04-decisions/open-questions.md#oq-04--are-the-three-game-submodules-in-product-scope-and-where-do-game-defects-get-fixed)
-  — the scope and ownership boundary of the three game submodules. Blocks the three game epics.
-
-The remaining ten are answered and are recorded for their reasoning, not for action.
+None is open. All twelve (`OQ-01` … `OQ-12`) are answered and are recorded for their reasoning, not for action;
+`OQ-04` is carried forward as an accepted assumption on the three game stories it shapes, because the submodule
+restyles ship from this repository but in their own releases.

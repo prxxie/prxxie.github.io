@@ -2,7 +2,7 @@
 id: US-FND-005
 title: Make the deploy workflow refuse a red tree
 epic: EPIC-00-foundation
-status: ready
+status: done
 priority: P0
 size: M
 depends_on: [US-FND-001, US-FND-002, US-FND-003]
@@ -50,6 +50,13 @@ Step order in `.github/workflows/deploy.yml`: checkout → setup node 20 → `pn
 - Keep the `repository_dispatch` trigger working; a game release must still deploy the site.
 - Cache the pnpm store to keep the added gate time acceptable.
 - `pnpm audit --prod` runs as a non-blocking report step (NFR-11), not a gate, until the advisory list is clean.
+
+**Shipped, with AC4 deferred.** The host workflow now gates publish behind a `verify` job (frozen install → test →
+lint → typecheck, plus a non-blocking `pnpm audit --prod`), and `build-and-deploy` needs it, so a red tree never reaches
+the assemble step. AC4 — moving the three game repositories' `build.yml` from npm to pnpm — is not done here: those
+workflows build a synthetic workspace from a sparse checkout and never read the host lockfile, so the npm calls there
+are consistent rather than broken. The conversion ships with US-GAME-002..004, which are the stories that commit in
+those repositories; the prepared patch is recorded in the story notes of US-GAME-002.
 
 ## 6. Implementation notes
 

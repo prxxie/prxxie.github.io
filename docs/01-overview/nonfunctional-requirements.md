@@ -33,7 +33,7 @@ NFR is never referenced. Numbers that the code already fixes are marked `[inferr
 
 | Id | Requirement | Measure |
 |----|-------------|---------|
-| NFR-12 | Every page meets WCAG 2.2 AA | automated check in CI reports no serious or critical violation on the seven routes (ADR-0008) |
+| NFR-12 | Every page meets WCAG 2.2 AA | `scripts/a11y-gate.mjs` runs axe-core over every route in the built manifest and measures the declared contrast pairs; the build fails on a serious or critical violation, and the report lands in `dist/a11y-report.json` (ADR-0008) |
 | NFR-13 | All three puzzles are playable with the keyboard alone | a level can be completed with no pointer event |
 | NFR-14 | Motion respects the visitor's preference and focus is always visible | `prefers-reduced-motion` variants exist for every animation; a visible focus ring on every interactive element |
 | NFR-15 | The layout works from 360px to 1920px wide | no horizontal scroll and no clipped control at either bound |

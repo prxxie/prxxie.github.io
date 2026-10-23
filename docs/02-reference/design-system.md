@@ -21,7 +21,7 @@ it fails if a declared token is never used.
 | Token | Value | Role |
 |-------|-------|------|
 | `--color-primary` | `#cc785c` | the single action colour: primary button, active nav, the pet's highlight |
-| `--color-primary-active` | `#a9583e` | pressed/hover state of primary |
+| `--color-primary-active` | `#9f533a` | pressed/hover state of primary |
 | `--color-primary-disabled` | `#e6dfd8` | disabled primary, same value as the hairline |
 | `--color-canvas` | `#faf9f5` | page background |
 | `--color-surface-card` | `#efe9de` | raised card, board frame, footer widget |
@@ -29,14 +29,17 @@ it fails if a declared token is never used.
 | `--color-surface-dark-elevated` | `#252320` | inverted surface, one step up |
 | `--color-ink` | `#141413` | headings and primary text on light |
 | `--color-body` | `#3d3d3a` | body copy on light |
-| `--color-muted` | `#6c6a64` | secondary text, metadata, captions |
+| `--color-muted` | `#6a6862` | secondary text, metadata, captions |
 | `--color-on-dark` | `#faf9f5` | text on `--color-surface-dark` |
 | `--color-on-dark-soft` | `#a09d96` | secondary text on dark |
 | `--color-accent-teal` | `#5db8a6` | the one non-coral accent, for success-adjacent emphasis |
 | `--color-accent-amber` | `#e8a55a` | star ratings, earned XP |
-| `--color-success` | `#5db872` | solved state |
-| `--color-warning` | `#d4a017` | the pet's hunger warning |
-| `--color-error` | `#c64545` | errors, invalid moves |
+| `--color-success` | `#3a7247` | solved state on a light surface |
+| `--color-success-on-dark` | `#7ad191` | solved state on an inverted surface |
+| `--color-warning` | `#8a6a0f` | the pet's hunger warning on a light surface |
+| `--color-warning-on-dark` | `#f0b862` | the pet's hunger warning on an inverted surface |
+| `--color-error` | `#a83232` | errors and invalid moves on a light surface |
+| `--color-error-on-dark` | `#f08585` | errors and invalid moves on an inverted surface |
 | `--color-hairline` | `#e6dfd8` | every 1px rule and border |
 
 Rules: coral is the only action colour and appears once per view; a second coral element means one of the two is not an
@@ -99,3 +102,17 @@ recipes above, and the accessibility rules of ADR-0008 apply identically inside 
 the collapse is asserted, not counted by hand: `tests/design-tokens.test.ts` fails on any `text-cozy-*`, `font-press`,
 `retro-window` or `pixel-` reference outside `index.css`, on any amber hex, and on any declared token that no file
 consumes. `DESIGN.md` remains the raw spec until the restyle finishes, at which point it is deleted (OQ-09).
+
+### Contrast, and why three tokens have an inverted twin
+
+The accessibility gate (US-FND-006, `scripts/a11y-gate.mjs`) measures every text-on-surface
+pair the system declares against WCAG 2.2 AA: 4.5:1 for body copy, 3:1 for a focus ring. These
+values were set so every pair passes — `--color-muted` `#6a6862` (4.61:1 on a panel),
+`--color-primary-active` `#9f533a` (4.61:1) and `--color-success` `#3a7247` (4.73:1) were each
+darkened to clear the line.
+
+No single value can clear 4.5:1 on both `#faf9f5` and `#181715`, so the three status colours carry
+an `-on-dark` twin (`--color-success-on-dark` `#7ad191`, `--color-warning-on-dark` `#f0b862`,
+`--color-error-on-dark` `#f08585`) used on the inverted surface. The theme block is declared
+`@theme static`, so every token ships whether a utility uses it or not — the gate measures the
+tokens, not the classes.

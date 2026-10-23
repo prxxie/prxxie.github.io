@@ -2,7 +2,7 @@
 id: US-PET-002
 title: Make the feeding economy legible
 epic: EPIC-06-pet
-status: ready
+status: done
 priority: P2
 size: M
 depends_on: [US-PET-001]
@@ -65,3 +65,16 @@ Unit tests over the service are already there; add component tests for disabled 
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+| # | Criterion | Where it is proven |
+|---|-----------|--------------------|
+| AC1 | food shown out of the stars earned, and the cost of one feed | `PetWidget` computes `starsEarned` from `completedLevels` and renders `"{available} of {earned} stars"`; the hint line says "Feed costs one star." |
+| AC2 | one feed consumes one food and adds one XP, immediately | `ProgressService.feedPet` does both; the widget re-reads `state` through the hook. `PetWidget.test.tsx` › offers feed, play and sleep |
+| AC3 | a second feed inside the cooldown is disabled with the wait in minutes | `cooldownMinutes(lastFedAt, now, HUNGER_COOLDOWN)` and the disabled Feed button; `PetWidget.test.tsx` › disables feeding inside the cooldown |
+| AC4 | zero food disables feeding and explains how to earn more | the "No stars to spend — finish a level to earn one." hint |
+| AC5 | asleep blocks play with a reason and adds no happiness | Play disabled, "Sleeping: play is paused until the pet wakes." |
+| AC6 | other tabs agree without a reload | `LocalProgressRepository` re-reads on the `storage` event (`packages/shared/src/repository/LocalProgressRepository.ts:36`), covered by its own tests |
+
+Notes: the widget renders rules, it does not restate them — the cooldown constant is imported from `shared`, so a change there moves the copy with it.

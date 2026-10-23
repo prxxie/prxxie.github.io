@@ -4,7 +4,7 @@ import PetWidgetFrame from "./primitives/PetWidgetFrame";
 import Tag from "./primitives/Tag";
 import Button from "./primitives/Button";
 import { useProgressService } from "../hooks/useProgressService";
-import { EVOLUTION_THRESHOLDS } from "shared";
+import { EVOLUTION_THRESHOLDS, HUNGER_COOLDOWN } from "shared";
 
 /**
  * US-PET-001: the pet, at footer size. Everything it shows comes from
@@ -26,6 +26,13 @@ export function levelGlyph(level: number, filled = "●", empty = "○"): string
   const steps = 5;
   const clamped = Math.max(0, Math.min(steps, Math.round(level)));
   return `${filled.repeat(clamped)}${empty.repeat(steps - clamped)}`;
+}
+
+/** Whole minutes left on the feed cooldown, so the wait is stated, not guessed. */
+export function cooldownMinutes(lastFedAt: number, now: number, cooldownMs: number = HUNGER_COOLDOWN): number {
+  const remaining = lastFedAt + cooldownMs - now;
+
+  return remaining <= 0 ? 0 : Math.ceil(remaining / 60_000);
 }
 
 /** How many stars until the next stage, and what happens at the top one. */
@@ -56,7 +63,9 @@ export default function PetWidget(): React.ReactElement | null {
 
   if (!state.pet) return null;
 
-  const canFeed = hungryLevel > 0 && foodAvailable > 0 && !isSleeping && busy === null;
+  const starsEarned = state.completedLevels.reduce((total, level) => total + (level.stars ?? 0), 0);
+  const waitMinutes = cooldownMinutes(state.pet.lastFedAt, Date.now());
+  const canFeed = hungryLevel > 0 && foodAvailable > 0 && waitMinutes === 0 && !isSleeping && busy === null;
   const canPlay = !isSleeping && happiness < 100 && busy === null;
   const status = isSleeping ? "Asleep" : hungryLevel > 0 ? "Hungry" : "Content";
 
@@ -68,7 +77,7 @@ export default function PetWidget(): React.ReactElement | null {
           <span className="font-medium text-ink">{stageName(state.pet.stage)}</span>
           <span>{status}</span>
           <Tag>{`${state.pet.xp} XP`}</Tag>
-          <Tag>{`${foodAvailable} star${foodAvailable === 1 ? "" : "s"}`}</Tag>
+          <Tag>{`${foodAvailable} of ${starsEarned} stars`}</Tag>
           <span className="text-muted">{nextStageHint(state.pet.xp)}</span>
         </span>
       }
@@ -116,7 +125,9 @@ export default function PetWidget(): React.ReactElement | null {
               ? "Not hungry yet."
               : foodAvailable === 0
                 ? "No stars to spend — finish a level to earn one."
-                : "Feed costs one star."}
+                : waitMinutes > 0
+                  ? `Feed again in ${waitMinutes} min (one feed every 10 min).`
+                  : "Feed costs one star."}
         </span>
       </div>
     </PetWidgetFrame>

@@ -1,9 +1,10 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import PetWidget, { levelGlyph, nextStageHint, stageName } from "./PetWidget";
+import PetWidget, { cooldownMinutes, levelGlyph, nextStageHint, stageName } from "./PetWidget";
+import type { ProgressServiceContextType } from "../hooks/useProgressService";
 
-const service = {
+const service: Omit<ProgressServiceContextType, "state"> & { state: ProgressServiceContextType["state"] } = {
   state: { completedLevels: [], foodConsumed: 0, pet: { xp: 4, stage: 1, lastFedAt: 0, happiness: 60, lastPlayedAt: 0, isSleeping: false } },
   isHungry: true,
   foodAvailable: 2,
@@ -83,6 +84,38 @@ describe("the pet widget (US-PET-001)", () => {
     const { container } = render(<PetWidget />);
 
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it("shows the food as a share of the stars earned, and the cost of one feed", () => {
+    service.state = {
+      completedLevels: [
+        { module: "shikaku", levelId: "1", completedAt: 0, stars: 3 },
+        { module: "sokoban", levelId: "2", completedAt: 0, stars: 2 },
+      ],
+      foodConsumed: 2,
+      pet: { xp: 4, stage: 1, lastFedAt: 0, happiness: 60, lastPlayedAt: 0, isSleeping: false },
+    };
+    render(<PetWidget />);
+
+    expect(screen.getByText("2 of 5 stars")).toBeInTheDocument();
+    expect(screen.getByText(/Feed costs one star/)).toBeInTheDocument();
+  });
+
+  it("disables feeding inside the cooldown and states the wait in minutes", () => {
+    service.state.pet.lastFedAt = Date.now();
+    render(<PetWidget />);
+
+    expect(screen.getByRole("button", { name: "Feed" })).toBeDisabled();
+    expect(screen.getByText(/Feed again in 10 min/)).toBeInTheDocument();
+  });
+
+  it("counts the cooldown in whole minutes and stops at zero", () => {
+    const cooldown = 10 * 60 * 1000;
+
+    expect(cooldownMinutes(0, 0, cooldown)).toBe(10);
+    expect(cooldownMinutes(0, 9.5 * 60 * 1000, cooldown)).toBe(1);
+    expect(cooldownMinutes(0, 10 * 60 * 1000, cooldown)).toBe(0);
+    expect(cooldownMinutes(0, 11 * 60 * 1000, cooldown)).toBe(0);
   });
 
   it("draws a five-step glyph for hunger and happiness", () => {

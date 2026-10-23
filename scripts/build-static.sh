@@ -39,4 +39,7 @@ cp -r packages/shikaku/dist/* dist/mfe/shikaku/
 cp -r packages/sokoban/dist/* dist/mfe/sokoban/
 cp -r packages/slitherlink/dist/* dist/mfe/slitherlink/
 
+# One HTML document per route, produced from the assembled artifact (US-SITE-003).
+node scripts/prerender.mjs
+
 echo "Build assembled successfully in dist/!"

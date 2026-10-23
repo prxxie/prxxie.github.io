@@ -107,12 +107,17 @@ in-component.
 ## Source layout
 
 ```
+scripts/
+  build-static.sh assemble the artifact: remotes, host, prerender
+  prerender.mjs   render every route to dist/<path>/index.html and write route-manifest.json
+
 packages/
   shell/          host: main.tsx (mount), App.tsx (providers + browser router), routes.tsx (the route table),
                   AppShell.tsx (chrome), screens/ (one component per route), components/primitives/
                   (Button, Card, StarRating, Tag, PetWidgetFrame), components/regions/ (Header, Footer,
                   SkipLink, ErrorBoundary), hooks/ (useProgressService), store/ (petStore, uiStore),
-                  index.css (design tokens), fonts.ts (self-hosted families), types/remotes.d.ts
+                  index.css (design tokens), fonts.ts (self-hosted families), entry-server.tsx (build-time
+                  renderer), types/remotes.d.ts
   about/          one exposed component plus its own Tailwind entry
   posts/          PostsApp plus utils/markdown.ts
   pets/           PetsApp, display-only, takes the progress context as a prop

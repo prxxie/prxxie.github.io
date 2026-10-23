@@ -21,7 +21,7 @@ Generated from story frontmatter — run `python3 .agents/scripts/verify-docs.py
 |---|---|---|---|---|---|
 | [US-SITE-001](US-SITE-001-replace-the-hash-router-with-real-routes.md) | Replace the hash router with real routes | P0 | L | done | US-FND-001 |
 | [US-SITE-002](US-SITE-002-give-the-shell-its-regions-and-its-failure-states.md) | Give the shell its regions and its failure states | P0 | M | done | US-SITE-001 |
-| [US-SITE-003](US-SITE-003-prerender-every-route-at-build-time.md) | Prerender every route at build time | P0 | L | ready | US-SITE-001, US-SITE-002 |
+| [US-SITE-003](US-SITE-003-prerender-every-route-at-build-time.md) | Prerender every route at build time | P0 | L | done | US-SITE-001, US-SITE-002 |
 | [US-SITE-004](US-SITE-004-make-the-real-paths-work-on-github-pages.md) | Make the real paths work on GitHub Pages | P0 | M | ready | US-SITE-003 |
 | [US-SITE-005](US-SITE-005-land-the-old-hash-links-on-their-pages.md) | Land the old hash links on their pages | P2 | S | ready | US-SITE-001 |
 | [US-SITE-006](US-SITE-006-offer-a-contact-path-with-no-backend.md) | Offer a contact path with no backend | P1 | S | ready | US-SITE-002 |

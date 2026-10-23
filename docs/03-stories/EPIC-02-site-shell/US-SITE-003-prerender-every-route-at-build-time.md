@@ -2,7 +2,7 @@
 id: US-SITE-003
 title: Prerender every route at build time
 epic: EPIC-02-site-shell
-status: ready
+status: done
 priority: P0
 size: L
 depends_on: [US-SITE-001, US-SITE-002]
@@ -69,3 +69,24 @@ Build-level test: run the build and assert one HTML file per manifest entry, eac
 ## 9. Open questions
 
 None.
+
+## 9. Outcome
+
+Shipped on `feat/US-SITE-003-prerender`. The renderer is `packages/shell/src/entry-server.tsx`, built by
+`packages/shell/vite.ssr.config.ts` and driven by `scripts/prerender.mjs`, which `scripts/build-static.sh` calls after
+the remotes are copied and before anything is published (AC6; `tests/prerender.test.ts` asserts the ordering and `set -e`).
+
+- AC1: nine documents are emitted — `/`, `/games`, the three `/games/<slug>`, `/devlog`, the two `/devlog/<slug>` and
+  `/404` (as `dist/404.html`) — plus `dist/route-manifest.json`, the manifest US-FND-006 and US-LAUNCH-002 read.
+- AC2: the markup is real React output, not a copy of the SPA shell, so headline, copy and links are in the document.
+  The devlog routes carry a placeholder headline and one sentence until US-DEVLOG-002/003 render the real content.
+- AC3: `titleForPath` gives every route its own `<title>` (`Sokoban — prxxie.dev`, `hello-retro-world — Devlog —
+  prxxie.dev`) and the `<main id="main">` region is rendered.
+- AC4: the SSR build has no federation plugin; remote imports are aliased to `screens/game/RemoteStub.tsx` and
+  `GameRoute` answers `import.meta.env.SSR` with `GamePlaceholder` — container plus loading sentence, never a board.
+  `AppShell` renders a sentence where the pet remote goes, so no Suspense boundary is left unfinished.
+- AC5: `assertReadable` fails the build with the route named when a document has no title, no `<main>`, no `<h1>`, an
+  unfinished Suspense boundary, a rendered board or under 800 bytes of markup.
+
+Tests: `packages/shell/src/entry-server.test.tsx` (5, renderer) and `tests/prerender.test.ts` (7, paths, injection,
+failure naming, build-script ordering).

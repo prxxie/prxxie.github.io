@@ -48,6 +48,15 @@ export default tseslint.config(
       },
     },
   },
+  // Build scripts run on plain Node, outside the TypeScript project: lint them
+  // without the type-aware rules that need a tsconfig entry for every file.
+  {
+    files: ["scripts/**/*.mjs"],
+    extends: [tseslint.configs.disableTypeChecked],
+    languageOptions: {
+      parserOptions: { project: false, projectService: false },
+    },
+  },
   {
     ignores: [
       "dist/",

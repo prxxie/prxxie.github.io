@@ -5,6 +5,7 @@ dist/
 .superpowers/
 .gemini/
 packages/*/dist/
+packages/*/.prerender/
 .DS_Store
 *.log
 .commandcode/

@@ -5,6 +5,7 @@ import Footer from "./components/regions/Footer";
 import SkipLink from "./components/regions/SkipLink";
 import StatsTelemetry from "./components/StatsTelemetry";
 import { useProgressService } from "./hooks/useProgressService";
+import { useLegacyHashRedirect } from "./hooks/useLegacyHashRedirect";
 
 const PetsApp = lazy(() => import("pets/PetsApp"));
 
@@ -25,6 +26,8 @@ export default function AppShell(): React.ReactElement {
   const mainRef = useRef<HTMLElement>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const progress = useProgressService();
+
+  useLegacyHashRedirect();
 
   useEffect(() => {
     setIsPanelOpen(false);

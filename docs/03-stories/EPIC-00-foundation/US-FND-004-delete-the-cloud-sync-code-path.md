@@ -2,7 +2,7 @@
 id: US-FND-004
 title: Delete the cloud-sync code path
 epic: EPIC-00-foundation
-status: ready
+status: done
 priority: P1
 size: M
 depends_on: [US-FND-001]
@@ -49,6 +49,10 @@ The surviving surface is the port (`packages/shared/src/repository/ProgressRepos
 
 - The port keeps `dispose?()` — the local adaptor implements it as a no-op.
 - Do not rename `ProgressService` methods while deleting: the games call them.
+
+**Shipped.** Deleted the modal, the Supabase client helper, the auth effect in `App.tsx`, the HUD cloud button, the
+cloud adaptor and its tests, the dependency in both manifests, and the two workflow variables; the provider now builds
+`ProgressService` on `LocalProgressRepository`. `tests/no-cloud-sync.test.ts` keeps the path from coming back.
 
 ## 6. Implementation notes
 

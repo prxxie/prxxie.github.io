@@ -8,9 +8,7 @@
       "default": "./src/index.ts"
     }
   },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.43.4"
-  },
+  "dependencies": {},
   "files": [
     "src"
   ]

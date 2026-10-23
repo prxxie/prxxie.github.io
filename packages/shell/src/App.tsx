@@ -7,8 +7,6 @@ import StatsTelemetry from "./components/StatsTelemetry";
 import HomeDashboard from "./components/HomeDashboard";
 import MfeLoader from "./components/MfeLoader";
 import { useProgressService, ProgressServiceProvider } from "./hooks/useProgressService";
-import { supabase } from "./utils/supabase";
-import CloudSyncModal from "./components/CloudSyncModal";
 
 const queryClient = new QueryClient();
 
@@ -70,35 +68,6 @@ function AppContent(): React.ReactElement {
   const [isMobileHudOpen, setIsMobileHudOpen] = useState(false);
   const progressService = useProgressService();
 
-  const [cloudUser, setCloudUser] = useState<string | null>(null);
-  const [isCloudModalOpen, setIsCloudModalOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (!supabase) return;
-    const client = supabase;
-
-    const checkUser = async () => {
-      try {
-        const { data: { user } } = await client.auth.getUser();
-        setCloudUser(user?.email || null);
-      } catch (err) {
-        console.error("Failed to retrieve user session:", err);
-      }
-    };
-    void checkUser();
-
-    const { data: { subscription } } = client.auth.onAuthStateChange((_event, session) => {
-      setCloudUser(session?.user?.email || null);
-      window.dispatchEvent(new CustomEvent("cozyos:progress-updated"));
-    });
-
-    return () => {
-      if (subscription) {
-        subscription.unsubscribe();
-      }
-    };
-  }, []);
-
   useEffect(() => {
     const handleFullscreenChange = (): void => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -143,11 +112,7 @@ function AppContent(): React.ReactElement {
   return (
     <div className="w-full flex justify-center min-h-screen">
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-        <ConsoleFrame
-          onMobileHud={() => setIsMobileHudOpen(true)}
-          onCloudClick={() => setIsCloudModalOpen(true)}
-          cloudUser={cloudUser}
-        >
+        <ConsoleFrame onMobileHud={() => setIsMobileHudOpen(true)}>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
             <div
               ref={windowRef}
@@ -248,11 +213,6 @@ function AppContent(): React.ReactElement {
             </div>
           </div>
         </ConsoleFrame>
-        <CloudSyncModal
-          isOpen={isCloudModalOpen}
-          onClose={() => setIsCloudModalOpen(false)}
-          cloudUser={cloudUser}
-        />
       </div>
     </div>
   );

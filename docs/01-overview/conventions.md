@@ -88,14 +88,9 @@ conventions are recorded below. The pack's own command table does not apply verb
 
 ## Configuration
 
-| Variable | Required | Purpose | Status |
-|----------|----------|---------|--------|
-| `VITE_SUPABASE_URL` | no | Supabase project URL for the cloud adaptor | deleted with the backend (ADR-0004) |
-| `VITE_SUPABASE_ANON_KEY` | no | Supabase anon key for the cloud adaptor | deleted with the backend (ADR-0004) |
-
-After ADR-0004 lands the build reads no configuration at all: the only environment is the deploy workflow's own
-`GITHUB_TOKEN`/`MFE_DOWNLOAD_TOKEN` secrets (`.github/workflows/deploy.yml:20`, `:33`), which never reach the bundle.
-There is no `.env.example` and none is needed until a variable exists again.
+The build reads no configuration at all (ADR-0004, applied in US-FND-004): the only environment is the deploy
+workflow's own `GITHUB_TOKEN`/`MFE_DOWNLOAD_TOKEN` secrets (`.github/workflows/deploy.yml:20`, `:33`), which never
+reach the bundle. There is no `.env.example` and none is needed until a variable exists again.
 
 ## Content
 

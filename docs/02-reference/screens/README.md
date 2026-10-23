@@ -40,3 +40,10 @@ Every screen renders inside the same three regions, owned by the host.
 These are states, and they live inside the screen that owns them: loading (a region skeleton, never a full-page spinner),
 empty (a post list with one post still reads as a list), offline remote (a named fallback with retry), solved (the win
 panel inside the game), unplayed (`0 / 100` stars, not a hidden section), sleeping pet (the widget's sleeping pose).
+
+## Legacy fragments
+
+Old links addressed pages as `#about`, `#posts`, `#shikaku`… `useLegacyHashRedirect`
+(`packages/shell/src/hooks/useLegacyHashRedirect.ts`) maps each once on mount with a replace
+navigation; an unmapped fragment lands on the not-found screen. The table is
+`LEGACY_HASH_ROUTES` in the same file — see US-SITE-005.

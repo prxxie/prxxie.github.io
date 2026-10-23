@@ -63,3 +63,12 @@ other role: anyone with repository write access can deploy, which is one person 
 `docs/01-overview/roles-and-permissions.md`). The game repositories can trigger a deploy of this site without write
 access here, because `repository_dispatch` with the `mfe-updated` type is accepted from a token held in this
 repository's secrets.
+
+## Accessibility gate
+
+`scripts/build-static.sh` runs `node scripts/a11y-gate.mjs` after the prerender step and before
+anything is published: axe-core over every route in `dist/route-manifest.json`, then the contrast
+pairs the design system declares, measured from the compiled `:root` tokens. A serious or critical
+violation fails the build naming the route and the node; a pair below its minimum fails naming the
+two tokens and the ratio. The workflow runs the same command and uploads `dist/a11y-report.json` as
+the `a11y-report` artifact (US-FND-006).

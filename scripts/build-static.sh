@@ -45,4 +45,8 @@ touch dist/.nojekyll
 # One HTML document per route, produced from the assembled artifact (US-SITE-003).
 node scripts/prerender.mjs
 
+# Accessibility is a gate, not an audit (US-FND-006): no artifact leaves this
+# script with a serious violation or an unreadable contrast pair.
+node scripts/a11y-gate.mjs
+
 echo "Build assembled successfully in dist/!"

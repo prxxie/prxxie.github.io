@@ -81,6 +81,16 @@ jobs:
       - name: Run Build Script
         run: pnpm run build:static
 
+      - name: Accessibility gate
+        run: node scripts/a11y-gate.mjs
+
+      - name: Upload accessibility report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-report
+          path: dist/a11y-report.json
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

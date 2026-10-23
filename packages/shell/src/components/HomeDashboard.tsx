@@ -161,7 +161,7 @@ export default function HomeDashboard(): React.ReactElement {
         <div className="panel panel-dark p-2 flex flex-col">
           <div className="text-[9px] font-code text-accent-teal border-b border-hairline pb-1 mb-1.5 flex justify-between">
             <span>SYSTEM_BOOT_LOGS</span>
-            <span className="text-success text-[8px] animate-pulse">● ONLINE</span>
+            <span className="text-success-on-dark text-[8px] animate-pulse">● ONLINE</span>
           </div>
           <div className="font-code text-[9px] text-on-dark leading-tight overflow-hidden whitespace-pre">
             {logs.join("\n")}
@@ -202,7 +202,7 @@ export default function HomeDashboard(): React.ReactElement {
               className="hover:underline flex justify-between"
             >
               <span>BRT-743-T (GITHUB)</span>
-              <span className="text-success">ONLINE</span>
+              <span className="text-success-on-dark">ONLINE</span>
             </a>
             <a
               href="https://twitter.com"
@@ -211,7 +211,7 @@ export default function HomeDashboard(): React.ReactElement {
               className="hover:underline flex justify-between"
             >
               <span>AEW-DYM-Y (TWITTER)</span>
-              <span className="text-success">STABLE</span>
+              <span className="text-success-on-dark">STABLE</span>
             </a>
             <div className="flex justify-between text-on-dark-soft">
               <span>RT-GPT-05 (LOCAL)</span>

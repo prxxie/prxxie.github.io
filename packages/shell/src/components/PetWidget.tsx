@@ -74,7 +74,7 @@ export default function PetWidget(): React.ReactElement {
           <span className="font-code">STATUS:</span>
           <span
             className={
-              isSleeping ? "text-on-dark-soft" : isHungry ? "text-warning" : "text-success"
+              isSleeping ? "text-on-dark-soft" : isHungry ? "text-warning-on-dark" : "text-success-on-dark"
             }
           >
             {isSleeping ? "SLEEPING" : isHungry ? "HUNGRY" : "FULL"}
@@ -86,7 +86,7 @@ export default function PetWidget(): React.ReactElement {
         onClick={() => { void handleFeed(); }}
         disabled={!canFeed}
         className={`w-full btn text-[8px] disabled:opacity-40 disabled:pointer-events-none ${
-          isHungry && foodAvailable === 0 ? "text-error" : ""
+          isHungry && foodAvailable === 0 ? "text-error-on-dark" : ""
         }`}
       >
         {isSleeping ? "AWAKE TO FEED" : canFeed ? "FEED PET" : isHungry ? "NO FOOD" : "NOT HUNGRY"}

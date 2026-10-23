@@ -74,7 +74,7 @@ host renders its `Fallback` naming that remote as offline.
 | Purpose | Command | Baseline on this tree |
 |---------|---------|----------------------|
 | Unit and component tests | `pnpm test` → `vitest run` | 37 files, 301 tests, all passing |
-| Lint | `pnpm lint` → `eslint .` | green: 0 errors, 0 warnings |
+| Lint | `pnpm lint` → `eslint . --max-warnings=0` | green: 0 problems; a warning fails the gate |
 | Type check | `pnpm typecheck` → `tsc --noEmit` | green: 0 errors |
 | Single test file | `pnpm exec vitest run packages/shared/src/pet/evolution.test.ts` | passes |
 

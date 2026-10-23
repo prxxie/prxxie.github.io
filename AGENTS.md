@@ -21,7 +21,7 @@
 | Install | `pnpm install --frozen-lockfile` | verified: pnpm 10.33.0 pinned by `packageManager`, one lockfile at the root, `shared` linked as `workspace:*` |
 | Run | `pnpm dev` | verified: host on `:3000` plus a watch build per remote, `:3001`–`:3006` |
 | Test | `pnpm test` → `vitest run` | 37 files, 301 tests, green |
-| Lint | `pnpm run lint` → `eslint .` | green: 0 errors, 0 warnings |
+| Lint | `pnpm run lint` → `eslint . --max-warnings=0` | green: 0 problems; warnings fail the gate |
 | Type check | `pnpm run typecheck` → `tsc --noEmit` | green: 0 errors |
 | Build | `pnpm run build:static` | verified: assembles `dist/` from all six remotes plus the host |
 

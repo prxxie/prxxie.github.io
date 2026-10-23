@@ -74,12 +74,17 @@ The rounding is the deliberate break from the pixel chrome: no 0-radius box and 
 
 | Component | Recipe |
 |-----------|--------|
-| Primary button | `--color-primary` fill, `--color-canvas` label, `--radius-md`, 12px vertical padding, hover to `--color-primary-active`, visible focus ring in `--color-primary` |
-| Secondary button | transparent fill, `--color-hairline` border, `--color-ink` label |
+| Primary button | `--color-primary` fill, `--color-canvas` label, `--radius-md`, 10px×14px padding, no wrapped label, hover and pressed both to `--color-primary-active`, disabled to `--color-primary-disabled` with `cursor: not-allowed`, focus ring in `--color-primary` |
+| Secondary button | transparent fill, `--color-hairline` border, `--color-ink` label, hover and pressed darken the border to `--color-ink` |
 | Card | `--color-surface-card` fill, 1px `--color-hairline`, `--radius-md`, no shadow |
 | Puzzle frame | `--color-surface-dark` fill, `--color-on-dark` labels, `--radius-lg`, the board inset by one spacing step |
-| Star rating | three glyphs, earned in `--color-accent-amber`, unearned as `--color-hairline` |
-| Pet widget | `--color-surface-card`, one line of copy, the sprite at 1×, actions beside it |
+| Star rating | three glyphs, earned in `--color-accent-amber`, unearned as `--color-hairline`, plus the count as text (`2/3`) and one `role="img"` label ("2 of 3 stars"); the glyph span is `aria-hidden` |
+| Tag | `--radius-pill`, 1px `--color-hairline`, 11px code face, uppercase; the `action` tone fills with `--color-primary` |
+| Pet widget | `--color-surface-card`, one line of copy, the sprite at 1×, actions beside it | 
+
+The recipes ship as components in `packages/shell/src/components/primitives/` — `Button`, `Card`, `StarRating`, `Tag` and
+`PetWidgetFrame` — one file each, styled only by the `.btn`/`.panel` classes above. A screen assembles them; it does not
+restyle them. MFEs never import them: a game re-skins with tokens and its own markup (see below).
 
 ## What the games inherit
 

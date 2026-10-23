@@ -67,7 +67,7 @@
     font-size: 16px;
     line-height: 1.55;
     position: relative;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   h1,
@@ -99,7 +99,6 @@
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
 
   /* The same surface inverted, for a board or a code block. */
@@ -113,6 +112,8 @@
     align-items: center;
     background-color: transparent;
     border-bottom: 1px solid var(--color-hairline);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
     color: var(--color-muted);
     display: flex;
     font-family: var(--font-body);
@@ -152,6 +153,7 @@
     font-weight: 500;
     padding: 10px 14px;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
   }
 
   .btn:hover {
@@ -165,6 +167,15 @@
   }
 
   .btn-primary:hover {
+    background-color: var(--color-primary-active);
+    border-color: var(--color-primary-active);
+  }
+
+  .btn:active {
+    border-color: var(--color-ink);
+  }
+
+  .btn-primary:active {
     background-color: var(--color-primary-active);
     border-color: var(--color-primary-active);
   }
@@ -367,14 +378,22 @@
   outline-offset: 2px;
 }
 
-/* Respect user preferences for reduced motion. */
+/*
+ * Reduced motion removes the motion rather than shortening it (AC5): no
+ * animation and no transition runs anywhere on the site, and the two transform
+ * keyframes lose their displacement.
+ */
 @media (prefers-reduced-motion: reduce) {
-  .animate-bounce,
-  .animate-shake,
-  .transition-transform,
-  .btn {
+  *,
+  *::before,
+  *::after {
     animation: none !important;
+    scroll-behavior: auto !important;
     transition: none !important;
+  }
+
+  .animate-bounce,
+  .animate-shake {
     transform: none !important;
   }
 }

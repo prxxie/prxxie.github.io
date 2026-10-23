@@ -3,6 +3,12 @@
 Project-specific working agreement. Anything the installed pack decides is linked rather than repeated here; what
 follows is what this project decides on top of it, and where it deviates.
 
+## Workspace linking
+
+The three game submodules declare `"shared": "*"` while the in-repo packages declare `"shared": "workspace:*"`. The root
+`.npmrc` sets `link-workspace-packages=true`, so pnpm links the local package for both spellings — without it, `"*"`
+would resolve to an unrelated package of the same name on the registry. `pnpm install --frozen-lockfile` passes.
+
 ## Stack packs
 
 | Pack | Layer | Skill |

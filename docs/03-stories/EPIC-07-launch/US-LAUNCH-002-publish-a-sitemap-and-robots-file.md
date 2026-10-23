@@ -2,7 +2,7 @@
 id: US-LAUNCH-002
 title: Publish a sitemap and robots file
 epic: EPIC-07-launch
-status: ready
+status: done
 priority: P2
 size: S
 depends_on: [US-LAUNCH-001]
@@ -60,3 +60,7 @@ Build assertion on the file contents plus a validator run against the deployed s
 ## 9. Open questions
 
 None.
+
+## 10. Outcome
+
+`scripts/prerender-helpers.mjs` gains `sitemap(routes)` and `robotsTxt()`; `scripts/prerender.mjs` writes `dist/sitemap.xml` and `dist/robots.txt` from the same manifest the pages were rendered from, excluding `/404` from both. Proven by `tests/prerender.test.ts` › the crawl surface (canonical URLs, one entry per route, well-formed XML, 404 exclusion, sitemap pointer).

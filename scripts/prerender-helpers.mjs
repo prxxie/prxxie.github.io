@@ -108,3 +108,22 @@ export function inject(template, page) {
 
   return withCanonical.replace('<div id="root"></div>', `<div id="root">${page.html}</div>`);
 }
+
+/**
+ * US-LAUNCH-002: the crawl surface, written from the same manifest the pages came
+ * from. `/404` is served to humans and stays out of both files.
+ */
+const EXCLUDED_FROM_CRAWLING = new Set(["/404"]);
+
+export function sitemap(routes) {
+  const entries = routes
+    .filter((route) => !EXCLUDED_FROM_CRAWLING.has(route))
+    .map((route) => `  <url><loc>${canonicalUrl(route)}</loc></url>`)
+    .join("\n");
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`;
+}
+
+export function robotsTxt() {
+  return ["User-agent: *", "Allow: /", "Disallow: /404", "", `Sitemap: ${SITE_ORIGIN}/sitemap.xml`, ""].join("\n");
+}

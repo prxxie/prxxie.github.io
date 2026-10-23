@@ -13,7 +13,7 @@ import { build } from "vite";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { assertReadable, inject, outputFiles } from "./prerender-helpers.mjs";
+import { assertReadable, inject, outputFiles, robotsTxt, sitemap } from "./prerender-helpers.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const shellDir = path.join(root, "packages/shell");
@@ -67,6 +67,10 @@ async function main() {
   }
 
   await writeFile(path.join(distDir, "route-manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  // US-LAUNCH-002: the crawl surface comes from the same list, so a route cannot
+  // be prerendered and left out of the sitemap.
+  await writeFile(path.join(distDir, "sitemap.xml"), sitemap(manifest.map((entry) => entry.path)), "utf8");
+  await writeFile(path.join(distDir, "robots.txt"), robotsTxt(), "utf8");
   await rm(ssrDir, { recursive: true, force: true });
 
   console.log(`prerendered ${manifest.length} routes into dist/`);

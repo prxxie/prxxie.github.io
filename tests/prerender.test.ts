@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { assertReadable, canonicalUrl, inject, outputFiles } from "../scripts/prerender-helpers.mjs";
+import { assertReadable, canonicalUrl, inject, outputFiles, robotsTxt, sitemap } from "../scripts/prerender-helpers.mjs";
 
 const root = path.resolve(__dirname, "..");
 const dist = path.join(root, "dist");
@@ -159,5 +159,53 @@ describe("the share card on disk (US-LAUNCH-001)", () => {
     expect(scripts.scripts["build:assets"]).toBe("node scripts/make-og-image.mjs");
     expect(build).toContain("pnpm run build:assets");
     expect(build.indexOf("pnpm run build:assets")).toBeLessThan(build.indexOf("pnpm -F shell run build"));
+  });
+});
+
+describe("the crawl surface (US-LAUNCH-002)", () => {
+  const routes = ["/", "/games", "/games/sokoban", "/devlog", "/devlog/hello-retro-world", "/404"];
+
+  it("lists every prerendered route with its canonical URL, once each", () => {
+    const xml = sitemap(routes);
+    const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
+
+    expect(locs).toEqual([
+      "https://prxxie.github.io/",
+      "https://prxxie.github.io/games",
+      "https://prxxie.github.io/games/sokoban",
+      "https://prxxie.github.io/devlog",
+      "https://prxxie.github.io/devlog/hello-retro-world",
+    ]);
+    expect(new Set(locs).size).toBe(locs.length);
+  });
+
+  it("declares the sitemap namespace and stays well formed", () => {
+    const xml = sitemap(routes);
+
+    expect(xml.startsWith('<?xml version="1.0" encoding="UTF-8"?>')).toBe(true);
+    expect(xml).toContain('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"');
+    expect((xml.match(/<urlset/g) ?? []).length).toBe(1);
+    expect((xml.match(/<\/urlset>/g) ?? []).length).toBe(1);
+  });
+
+  it("keeps the 404 page out of the sitemap and out of crawling", () => {
+    expect(sitemap(routes)).not.toContain("/404");
+    expect(robotsTxt()).toContain("Disallow: /404");
+    expect(robotsTxt()).toContain("Sitemap: https://prxxie.github.io/sitemap.xml");
+  });
+
+  it("allows the site and points at the sitemap", () => {
+    const robots = robotsTxt();
+
+    expect(robots).toContain("User-agent: *");
+    expect(robots).toContain("Allow: /");
+  });
+
+  it("is written by the prerender step from the manifest, not by hand", () => {
+    const script = readFileSync(path.join(root, "scripts/prerender.mjs"), "utf8");
+
+    expect(script).toContain('"sitemap.xml"');
+    expect(script).toContain('"robots.txt"');
+    expect(script).toContain("sitemap(manifest.map((entry) => entry.path))");
   });
 });

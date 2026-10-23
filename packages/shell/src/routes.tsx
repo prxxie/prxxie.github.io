@@ -7,6 +7,7 @@ import GameRoute from "./screens/GameRoute";
 import DevlogIndex from "./screens/DevlogIndex";
 import DevlogPost from "./screens/DevlogPost";
 import NotFound from "./screens/NotFound";
+import { RouteError } from "./components/regions/ErrorBoundary";
 
 /** The three puzzle remotes, in the order the hub lists them. */
 export const games = [
@@ -60,13 +61,15 @@ export function createAppRoutes(): RouteObject[] {
     {
       path: "/",
       element: <AppShell />,
+      // Each child carries its own errorElement so a failure replaces the page
+      // region only: the header, the navigation and the footer stay mounted.
       children: [
-        { index: true, element: <HomePage /> },
-        { path: "games", element: <GamesHub /> },
-        { path: "games/:game", element: <GameRoute /> },
-        { path: "devlog", element: <DevlogIndex /> },
-        { path: "devlog/:slug", element: <DevlogPost /> },
-        { path: "*", element: <NotFound /> },
+        { index: true, element: <HomePage />, errorElement: <RouteError /> },
+        { path: "games", element: <GamesHub />, errorElement: <RouteError /> },
+        { path: "games/:game", element: <GameRoute />, errorElement: <RouteError /> },
+        { path: "devlog", element: <DevlogIndex />, errorElement: <RouteError /> },
+        { path: "devlog/:slug", element: <DevlogPost />, errorElement: <RouteError /> },
+        { path: "*", element: <NotFound />, errorElement: <RouteError /> },
       ],
     },
   ];

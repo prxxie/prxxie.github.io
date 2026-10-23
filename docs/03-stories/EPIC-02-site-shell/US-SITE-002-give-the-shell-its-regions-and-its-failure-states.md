@@ -2,7 +2,7 @@
 id: US-SITE-002
 title: Give the shell its regions and its failure states
 epic: EPIC-02-site-shell
-status: ready
+status: done
 priority: P0
 size: M
 depends_on: [US-SITE-001]
@@ -64,5 +64,23 @@ Regions are fixed: `Header`, `Main`, `Footer`, `ErrorBoundary`, `SkipLink`. The 
 Component tests: skip-link target exists, landmarks are unique, the error boundary catches a thrown child, the nav marks the active route.
 
 ## 9. Open questions
+
+None.
+
+## 10. Outcome
+
+- New region components under `packages/shell/src/components/regions/`: `SkipLink`, `Header` (+ `navItems.ts`), `Footer`,
+  `ErrorBoundary` and `RouteError`.
+- `AppShell` is now skip link → header → `main#main` (`tabIndex={-1}`) → footer, with the pet HUD and telemetry in an
+  `aside` that becomes a labelled dialog on small screens. A route change scrolls to the top and moves focus to `main`.
+- Every child route carries `errorElement={<RouteError />}`, so a failed page renders inside the main region and the
+  header and footer survive; `GameRoute` adds its own boundary so a dead remote shows "<game> could not start".
+- `ConsoleFrame` and `MatrixMenu` were deleted with their tests; the nav dropped from six items to three (Home, Games,
+  Devlog) and now exposes `aria-current="page"`. The fullscreen toggle went with the old chrome.
+- `HomePage` gained the page's single `h1`; the shell's panel title is no longer a heading (there were two `h1`s per page).
+- `.skip-link` styles added to `packages/shell/src/index.css`.
+- Tests: `regions.test.tsx` (5) covers the skip link, the one-banner/one-main/one-contentinfo rule, the three-item nav
+  with `aria-current`, focus on route change and header/footer survival; `remoteFailure.test.tsx` (1) covers the dead
+  remote; `App.test.tsx` was rewritten for the new chrome.
 
 None.

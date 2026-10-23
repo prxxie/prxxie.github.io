@@ -1,10 +1,16 @@
 import React from "react";
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { ProgressServiceProvider } from "./hooks/useProgressService";
 import "@testing-library/jest-dom";
 import { createAppRoutes } from "./routes";
+
+vi.mock("./utils/audio", () => ({
+  playBeepSound: vi.fn(),
+  getAudioMuted: () => true,
+  setAudioMuted: vi.fn(),
+}));
 
 function renderAt(path: string): void {
   const router = createMemoryRouter(createAppRoutes(), { initialEntries: [path] });
@@ -16,68 +22,31 @@ function renderAt(path: string): void {
 }
 
 describe("Shell Host App", () => {
-  let originalFullscreenElementDescriptor: PropertyDescriptor | undefined;
-
-  beforeEach(() => {
-    Object.defineProperty(HTMLDivElement.prototype, "requestFullscreen", {
-      value: vi.fn().mockResolvedValue(undefined),
-      writable: true,
-      configurable: true,
-    });
-    Object.defineProperty(document, "exitFullscreen", {
-      value: vi.fn().mockResolvedValue(undefined),
-      writable: true,
-      configurable: true,
-    });
-
-    originalFullscreenElementDescriptor = Object.getOwnPropertyDescriptor(document, "fullscreenElement");
-    Object.defineProperty(document, "fullscreenElement", {
-      value: null,
-      writable: true,
-      configurable: true,
-    });
-  });
-
-  afterEach(() => {
-    // @ts-expect-error - test cleanup
-    delete HTMLDivElement.prototype.requestFullscreen;
-    // @ts-expect-error - test cleanup
-    delete document.exitFullscreen;
-
-    if (originalFullscreenElementDescriptor) {
-      Object.defineProperty(document, "fullscreenElement", originalFullscreenElementDescriptor);
-    } else {
-      // @ts-expect-error - test cleanup
-      delete document.fullscreenElement;
-    }
-    vi.restoreAllMocks();
-  });
-
-  it("renders the home page at the root", () => {
-    renderAt("/");
-    expect(screen.getByText("BYRIA-RR9")).toBeInTheDocument();
-    expect(screen.getByText("Proof")).toBeInTheDocument();
-  });
-
-  it("renders the section navigation", () => {
-    renderAt("/");
-    expect(screen.getAllByRole("link", { name: "Games" }).length).toBeGreaterThanOrEqual(1);
-  });
-
-  it("toggles fullscreen", () => {
+  it("renders the front page inside the three regions", () => {
     renderAt("/");
 
-    const toggleButton = screen.getByLabelText("Enter fullscreen");
-    expect(toggleButton).toHaveTextContent("[⛶]");
-
-    fireEvent.click(toggleButton);
-    expect(HTMLDivElement.prototype.requestFullscreen).toHaveBeenCalled();
-
-    Object.defineProperty(document, "fullscreenElement", { value: {}, writable: true, configurable: true });
-    fireEvent(document, new Event("fullscreenchange"));
-    expect(screen.getByLabelText("Leave fullscreen")).toHaveTextContent("[×]");
-
-    fireEvent.click(screen.getByLabelText("Leave fullscreen"));
-    expect((document as unknown as { exitFullscreen: ReturnType<typeof vi.fn> }).exitFullscreen).toHaveBeenCalled();
+    expect(screen.getByRole("banner")).toBeInTheDocument();
+    expect(screen.getByRole("main")).toBeInTheDocument();
+    expect(screen.getByRole("contentinfo")).toBeInTheDocument();
+    expect(document.getElementById("region-title")).toHaveTextContent("Home");
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
+
+  it("renames the page region as the route changes", async () => {
+    renderAt("/");
+
+    fireEvent.click(screen.getByRole("link", { name: "Games" }));
+
+    await waitFor(() => {
+      expect(document.getElementById("region-title")).toHaveTextContent("Games");
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    });
+  });
+
+  it("shows the not-found page for an unknown path", () => {
+    renderAt("/nope");
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/does not exist/i);
+  });
+
 });

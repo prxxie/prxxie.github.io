@@ -40,6 +40,24 @@
 }
 
 @layer base {
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+    padding: 0.5rem 1rem;
+    background: var(--color-surface-dark);
+    color: var(--color-on-dark);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-family: var(--font-body);
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  .skip-link:focus {
+    left: 0;
+  }
+
   html {
     -webkit-text-size-adjust: 100%;
   }

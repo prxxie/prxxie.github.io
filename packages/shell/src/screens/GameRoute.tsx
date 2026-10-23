@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from "react";
 import { Link, useParams } from "react-router";
 import { isGameSlug } from "../routes";
 import MfeLoader from "../components/MfeLoader";
+import ErrorBoundary from "../components/regions/ErrorBoundary";
 import { useProgressService } from "../hooks/useProgressService";
 
 const ShikakuApp = lazy(() => import("shikaku/ShikakuApp"));
@@ -42,8 +43,10 @@ export default function GameRoute(): React.ReactElement {
   }
 
   return (
-    <Suspense fallback={<MfeLoader petStage={progress.state.pet.stage} />}>
-      <Remote slug={game} />
-    </Suspense>
+    <ErrorBoundary title={`${game} could not start`} resetKey={game}>
+      <Suspense fallback={<MfeLoader petStage={progress.state.pet.stage} />}>
+        <Remote slug={game} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

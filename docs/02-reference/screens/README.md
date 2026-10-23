@@ -18,15 +18,17 @@ Every screen renders inside the same three regions, owned by the host.
 
 | Region | Contents | Notes |
 |--------|----------|-------|
-| Header | site mark, nav (Games, Devlog, Contact), skip link | nav is three items; the pet is not navigation (OQ-04) |
-| Main | the screen | one `h1` per page, focus moves here on route change |
-| Footer | pet widget (home only), colophon, contact links | the widget is the only place the pet appears |
+| Header | site mark, nav (Home, Games, Devlog), sound switch, panel switch on small screens | the skip link precedes the header; nav is three items and the active one carries `aria-current="page"`; the pet is not navigation (OQ-04) |
+| Main | the screen | `id="main"`, `tabindex="-1"`; one `h1` per page; focus lands here and the scroll resets on every route change |
+| Footer | `#pet-widget-slot`, colophon, contact links | the widget is the only place the pet appears; contact links arrive with US-SITE-006 |
 
 ## Cross-screen rules
 
 - One coral action per view. A second coral element means one of the two is not an action (ADR-0001).
 - A game is playable without an account, without a request, and without waiting for a network round trip (NFR-03).
-- A remote that fails to load renders its own named fallback with a retry; the rest of the page stays usable (NFR-15).
+- A remote that fails to load renders its own named fallback with a retry; the rest of the page stays usable (NFR-15). The
+  game region catches its own failure (`ErrorBoundary`), so the header, nav and footer stay mounted.
+- A route that throws is replaced by a named error region with a way back; the shell never swaps the whole document.
 - Stars appear only where they mean something: the game that awarded them, the hub tally and the home telemetry. They are
   never a badge on a nav item.
 - Keyboard and screen-reader paths are part of the screen, not a follow-up: each screen lists its own in **Accessibility**.

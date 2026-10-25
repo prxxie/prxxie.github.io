@@ -1,5 +1,5 @@
-import { i as importShared } from './_virtual___federation_fn_import-Bhvr9fyf.js';
-import { r as reactExports, g as getDefaultExportFromCjs } from './index-Dm_EQZZA.js';
+import { i as importShared } from './_virtual___federation_fn_import-awsP_RH0.js';
+import { r as reactExports, g as getDefaultExportFromCjs } from './index-BxRxKft-.js';
 
 const __vite_import_meta_env__$1 = {};
 const createStoreImpl = (createState) => {

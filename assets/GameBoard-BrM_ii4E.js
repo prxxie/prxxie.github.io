@@ -1,3 +1,6 @@
+import { i as importShared } from './_virtual___federation_fn_import-awsP_RH0.js';
+import { j as jsxRuntimeExports } from './jsx-runtime-CsM3lTE3.js';
+
 const remotesMap = {
 'about':{url:'/mfe/about/assets/remoteEntry.js',format:'esm',from:'vite'},
   'posts':{url:'/mfe/posts/assets/remoteEntry.js',format:'esm',from:'vite'},
@@ -37,7 +40,7 @@ const remotesMap = {
 
                 const wrapShareModule = remoteFrom => {
                   return merge({
-                    'react':{'18.3.1':{get:()=>get(new URL('__federation_shared_react-BCcI129A.js', import.meta.url).href, remoteFrom), loaded:1}},'react-dom':{'18.3.1':{get:()=>get(new URL('__federation_shared_react-dom-BhMZJInU.js', import.meta.url).href, remoteFrom), loaded:1}},'zustand':{'4.5.7':{get:()=>get(new URL('__federation_shared_zustand-EnliSshk.js', import.meta.url).href, remoteFrom), loaded:1}},'@tanstack/react-query':{'5.101.4':{get:()=>get(new URL('__federation_shared_@tanstack/react-query-qskeoNo-.js', import.meta.url).href, remoteFrom), loaded:1}}
+                    'react':{'18.3.1':{get:()=>get(new URL('__federation_shared_react-C3Pr5fKJ.js', import.meta.url).href, remoteFrom), loaded:1}},'react-dom':{'18.3.1':{get:()=>get(new URL('__federation_shared_react-dom-34UylTkL.js', import.meta.url).href, remoteFrom), loaded:1}},'zustand':{'4.5.7':{get:()=>get(new URL('__federation_shared_zustand-D9Yp57aV.js', import.meta.url).href, remoteFrom), loaded:1}},'@tanstack/react-query':{'5.101.4':{get:()=>get(new URL('__federation_shared_@tanstack/react-query-DOvBSngk.js', import.meta.url).href, remoteFrom), loaded:1}}
                   }, (globalThis.__federation_shared__ || {})['default'] || {});
                 };
 
@@ -99,4 +102,22 @@ const remotesMap = {
                     return __federation_method_ensure(remoteName).then((remote) => remote.get(componentName).then(factory => factory()));
                 }
 
-export { __federation_method_getRemote as _, __federation_method_wrapDefault as a };
+const {lazy} = await importShared('react');
+
+const ShikakuApp = lazy(() => __federation_method_getRemote("shikaku" , "./ShikakuApp").then(module=>__federation_method_wrapDefault(module, true)));
+const SokobanApp = lazy(() => __federation_method_getRemote("sokoban" , "./SokobanApp").then(module=>__federation_method_wrapDefault(module, true)));
+const SlitherlinkApp = lazy(() => __federation_method_getRemote("slitherlink" , "./SlitherlinkApp").then(module=>__federation_method_wrapDefault(module, true)));
+function GameBoard({ slug }) {
+  switch (slug) {
+    case "shikaku":
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(ShikakuApp, {});
+    case "sokoban":
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(SokobanApp, {});
+    case "slitherlink":
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(SlitherlinkApp, {});
+    default:
+      return null;
+  }
+}
+
+export { GameBoard as default };

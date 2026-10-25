@@ -8206,8 +8206,8 @@ function PuzzleSlot() {
   ] });
 }
 
-const tests = 378;
-const files = 52;
+const tests = 380;
+const files = 53;
 const gates = [
 	{
 		name: "typecheck",

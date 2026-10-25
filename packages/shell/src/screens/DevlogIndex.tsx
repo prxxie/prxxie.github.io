@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import { loadPosts, type Post } from "posts/content";
+import { loadPosts, type Post } from "@devlog/content";
 
 /** The collection is compiled during the build; this module-level read is the only one. */
 const posts: Post[] = loadPosts();

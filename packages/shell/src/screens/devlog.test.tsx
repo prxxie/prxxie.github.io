@@ -3,7 +3,7 @@ import { render } from "@testing-library/react";
 import { RouterProvider, createMemoryRouter } from "react-router";
 import { createAppRoutes } from "../routes";
 import { ProgressServiceProvider } from "../hooks/useProgressService";
-import { loadPosts } from "posts/content";
+import { loadPosts } from "@devlog/content";
 
 function renderAt(path: string) {
   const router = createMemoryRouter(createAppRoutes(), { initialEntries: [path] });

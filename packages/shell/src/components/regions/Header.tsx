@@ -4,12 +4,8 @@ import { NAV_ITEMS } from "./navItems";
 import { playBeepSound, getAudioMuted, setAudioMuted } from "../../utils/audio";
 import Button from "../primitives/Button";
 
-interface HeaderProps {
-  onMobileHud?: () => void;
-}
-
 /** The one banner landmark: brand, the three sections, and the console switches. */
-export default function Header({ onMobileHud }: HeaderProps): React.ReactElement {
+export default function Header(): React.ReactElement {
   const [muted, setMuted] = useState<boolean>(getAudioMuted);
 
   const toggleAudio = (): void => {
@@ -48,15 +44,6 @@ export default function Header({ onMobileHud }: HeaderProps): React.ReactElement
           <Button onClick={toggleAudio} className="px-2 py-[2px] text-[12px]" aria-pressed={!muted}>
             Sound {muted ? "off" : "on"}
           </Button>
-          {onMobileHud && (
-            <Button
-              onClick={onMobileHud}
-              className="px-2 py-[2px] text-[12px] lg:hidden"
-              aria-label="Open the pet and progress panel"
-            >
-              Panel
-            </Button>
-          )}
         </div>
       </div>
     </header>

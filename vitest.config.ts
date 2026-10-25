@@ -33,11 +33,11 @@ export default defineConfig({
         __dirname,
         "./packages/shell/src/components/MockMfe.tsx"
       ),
-      "posts/content": path.resolve(
+      "@devlog/content": path.resolve(
         __dirname,
         "./packages/posts/src/content/loadPosts.ts"
       ),
-      "posts/markdown": path.resolve(
+      "@devlog/markdown": path.resolve(
         __dirname,
         "./packages/posts/src/utils/markdown.ts"
       ),

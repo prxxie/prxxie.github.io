@@ -3,6 +3,14 @@
 Project-specific working agreement. Anything the installed pack decides is linked rather than repeated here; what
 follows is what this project decides on top of it, and where it deviates.
 
+## Cross-package imports in the host
+
+The shell reads the devlog's build-time content through two aliases: `@devlog/content` and `@devlog/markdown`. They must
+not be spelled `posts/...`: Module Federation registers every remote under its package name, so `posts/content` resolves
+to a *remote module* (`posts` + `./content`) in a production build, and the remote does not expose it. That shipped once
+and left every page throwing `Can not find remote module ./content`. Any alias that starts with a remote name is a
+collision waiting to happen — the prerender step hides it, because the SSR config resolves the alias locally.
+
 ## Workspace linking
 
 The three game submodules declare `"shared": "*"` while the in-repo packages declare `"shared": "workspace:*"`. The root

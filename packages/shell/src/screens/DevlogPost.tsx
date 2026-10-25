@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useParams } from "react-router";
-import { loadPosts, type Post } from "posts/content";
-import { renderPostBody } from "posts/markdown";
+import { loadPosts, type Post } from "@devlog/content";
+import { renderPostBody } from "@devlog/markdown";
 import NotFound from "./NotFound";
 
 /** The collection is compiled during the build; this module-level read is the only one. */

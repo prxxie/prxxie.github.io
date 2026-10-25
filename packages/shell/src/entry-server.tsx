@@ -4,7 +4,7 @@ import { createStaticHandler, createStaticRouter, StaticRouterProvider } from "r
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createAppRoutes, games, prerenderPaths } from "./routes";
 import { ProgressServiceProvider } from "./hooks/useProgressService";
-import { loadPosts, type Post } from "posts/content";
+import { loadPosts, type Post } from "@devlog/content";
 
 export interface PrerenderedPage {
   path: string;
